@@ -1,0 +1,20 @@
+.wrapper
+	--width: 800px
+	--height: 600px
+	position: relative
+	width: var(--width)
+	height: var(--height)
+	background-color: #eee
+
+	section, div.border
+		position: absolute
+		width: 100%
+		height: 100%
+
+	div.border
+		--border: 500px
+		border: rgba(255,255,255,.85) var(--border) solid
+		box-sizing: content-box
+		top: calc(var(--border) * -1)
+		left: calc(var(--border) * -1)
+

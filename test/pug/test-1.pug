@@ -1,0 +1,18 @@
+extends base/test
+
+block append vars
+	- var title = 			'test #1'
+	- var scriptModule = 	'test-1.js'
+	- var consoleMode = 	'bottom'
+
+block style
+	style
+		include:sass test-1.sass
+
+block stage
+
+	.wrapper
+		section(style='background-color:#A5D5FF')
+		section(style='background-color:#FFE5B6')
+		section(style='background-color:#FEB0B4')
+		.border

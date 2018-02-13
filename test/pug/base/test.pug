@@ -1,0 +1,46 @@
+html
+
+	block vars
+		- var title = 'test page'
+
+	head
+		title #{title}
+		link(rel='stylesheet', type='text/css', href='/reset.css')
+		style
+			include:sass style.sass
+		if (consoleMode === 'bottom')
+			style
+				include:sass console-bottom.sass
+		block style
+
+
+	body
+		pre.console
+		div.stage
+			block stage
+
+		script.
+
+			(function(){
+
+				let consolePre = document.querySelector('pre.console')
+
+				let consoleLog = console.log
+
+				console.log = function(...args) {
+
+					consoleLog(...args)
+					consolePre.append(args.join(' ') + '\n')
+
+				}
+
+			})()
+				
+			console.log('#{title}')
+
+		if (scriptModule)
+			script(type='module').
+				import * as main from './#{scriptModule}'
+				Object.assign(window, main)
+
+		block script
