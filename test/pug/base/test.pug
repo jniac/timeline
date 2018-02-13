@@ -15,7 +15,8 @@ html
 
 
 	body
-		pre.console
+		div.console
+			pre
 		div.stage
 			block stage
 
@@ -23,14 +24,22 @@ html
 
 			(function(){
 
-				let consolePre = document.querySelector('pre.console')
+				let consolePre = document.querySelector('div.console pre')
 
 				let consoleLog = console.log
 
 				console.log = function(...args) {
 
 					consoleLog(...args)
-					consolePre.append(args.join(' ') + '\n')
+
+					let span = document.createElement('span')
+					span.innerHTML =  args.join(' ') + '\n'
+					consolePre.append(span)
+
+					if (consolePre.children.length > 120)
+						consolePre.removeChild(consolePre.firstElementChild)
+
+					consolePre.parentElement.scrollTop = consolePre.parentElement.scrollHeight
 
 				}
 
