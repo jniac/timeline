@@ -98,8 +98,13 @@ function getChildren(object, childrenDelegate, includeSelf) {
 /**
  * returns children objects matching selector
  * selector rules:
- *    'first:[str]' to match only the first result (the result will not be necessarily iterable)
- *    '[str] > [str]' to match children
+ *
+ *    • Match only the first result (the result will not be necessarily iterable)
+ *    'first:[str]' 
+ *
+ *    • Match children
+ *    '[str] > [str]' 
+ *
  */
 export function query(object, selector, { firstOnly = false, propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
 

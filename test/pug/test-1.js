@@ -37,12 +37,16 @@ for (let section of document.querySelectorAll('.wrapper section')) {
 
 }
 
-timeline.section({ position: '50%', width: 10, align: 0, })
+timeline.section({ position: '50%', width: 0, align: 0, })
+	.addTo('uid=3')
 	.on(/leave/, event => {
 
 		document.querySelector('section:nth-child(3)').style.color = event.direction === 1 ? 'white' : null
 
 	})
+
+timeline.section({ width: 200, order: -Infinity })
+timeline.section({ width: 200, order: Infinity })
 
 
 timeline.rootSection.space.resolveSpace()

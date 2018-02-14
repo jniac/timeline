@@ -11,6 +11,7 @@ const spaces = /\s/
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
  * '100%' 		> new Double(0, 1)
+ * '0 1' 		> new Double(0, 1)
  * '50 50%' 	> new Double(50, .5)
  * '50% 50%' 	> new Double(.5, .5)
  * [x, y] 		> new Double(x, y)
