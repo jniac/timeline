@@ -2,7 +2,7 @@ import { Timeline } from '../../../src/timeline.js'
 export { Timeline }
 import { query, copy } from '../../../src/query.js'
 export { query, copy } 
-import { EventHandler } from '../../../src/EventHandler.js'
+import { UIEventHandler } from '../../../src/UIEventHandler.js'
 
 export let timeline = new Timeline(800)
 
@@ -42,7 +42,14 @@ console.log(timeline.rootSection)
 console.log(timeline.currentSection)
 console.log(timeline.head)
 
-export let handler = new EventHandler(document.body)
+export let handler = new UIEventHandler(document.body)
 
 // handler.on(/^((?!-x).)*$/, event => console.log(event.type))
-handler.on(/swipe/, event => console.log(event.type))
+// handler.on(/swipe/, event => console.log(event.type))
+
+handler.on('wheel', event => {
+
+	// console.log(event.type, event.dx)
+	timeline.head.value += event.dx
+
+})

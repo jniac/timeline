@@ -167,6 +167,7 @@ class Space {
 			uid: spaceUID++,
 			localPosition: new Double(0, 0),
 			localWidth: new Double(0, 1),
+			align: new Double(0, 1), // 100% = align left, 0% = center, -100% = align right
 
 		})
 
@@ -174,7 +175,7 @@ class Space {
 
 			parent,
 			
-			globalValue: 0,
+			globalPosition: 0,
 			globalWidth: 1,
 
 			globalBoundsMin: 0,
@@ -212,38 +213,40 @@ class Space {
 
 	}
 
-	getRelative(globalValue) {
+	getRelative(value) {
 
-		return (globalValue - this.globalValue) / this.globalWidth
+		return (value - this.globalPosition) / this.globalWidth
 
 	}
 
-	resolve(value) { return this.globalValue + this.globalWidth * value.relative + value.absolute }
+	resolve(value) { return this.globalPosition + this.globalWidth * value.relative + value.absolute }
 
-	resolveValue(absoluteValue, relativeValue = 0) { return this.globalValue + this.globalWidth * relativeValue + absoluteValue }
+	resolveValue(absoluteValue, relativeValue = 0) { return this.globalPosition + this.globalWidth * relativeValue + absoluteValue }
 
 	// R stands for recursive
 	resolveR() {
 
-		let { parent, localPosition, localWidth, children } = this
-
-		let globalValue = !parent
-			? localPosition.relative + localPosition.absolute
-			: parent.globalValue + parent.globalWidth * localPosition.relative + localPosition.absolute
+		let { parent, localPosition, localWidth, align, children } = this
 
 		let globalWidth = !parent
 			? localWidth.relative + localWidth.absolute
 			: parent.globalWidth * localWidth.relative + localWidth.absolute
 
+		let alignOffset = globalWidth * (align.relative - 1) / 2 + align.absolute
+
+		let globalPosition = !parent
+			? alignOffset + localPosition.relative + localPosition.absolute
+			: alignOffset + parent.globalPosition + parent.globalWidth * localPosition.relative + localPosition.absolute
+
 		Object.assign(this, {
 
-			globalValue,
+			globalPosition,
 			globalWidth,
 
 		})
 
-		this.globalBoundsMin = this.globalValue
-		this.globalBoundsMax = this.globalValue + this.globalWidth
+		this.globalBoundsMin = globalPosition
+		this.globalBoundsMax = globalPosition + globalWidth
 
 		if (children)
 			
@@ -281,7 +284,7 @@ class Space {
 
 	contains(value) {
 
-		return value >= this.globalValue && value <= this.globalValue + this.globalWidth
+		return value >= this.globalPosition && value <= this.globalPosition + this.globalWidth
 
 	}
 
@@ -293,7 +296,7 @@ class Space {
 
 	toString() {
 
-		return `Space{#${this.uid}, d:${this.depth}, p:${this.globalValue.toFixed(1)} (${this.localPosition.toString()}), w:${this.globalWidth.toFixed(1)} (${this.localWidth.toString()}), b:[${this.globalBoundsMin.toFixed(0)},${this.globalBoundsMax.toFixed(0)}]}`
+		return `Space{#${this.uid}, d:${this.depth}, p:${this.globalPosition.toFixed(1)} (${this.localPosition.toString()}), w:${this.globalWidth.toFixed(1)} (${this.localWidth.toString()}), b:[${this.globalBoundsMin.toFixed(0)},${this.globalBoundsMax.toFixed(0)}]}`
 
 	}
 
@@ -414,7 +417,7 @@ class Section extends eventjs.EventDispatcher {
 
 	toString() {
 
-		let r = `[${this.space.globalValue}, ${this.space.globalValue + this.space.globalWidth}]`
+		let r = `[${this.space.globalPosition}, ${this.space.globalPosition + this.space.globalWidth}]`
 		let b = `[${this.space.globalBoundsMin}, ${this.space.globalBoundsMax}]`
 		let props = propsToString(copy(this.props, { exclude: 'uid' }))
 
@@ -465,7 +468,7 @@ class Head {
 			this.timeline.rootSection.walk(section => {
 
 				let relative = section.space.getRelative(value)
-				let values = { index, global: value, absolute: value - section.space.globalValue, relative, relativeClamp: clamp(relative) }
+				let values = { index, global: value, absolute: value - section.space.globalPosition, relative, relativeClamp: clamp(relative) }
 				section.updateHead(index, values)
 
 			})
@@ -534,7 +537,7 @@ export class Timeline {
 
 	update() {
 
-		this.rootSection.space.resolveR()
+		// this.rootSection.space.resolveR()
 
 		for (let head of this.heads)
 			head.update()

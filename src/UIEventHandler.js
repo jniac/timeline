@@ -1,7 +1,7 @@
 import * as eventjs from './event.js'
 import { Variable } from './variable.js'
 
-const wheelDiscreteInterval = 120
+const wheelDiscreteInterval = 120 // ms
 
 function onWheel(handler, event) {
 
@@ -50,6 +50,8 @@ function onWheel(handler, event) {
 
 		wheelSpeedSmoothX.newValue(wheelSpeedX.average.value)
 		wheelSpeedSmoothY.newValue(wheelSpeedY.average.value)
+
+		handler.dispatchEvent('wheel', { dx, dy })
 
 		if (wheelSpeedSmoothX.growth.value > 1) {
 
@@ -120,7 +122,7 @@ function mouseDown(handler, event) {
 
 }
 
-export class EventHandler extends eventjs.EventDispatcher {
+export class UIEventHandler extends eventjs.EventDispatcher {
 
 	constructor(element, options) {
 
