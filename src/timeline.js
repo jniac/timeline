@@ -36,16 +36,22 @@ let sectionUID = 0
 
 class Section extends eventjs.EventDispatcher {
 
-	constructor(parent, props = null) {
+	constructor(timeline, parent, spaceProps = null, props = null) {
 
 		super()
 
 		readonlyProperties(this, {
 
 			uid: sectionUID++,
-			space: new Space(),
+			space: new Space(spaceProps),
 			props: { ...props },
 			heads: [],
+
+		})
+
+		Object.assign(this, {
+
+			timeline,
 
 		})
 
@@ -53,8 +59,24 @@ class Section extends eventjs.EventDispatcher {
 
 		sectionMap.set(this.space, this)
 
-		if (parent)
+		if (parent) {
+			console.log(parent)
 			parent.space.addChild(this.space)
+		}
+
+	}
+
+	addTo(parent) {
+
+		if (typeof parent === 'string')
+			parent = this.timeline.query(parent)
+
+		if (Array.isArray(parent))
+			parent = parent[0]
+
+		parent.space.addChild(this.space)
+
+		return this
 
 	}
 
@@ -69,8 +91,17 @@ class Section extends eventjs.EventDispatcher {
 		return query(this, selector)[0] || null
 	}
 
-	updateHead(index, newValues) {
+	updateHead(index, headValue) {
 
+		let relative = this.space.range.ratio(headValue)
+
+		// handle the 0 / 0 case (0 / range.width)
+		if (isNaN(relative))
+			relative = 1
+
+		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative
+
+		let newValues = { index, global: headValue, absolute: headValue - this.space.range.min, relative, relativeClamp }
 		let oldValues = this.heads[index] || { index: -1, global: NaN, absolute: NaN, relative: NaN, relativeClamp: NaN }
 
 		this.heads[index] = newValues
@@ -173,9 +204,10 @@ class Head {
 			
 			this.timeline.rootSection.walk(section => {
 
-				let relative = section.space.getRelative(value)
-				let values = { index, global: value, absolute: value - section.space.range.min, relative, relativeClamp: clamp(relative) }
-				section.updateHead(index, values)
+				// let relative = section.space.getRelative(value)
+				// let values = { index, global: value, absolute: value - section.space.range.min, relative, relativeClamp: clamp(relative) }
+				// section.updateHead(index, values)
+				section.updateHead(index, value)
 
 			})
 
@@ -216,10 +248,12 @@ export class Timeline {
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootSection: this.createSection(0, rootWidth),
+			rootSection: this.createSection(null, { width: rootWidth }),
 			heads: [],
 
 		})
+
+		this.currentSection = this.rootSection
 
 		Object.assign(this, {
 
@@ -254,45 +288,38 @@ export class Timeline {
 
 	}
 
-	createSection(position, width, parent = this.rootSection, props = null) {
+	createSection(parent = this.rootSection, spaceProps, props = null) {
 
-		let section = new Section(parent, props)
-		section.space.position.set(position)
-		section.space.width.set(width)
-		section.space.resolveSpace()
+		let section = new Section(this, parent, spaceProps, props)
 
-		this.currentSection = section
+		this.lastSection = section
 
 		return section
 
 	}
 
-	appendSection(width, props = null) {
+	// appendSection(width, props = null) {
 
-		let space = this.currentSection === this.rootSection
-			? 0
-			: '100%'
+	// 	let position = this.currentSection === this.rootSection
+	// 		? 0
+	// 		: '100%'
 
-		let section = this.createSection(space, width, this.currentSection, props)
+	// 	let section = this.createSection(position, width, this.currentSection, props)
 
-		return section
+	// 	return section
 
-	}
+	// }
 
 	// shorthands (returning previous methods result)
 
 	query(selector) { return this.rootSection.query(selector) }
 	queryFirst(selector) { return this.rootSection.queryFirst(selector) }
 
-	section({ position, min, max, width }) {
+	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0 }) {
 
-		let props = copy(arguments[0], { recursive: false, exclude: 'position, min, max, width' })
+		let props = copy(arguments[0], { recursive: false, exclude: 'position, width, align, order' })
 
-		if (position && width !== undefined)
-			return this.createSection(position, width, this.currentSection, props)
-
-		if (width)
-			return this.appendSection(width, props)
+		return this.createSection(this.currentSection, { position, width, align, order }, props)
 
 		return null
 
