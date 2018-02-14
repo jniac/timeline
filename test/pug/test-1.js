@@ -41,8 +41,6 @@ timeline.rootSection.space.resolveR()
 timeline.head.value = 0
 
 timeline.rootSection.walk(section => console.log(section.space + ''))
-// console.log(timeline.rootSection)
-// console.log(timeline.currentSection)
 console.log(timeline.head)
 
 export let handler = new UIEventHandler(document.body)
@@ -54,6 +52,8 @@ handler.on('wheel', event => {
 
 	// console.log(event.type, event.dx)
 	timeline.head.value += event.dx
+
+	timelineCanvas.draw()
 
 })
 

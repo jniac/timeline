@@ -92,10 +92,14 @@ export class TimelineCanvas {
 		let scale = (width / ratio - 2 * margin) / space.bounds.width
 		let x = margin + space.range.min * scale
 
-		space.walk(space => {
+		timeline.rootSection.walk(section => {
 
+			let space = section.space
 			let y = 20 + 20 * space.depth
 			drawSpace(space, x, y, scale)
+
+			for (let head of section.heads)
+				lineV(1, x + head.global * scale, y, 10)
 
 		})
 
