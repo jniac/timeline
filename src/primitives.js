@@ -3,9 +3,10 @@ const percent = /%/
 const spaces = /\s/
 
 /**
+ *
  * Double
  * 
- * Most of the lines are about parsing input values
+ * Most of the lines are about parsing input values:
  * 
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
@@ -106,11 +107,31 @@ export class Double {
 
 }
 
+
+
+
+/** Class representing an interval [min, max] */
+
 export class Range {
 
-	constructor(min, max) {
+	constructor(min = 0, max = 1) {
 
 		Object.assign(this, { min, max })
+
+	}
+
+	copy(other) {
+
+		this.min = min
+		this.max = max
+
+		return this
+
+	}
+
+	clone() {
+
+		return new Range(this.min, this.max)
 
 	}
 
@@ -120,19 +141,48 @@ export class Range {
 
 	}
 
-	interpolate(x) {
+	/**
+	 * interpolate a value to local bound
+	 * @param {number} x the ratio, if x = 0: interpolate(x) = min, if x = 1: interpolate(x) = max
+	 * @param {boolean} clamp should the result be clamp to [min, max]?
+	 */
+	interpolate(x, clamp = false) {
+
+		if (clamp)
+			x = x < 0 ? 0 : x > 1 ? 1 : x
 
 		return this.min + (this.max - this.min) * x
+
+	}
+
+	/**
+	 * return the ratio of x inside the range
+	 * @param {number} x the value, if x = min: interpolate(x) = 0, if x = max: interpolate(x) = 1
+	 * @param {boolean} clamp should the result be clamp to [0, 1]?
+	 */
+	ratio(x, clamp = false) {
+
+		if (clamp) {
+
+			if (x < this.min)
+				return 0
+
+			if (x > this.max)
+				return 1
+
+		}
+
+		return (x - this.min) / (this.max - this.min)
 
 	}
 
 	get width() { return this.max - this.min }
 	set width(value) { this.max = this.min + value }
 
-	toString(type) {
+	toString(type = null) {
 
 		if (type === 1)
-			return this.min.toFixed(0) + '|' + this.max.toFixed(0)
+			return this.min.toFixed(0) + '~' + this.max.toFixed(0)
 
 		return '[' + this.min.toFixed(1) + ', ' + this.max.toFixed(1) + ']'
 

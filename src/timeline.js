@@ -6,8 +6,6 @@ import { Double, Range } from './primitives.js'
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 
-// Utils
-
 let now = typeof performance === 'object' 
 	? performance.now.bind(performance)
 	: Date.now.bind(Date)
@@ -102,8 +100,10 @@ class Space {
 
 	resolveValue(absoluteValue, relativeValue = 0) { return this.range.min + this.range.width * relativeValue + absoluteValue }
 
-	// R stands for recursive
-	resolveR() {
+	/**
+	 * recursive
+	 */
+	resolveSpace() {
 
 		let { range, parent, position, width, align, children } = this
 
@@ -126,7 +126,7 @@ class Space {
 			
 			for (let space of children) {
 				
-				space.resolveR()
+				space.resolveSpace()
 
 				if (this.bounds.min > space.bounds.min)
 					this.bounds.min = space.bounds.min
@@ -250,30 +250,42 @@ class Section extends eventjs.EventDispatcher {
 		return query(this, selector)[0] || null
 	}
 
-	updateHead(index, values) {
+	updateHead(index, newValues) {
 
 		let oldValues = this.heads[index] || { index: -1, global: NaN, absolute: NaN, relative: NaN, relativeClamp: NaN }
 
-		this.heads[index] = values
+		this.heads[index] = newValues
 
-		let wasInside = oldValues.relative >= 0 && oldValues.relative <= 1
-		let isInside = values.relative >= 0 && values.relative <= 1
+		let old_r = 		oldValues.relative
+		let new_r = 		newValues.relative
+		let direction = 	old_r < new_r ? 1 : -1
 
-		let stayInside = wasInside && isInside
-		let enter = !wasInside && isInside
-		let exit = wasInside && !isInside
+		// flags:
+
+		let wasInside = 	old_r >= 0 && old_r <= 1
+		let isInside = 		new_r >= 0 && new_r <= 1
+
+		let stayInside = 	wasInside && isInside
+		let enter = 		!wasInside && isInside
+		let exit = 			wasInside && !isInside
+
+		let leave = 		old_r <= 1 && new_r > 1 ||
+							old_r >= 0 && new_r < 0
 
 		if (isNaN(oldValues.global))
-			this.dispatchEvent(`init-head${index}`, { values, oldValues })
+			this.dispatchEvent(`init-head${index}`, { values:newValues, oldValues, direction })
 
 		if (enter)
-			this.dispatchEvent(`enter-head${index}`, { values, oldValues })
+			this.dispatchEvent(`enter-head${index}`, { values:newValues, oldValues, direction })
 
 		if (exit)
-			this.dispatchEvent(`exit-head${index}`, { values, oldValues })
+			this.dispatchEvent(`exit-head${index}`, { values:newValues, oldValues, direction })
 
 		if (isInside)
-			this.dispatchEvent(`inside-head${index}`, { values, oldValues })
+			this.dispatchEvent(`inside-head${index}`, { values:newValues, oldValues, direction })
+
+		if (leave)
+			this.dispatchEvent(`leave-head${index}`, { values:newValues, oldValues, direction })
 
 	}
 
@@ -414,7 +426,7 @@ export class Timeline {
 
 		let t = now()
 
-		this.rootSection.space.resolveR()
+		this.rootSection.space.resolveSpace()
 
 		for (let head of this.heads)
 			head.update()
@@ -423,12 +435,12 @@ export class Timeline {
 
 	}
 
-	createSection(space, width, parent = this.rootSection, props = null) {
+	createSection(position, width, parent = this.rootSection, props = null) {
 
 		let section = new Section(parent, props)
-		section.space.position.set(space)
+		section.space.position.set(position)
 		section.space.width.set(width)
-		section.space.resolveR()
+		section.space.resolveSpace()
 
 		this.currentSection = section
 
@@ -453,11 +465,14 @@ export class Timeline {
 	query(selector) { return this.rootSection.query(selector) }
 	queryFirst(selector) { return this.rootSection.queryFirst(selector) }
 
-	section({ min, max, width }) {
+	section({ position, min, max, width }) {
 
-		let props = copy(arguments[0], { recursive: false, exclude: 'min, max, width' })
+		let props = copy(arguments[0], { recursive: false, exclude: 'position, min, max, width' })
 
-		if (min === undefined && width)
+		if (position && width !== undefined)
+			return this.createSection(position, width, this.currentSection, props)
+
+		if (width)
 			return this.appendSection(width, props)
 
 		return null

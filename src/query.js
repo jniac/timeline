@@ -95,7 +95,13 @@ function getChildren(object, childrenDelegate, includeSelf) {
 
 }
 
-export function query(object, selector, { propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
+/**
+ * returns children objects matching selector
+ * selector rules:
+ *    'first:[str]' to match only the first result (the result will not be necessarily iterable)
+ *    '[str] > [str]' to match children
+ */
+export function query(object, selector, { firstOnly = false, propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
 
 	if (typeof propsDelegate === 'string') {
 
@@ -108,6 +114,13 @@ export function query(object, selector, { propsDelegate = 'props', childrenDeleg
 
 		let key = childrenDelegate
 		childrenDelegate = object => object[key]
+
+	}
+
+	if (selector.indexOf('first:') === 0) {
+
+		firstOnly = true
+		selector = selector.slice(6)
 
 	}
 
@@ -145,7 +158,7 @@ export function query(object, selector, { propsDelegate = 'props', childrenDeleg
 
 	}
 
-	return array
+	return firstOnly ? array[0] || null : array
 
 }
 

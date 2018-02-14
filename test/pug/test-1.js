@@ -37,7 +37,15 @@ for (let section of document.querySelectorAll('.wrapper section')) {
 
 }
 
-timeline.rootSection.space.resolveR()
+timeline.section({ position: '50%', width: 10, align: 0, })
+	.on(/leave/, event => {
+
+		document.querySelector('section:nth-child(3)').style.color = event.direction === 1 ? 'white' : null
+
+	})
+
+
+timeline.rootSection.space.resolveSpace()
 timeline.head.value = 0
 
 timeline.rootSection.walk(section => console.log(section.space + ''))
