@@ -5,6 +5,7 @@
 	width: var(--width)
 	height: var(--height)
 	background-color: #eee
+	z-index: -1
 
 	overflow: visible
 
@@ -22,7 +23,8 @@
 	div.border
 		--border: 500px
 		border: rgba(255,255,255,.85) var(--border) solid
-		box-sizing: content-box
+		width: calc(100% + 2 * var(--border))
+		height: calc(100% + 2 * var(--border))
 		top: calc(var(--border) * -1)
 		left: calc(var(--border) * -1)
 
