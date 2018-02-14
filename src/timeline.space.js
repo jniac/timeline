@@ -1,5 +1,15 @@
 import { Double, Range } from './primitives.js'
-import { now, readonlyProperties, clamp } from './timeline.utils.js'
+import { now, readonlyProperties, clamp, makeEnum } from './timeline.utils.js'
+
+
+
+
+
+const LayoutEnum = makeEnum(
+	'ABSOLUTE', 
+	'STACK',
+	// 'FLOAT',
+)
 
 
 
@@ -9,25 +19,33 @@ let spaceUID = 0
 
 export class Space {
 
-	constructor(parent = null) {
+	constructor({ position = 0, width = '100%', align = '100%', order = 0 } = {}) {
 
 		readonlyProperties(this, {
 
 			uid: spaceUID++,
-			position: new Double(0, 0),
-			width: new Double(0, 1),
-			align: new Double(0, 1), // 100% = align left, 0% = center, -100% = align right
 
 			range: new Range(0, 1),
 			bounds: new Range(0, 0),
+
+			// design
+			position: new Double().set(position),
+			width: new Double().set(width),
+			align: new Double().set(align), // 100% = align left, 0% = center, -100% = align right
 
 		})
 
 		Object.assign(this, {
 
-			parent,
-			
-			children: null,
+			// design
+			layout: LayoutEnum.STACK,
+			order,
+
+			// hierarchy
+			parent: null,
+			index: -1,
+			children: [],
+			floatChildren: [],
 
 		})
 
@@ -37,10 +55,11 @@ export class Space {
 
 	addChild(child) {
 
-		if (!this.children)
-			this.children = []
+		if (child.parent)
+			child.parent.removeChild(child)
 
 		child.parent = this
+		child.index = this.children.length
 		this.children.push(child)
 
 		return this
@@ -53,6 +72,7 @@ export class Space {
 			throw 'child argument is not a child of this'
 
 		child.parent = null
+		child.index = -1
 		this.children.splice(this.children.indexOf(child), 1)
 
 		return this
@@ -72,7 +92,7 @@ export class Space {
 	/**
 	 * recursive
 	 */
-	resolveSpace() {
+	resolveSpace(offset = 0) {
 
 		let { range, parent, position, width, align, children } = this
 
@@ -83,27 +103,35 @@ export class Space {
 		let alignOffset = range.width * (align.relative - 1) / 2 + align.absolute
 
 		range.min = !parent
-			? alignOffset + position.relative + position.absolute
-			: alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
+			? offset + alignOffset + position.relative + position.absolute
+			: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
 
 		range.width = rangeWidth
 
 		this.bounds.min = range.min
 		this.bounds.max = range.max
 
-		if (children)
+		// children:
+
+		children.sort((a, b) => a.order - b.order || a.index - b.index)
+
+		let childOffset = 0
+		this.floatChildren.length = 0
+
+		for (let child of children) {
 			
-			for (let space of children) {
-				
-				space.resolveSpace()
+			child.resolveSpace(childOffset)
 
-				if (this.bounds.min > space.bounds.min)
-					this.bounds.min = space.bounds.min
+			if (child.layout === LayoutEnum.STACK)
+				childOffset += child.range.width
 
-				if (this.bounds.max < space.bounds.max)
-					this.bounds.max = space.bounds.max
+			if (this.bounds.min > child.bounds.min)
+				this.bounds.min = child.bounds.min
 
-			}
+			if (this.bounds.max < child.bounds.max)
+				this.bounds.max = child.bounds.max
+
+		}
 
 		return this
 
@@ -113,9 +141,8 @@ export class Space {
 
 		callback(this)
 
-		if (this.children)
-			for (let child of this.children)
-				child.walk(callback)
+		for (let child of this.children)
+			child.walk(callback)
 
 		return this
 
@@ -133,7 +160,7 @@ export class Space {
 
 	toString() {
 
-		return `Space#${this.uid} { d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)} }`
+		return `Space#${this.uid}{ ${this.layout} d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)} }`
 
 	}
 
