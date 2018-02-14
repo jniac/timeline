@@ -7,6 +7,10 @@ import query, { copy, propsToString } from './query.js'
 
 // Utils
 
+let now = typeof performance === 'object' 
+	? performance.now.bind(performance)
+	: Date.now.bind(Date)
+
 const readonlyProperties = (target, properties, options = {}) => {
 
 	for (let [key, value] of Object.entries(properties))
@@ -154,6 +158,40 @@ export class Double {
 
 }
 
+export class Range {
+
+	constructor(min, max) {
+
+		Object.assign(this, { min, max })
+
+	}
+
+	contains(x) {
+
+		return x >= this.min && x <= this.max
+
+	}
+
+	interpolate(x) {
+
+		return this.min + (this.max - this.min) * x
+
+	}
+
+	get width() { return this.max - this.min }
+	set width(value) { this.max = this.min + value }
+
+	toString(type) {
+
+		if (type === 1)
+			return this.min.toFixed(0) + '|' + this.max.toFixed(0)
+
+		return '[' + this.min.toFixed(1) + ', ' + this.max.toFixed(1) + ']'
+
+	}
+
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 
 let spaceUID = 0
@@ -165,21 +203,18 @@ class Space {
 		readonlyProperties(this, {
 
 			uid: spaceUID++,
-			localPosition: new Double(0, 0),
-			localWidth: new Double(0, 1),
+			position: new Double(0, 0),
+			width: new Double(0, 1),
 			align: new Double(0, 1), // 100% = align left, 0% = center, -100% = align right
+
+			range: new Range(0, 1),
+			bounds: new Range(0, 0),
 
 		})
 
 		Object.assign(this, {
 
 			parent,
-			
-			globalPosition: 0,
-			globalWidth: 1,
-
-			globalBoundsMin: 0,
-			globalBoundsMax: 0,
 			
 			children: null,
 
@@ -215,38 +250,33 @@ class Space {
 
 	getRelative(value) {
 
-		return (value - this.globalPosition) / this.globalWidth
+		return (value - this.range.min) / this.range.width
 
 	}
 
-	resolve(value) { return this.globalPosition + this.globalWidth * value.relative + value.absolute }
+	resolve(value) { return this.range.min + this.range.width * value.relative + value.absolute }
 
-	resolveValue(absoluteValue, relativeValue = 0) { return this.globalPosition + this.globalWidth * relativeValue + absoluteValue }
+	resolveValue(absoluteValue, relativeValue = 0) { return this.range.min + this.range.width * relativeValue + absoluteValue }
 
 	// R stands for recursive
 	resolveR() {
 
-		let { parent, localPosition, localWidth, align, children } = this
+		let { range, parent, position, width, align, children } = this
 
-		let globalWidth = !parent
-			? localWidth.relative + localWidth.absolute
-			: parent.globalWidth * localWidth.relative + localWidth.absolute
+		let rangeWidth = !parent
+			? width.relative + width.absolute
+			: parent.range.width * width.relative + width.absolute
 
-		let alignOffset = globalWidth * (align.relative - 1) / 2 + align.absolute
+		let alignOffset = range.width * (align.relative - 1) / 2 + align.absolute
 
-		let globalPosition = !parent
-			? alignOffset + localPosition.relative + localPosition.absolute
-			: alignOffset + parent.globalPosition + parent.globalWidth * localPosition.relative + localPosition.absolute
+		range.min = !parent
+			? alignOffset + position.relative + position.absolute
+			: alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
 
-		Object.assign(this, {
+		range.width = rangeWidth
 
-			globalPosition,
-			globalWidth,
-
-		})
-
-		this.globalBoundsMin = globalPosition
-		this.globalBoundsMax = globalPosition + globalWidth
+		this.bounds.min = range.min
+		this.bounds.max = range.max
 
 		if (children)
 			
@@ -254,11 +284,11 @@ class Space {
 				
 				space.resolveR()
 
-				if (this.globalBoundsMin > space.globalBoundsMin)
-					this.globalBoundsMin = space.globalBoundsMin
+				if (this.bounds.min > space.bounds.min)
+					this.bounds.min = space.bounds.min
 
-				if (this.globalBoundsMax < space.globalBoundsMax)
-					this.globalBoundsMax = space.globalBoundsMax
+				if (this.bounds.max < space.bounds.max)
+					this.bounds.max = space.bounds.max
 
 			}
 
@@ -284,7 +314,7 @@ class Space {
 
 	contains(value) {
 
-		return value >= this.globalPosition && value <= this.globalPosition + this.globalWidth
+		return value >= this.range.min && value <= this.range.min + this.range.width
 
 	}
 
@@ -296,7 +326,7 @@ class Space {
 
 	toString() {
 
-		return `Space{#${this.uid}, d:${this.depth}, p:${this.globalPosition.toFixed(1)} (${this.localPosition.toString()}), w:${this.globalWidth.toFixed(1)} (${this.localWidth.toString()}), b:[${this.globalBoundsMin.toFixed(0)},${this.globalBoundsMax.toFixed(0)}]}`
+		return `Space#${this.uid} { d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)} }`
 
 	}
 
@@ -417,8 +447,8 @@ class Section extends eventjs.EventDispatcher {
 
 	toString() {
 
-		let r = `[${this.space.globalPosition}, ${this.space.globalPosition + this.space.globalWidth}]`
-		let b = `[${this.space.globalBoundsMin}, ${this.space.globalBoundsMax}]`
+		let r = `[${this.space.range.min}, ${this.space.range.min + this.space.range.width}]`
+		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`
 		let props = propsToString(copy(this.props, { exclude: 'uid' }))
 
 		return `Section#${this.uid}{ props: ${props}, r: ${r}, b: ${b} }`
@@ -431,6 +461,7 @@ class Head {
 
 	constructor(timeline) {
 
+		this.color = 'red'
 		this.timeline = timeline
 		this._value = NaN
 		this._valueOld = NaN
@@ -468,7 +499,7 @@ class Head {
 			this.timeline.rootSection.walk(section => {
 
 				let relative = section.space.getRelative(value)
-				let values = { index, global: value, absolute: value - section.space.globalPosition, relative, relativeClamp: clamp(relative) }
+				let values = { index, global: value, absolute: value - section.space.range.min, relative, relativeClamp: clamp(relative) }
 				section.updateHead(index, values)
 
 			})
@@ -537,18 +568,22 @@ export class Timeline {
 
 	update() {
 
-		// this.rootSection.space.resolveR()
+		let t = now()
+
+		this.rootSection.space.resolveR()
 
 		for (let head of this.heads)
 			head.update()
+
+		let dt = now() - t
 
 	}
 
 	createSection(space, width, parent = this.rootSection, props = null) {
 
 		let section = new Section(parent, props)
-		section.space.localPosition.set(space)
-		section.space.localWidth.set(width)
+		section.space.position.set(space)
+		section.space.width.set(width)
 		section.space.resolveR()
 
 		this.currentSection = section

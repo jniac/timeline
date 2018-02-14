@@ -4,6 +4,8 @@ import { query, copy } from '../../../src/query.js'
 export { query, copy } 
 import { UIEventHandler } from '../../../src/UIEventHandler.js'
 
+import { TimelineCanvas } from '../../../src/timeline.canvas.js'
+
 export let timeline = new Timeline(800)
 
 /*
@@ -38,8 +40,9 @@ for (let section of document.querySelectorAll('.wrapper section')) {
 timeline.rootSection.space.resolveR()
 timeline.head.value = 0
 
-console.log(timeline.rootSection)
-console.log(timeline.currentSection)
+timeline.rootSection.walk(section => console.log(section.space + ''))
+// console.log(timeline.rootSection)
+// console.log(timeline.currentSection)
 console.log(timeline.head)
 
 export let handler = new UIEventHandler(document.body)
@@ -53,3 +56,15 @@ handler.on('wheel', event => {
 	timeline.head.value += event.dx
 
 })
+
+
+
+
+
+
+export let timelineCanvas = new TimelineCanvas(timeline)
+timelineCanvas.draw()
+
+document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
+
+
