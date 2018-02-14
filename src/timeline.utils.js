@@ -19,21 +19,30 @@ class EnumKey {
 
 }
 
-export function makeEnum(...keys) {
+export class Enum {
 
-	let object = {}
+	constructor(...keys) {
+		
+		for (let [index, key] of keys.entries()) {
 
-	for (let [index, key] of keys.entries()) {
+			Object.defineProperty(this, key, {
 
-		Object.defineProperty(object, key, {
+				value: new EnumKey({ name:key, index, enum:this }),
+				enumerable: true,
 
-			value: new EnumKey({ name:key, index, object }),
-			enumerable: true,
+			})
 
-		})
+		}
+
+		Object.freeze(this)
 
 	}
 
-	return Object.freeze(object)
+	*[Symbol.iterator]() {
+
+		for (let key of Object.keys(this))
+			yield this[key]
+
+	}
 
 }

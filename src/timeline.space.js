@@ -1,11 +1,11 @@
 import { Double, Range } from './primitives.js'
-import { now, readonlyProperties, clamp, makeEnum } from './timeline.utils.js'
+import { now, readonlyProperties, clamp, Enum } from './timeline.utils.js'
 
 
 
 
 
-const LayoutEnum = makeEnum(
+const LayoutEnum = new Enum(
 	'ABSOLUTE', 
 	'STACK',
 	// 'FLOAT',
@@ -160,7 +160,7 @@ export class Space {
 
 	toString() {
 
-		return `Space#${this.uid}{ ${this.layout} d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)} }`
+		return `Space#${this.uid} {${this.layout} d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)}}`
 
 	}
 
