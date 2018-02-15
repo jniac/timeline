@@ -4,6 +4,16 @@
 
 **Renamed inside event to 'progress':**  
 inside is not as meaningfull as progress
+```javascript
+section.on(/progress/, event => myDiv.style.opacity = event.progress)
+```
+
+**Renamed leave event to 'pass':**  
+'leave' introduces the idea of being inside before leaving, 'pass' is more generic  
+The leave/pass event is fired when leaving a section as well as passing over the section. Usage: before that section that variable should be in that state, after in that other state, example:
+```javascript
+section.on(/pass/, event => myState.myVar = event.direction === 1 ? 'beyond' : 'below') 
+```
 
 ---
 
@@ -40,6 +50,6 @@ It should be very easy to watch local progression, resizing, etc.
 ```javascript
 section.on(/exit/, event => { ...do something }
 ```
-- **Multiple heads:**  
+- **Multiple heads:**  <br/>
 *Not currently* seeing usages of such a feature, but in order to be future proof as much as possible, current position will not be unique (as can be seen actual web scroll position). A position in the timeline will be named **Head**, and `Timeline` instances will accept any arbitrary number of heads. 
 
