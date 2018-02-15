@@ -121,6 +121,12 @@ export class Range {
 
 	}
 
+	isVoid() {
+
+		return isNaN(this.min) || isNaN(this.max)
+
+	}
+
 	copy(other) {
 
 		this.min = other.min
@@ -133,6 +139,21 @@ export class Range {
 	clone() {
 
 		return new Range(this.min, this.max)
+
+	}
+
+	intersects(other) {
+
+		return !(other.max < this.min || other.min > this.max)
+		
+	}
+
+	intersection(other) {
+
+		if (!this.intersects(other))
+			return new Range(NaN, NaN)
+
+		return new Range(Math.max(this.min, other.min), Math.min(this.max, other.max))
 
 	}
 
@@ -190,3 +211,9 @@ export class Range {
 	}
 
 }
+
+let A = new Range(1, 2)
+let B = new Range(2.5, 3)
+// let B = new Range(NaN, NaN)
+
+console.log(A.intersection(B).isVoid())
