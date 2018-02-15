@@ -11,7 +11,7 @@ Section term will be reserved to portions of timeline (`Division` instances) tha
 ### Added physics to Head
 `position`, `velocity`, `friction` are set simulate the movement of a Mobile.
 ```javascript
-// integrals to accurate position update:
+// integrals for accurate position updates:
 position += velocity * (friction ** dt - 1) / Math.log(friction)
 
 // key feature: anticipate destination with
