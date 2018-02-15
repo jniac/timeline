@@ -2,6 +2,12 @@
 
 # Thu Feb 15 2018
 
+**Renamed Section to 'Division':**  
+The sense of *division* is more neutral than *section*, refers to more simple objects.  
+Section term will be reserved to portions of timeline (`Division` instances) that have to 'hold' `Head` instances when the timeline is being altered (because of element resizing or removing).`
+
+---
+
 ### Added physics to Head
 `position`, `velocity`, `friction` are set simulate the movement of a Mobile.
 ```javascript
