@@ -1,6 +1,6 @@
 
 /**
- * class to simulate a the movement of a Mobile from 2 variables:
+ * Class to simulate the movement of a Mobile from 2 variables:
  * • velocity
  * • friction
  *
@@ -14,8 +14,8 @@ class Mobile {
 
 			// classic physic properties
 			position: 0,
-			velocity: 0,
-			friction: .1, 	// WARN: inversed expression, friction represent the remaining part of velocity after 1 second
+			velocity: 0,	// px / s
+			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
 
 			hasMoved: false,
 			positionOld: 0,
@@ -23,8 +23,8 @@ class Mobile {
 			
 			// target
 			forcedPosition: NaN,
-			target: NaN,
-			computedFriction: .1,
+			// target: NaN,
+			// computedFriction: .1,
 
 		})
 
@@ -57,6 +57,14 @@ class Mobile {
 
 	}
 
+	setPosition(value, { computeVelocity = true, dt = 1 / 60 } = {}) {
+
+		let d = value - this.positionOld
+		this.position = value
+		this.velocity = d ** (1 / dt)
+
+	}
+
 	/**
 	 * F*** powerful, i can't remind how it works, but it works!
 	 */
@@ -80,7 +88,28 @@ class Mobile {
 
 	get destination() { return this.getDestination() }
 
+	shoot(destination) {
+
+		this.velocity = this.getVelocityForDestination(destination)
+
+		return this
+
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+/**
+ * Extends Mobile to add Timeline integration.
+ */
 
 export class Head extends Mobile {
 

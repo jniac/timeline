@@ -53,6 +53,14 @@ export class Section extends eventjs.EventDispatcher {
 
 	}
 
+	remove() {
+
+		this.space.remove()
+
+		return this
+
+	}
+
 	query(selector) {
 
 		return query(this, selector)

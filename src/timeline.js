@@ -57,6 +57,8 @@ export class Timeline {
 
 		let dt = now() - t
 
+		this.updateCost = dt
+
 	}
 
 	createSection(parent = this.rootSection, spaceProps, props = null) {

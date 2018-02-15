@@ -28,7 +28,7 @@ export let timeline = new Timeline(800)
 
 for (let section of document.querySelectorAll('.wrapper section')) {
 
-	timeline.section({ width: '100%', section })
+	timeline.section({ width: '100%', section, page: true })
 
 		.on(/init|progress/, event => {
 

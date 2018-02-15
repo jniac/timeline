@@ -86,6 +86,15 @@ export class Space {
 
 	}
 
+	remove() {
+
+		if (this.parent)
+			this.parent.removeChild(this)
+
+		return this
+
+	}
+
 	getFixedParent() {
 
 		let parent = this.parent
