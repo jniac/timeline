@@ -2,8 +2,10 @@
 
 ## Thu Feb 15 2018
 
-### Renamed inside event to 'progress'
-inside is not as meaningfull as progress
+#### Renamed inside event to 'progress'
+*inside is not as meaningfull as progress*
+
+---
 
 - **[Reminder] Head**  
 `Head` instances must be 'clipped' to relevant `Section` (in order to resize parent section (responsive) or remove preceding section without having `Head` instances jumping or sliding through current section, (global position should be as meaningless as possible))
