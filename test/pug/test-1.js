@@ -5,6 +5,8 @@ export { query, copy }
 import { UIEventHandler } from '../../../src/UIEventHandler.js'
 
 import { TimelineCanvas } from '../../../src/timeline.canvas.js'
+import { bench } from '../../../src/bench.js'
+export { bench }
 
 export let timeline = new Timeline(800)
 
@@ -47,6 +49,12 @@ timeline.section({ position: '50%', width: 0, align: 0, })
 
 timeline.section({ width: 200, order: -Infinity })
 timeline.section({ width: 200, order: Infinity })
+
+timeline.section({ name: 'exp', expand: 'EXPANDABLE' })
+timeline.section({ parent: 'first:name=exp' })
+timeline.section({ parent: 'first:name=exp', name:'foo', width: '200%' })
+
+timeline.section({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })
 
 
 timeline.rootSection.space.resolveSpace()

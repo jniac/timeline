@@ -13,7 +13,7 @@ export const clamp = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x
 
 class EnumKey {
 
-	constructor(props) { readonlyProperties(this, props) }
+	constructor(props) { Object.freeze(Object.assign(this, props)) }
 
 	toString() { return this.name }
 
@@ -38,11 +38,15 @@ export class Enum {
 
 	}
 
+	has(key) { return this[key] === key }
+
 	*[Symbol.iterator]() {
 
 		for (let key of Object.keys(this))
 			yield this[key]
 
 	}
+
+	toString() { return [...this].join(', ') }
 
 }

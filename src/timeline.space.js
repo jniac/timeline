@@ -6,11 +6,17 @@ import { now, readonlyProperties, clamp, Enum } from './timeline.utils.js'
 
 
 const LayoutEnum = new Enum(
-	'ABSOLUTE', 
-	'STACK',
-	// 'FLOAT',
+
+	'ABSOLUTE', 		// only position define space global position
+	'STACKED',			// position is affected by index in children array
 )
 
+const ExpandEnum = new Enum(
+
+	'FIXED',			// width is fixed (from 'width' property)
+	'EXPANDABLE',		// width is computed from content
+
+)
 
 
 
@@ -19,7 +25,7 @@ let spaceUID = 0
 
 export class Space {
 
-	constructor({ position = 0, width = '100%', align = '100%', order = 0 } = {}) {
+	constructor({ position = 0, width = '100%', align = '100%', order = 0, layout, expand } = {}) {
 
 		readonlyProperties(this, {
 
@@ -38,7 +44,8 @@ export class Space {
 		Object.assign(this, {
 
 			// design
-			layout: LayoutEnum.STACK,
+			layout: LayoutEnum[layout] || LayoutEnum.STACKED,
+			expand: ExpandEnum[expand] || ExpandEnum.FIXED,
 			order,
 
 			// hierarchy
@@ -79,11 +86,22 @@ export class Space {
 
 	}
 
-	getRelative(value) {
+	getFixedParent() {
 
-		return (value - this.range.min) / this.range.width
+		let parent = this.parent
+
+		while(parent && parent.expand !== ExpandEnum.FIXED)
+			parent = parent.parent
+
+		return parent
 
 	}
+
+	// getRelative(value) {
+
+	// 	return (value - this.range.min) / this.range.width
+
+	// }
 
 	resolve(value) { return this.range.min + this.range.width * value.relative + value.absolute }
 
@@ -94,13 +112,15 @@ export class Space {
 	 */
 	resolveSpace(offset = 0) {
 
-		let { range, parent, position, width, align, children } = this
+		let { parent, range, position, width, align, children } = this
 
-		let rangeWidth = !parent
+		let fixedParent = this.getFixedParent()
+
+		let rangeWidth = !fixedParent
 			? width.relative + width.absolute
-			: parent.range.width * width.relative + width.absolute
+			: fixedParent.range.width * width.relative + width.absolute
 
-		let alignOffset = range.width * (align.relative - 1) / 2 + align.absolute
+		let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute
 
 		range.min = !parent
 			? offset + alignOffset + position.relative + position.absolute
@@ -108,8 +128,7 @@ export class Space {
 
 		range.width = rangeWidth
 
-		this.bounds.min = range.min
-		this.bounds.max = range.max
+		this.bounds.copy(this.range)
 
 		// children:
 
@@ -122,7 +141,7 @@ export class Space {
 			
 			child.resolveSpace(childOffset)
 
-			if (child.layout === LayoutEnum.STACK)
+			if (child.layout === LayoutEnum.STACKED)
 				childOffset += child.range.width
 
 			if (this.bounds.min > child.bounds.min)
@@ -132,6 +151,9 @@ export class Space {
 				this.bounds.max = child.bounds.max
 
 		}
+
+		if (this.expand === ExpandEnum.EXPANDABLE)
+			this.range.copy(this.bounds)
 
 		return this
 

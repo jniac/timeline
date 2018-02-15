@@ -86,10 +86,10 @@ class Section extends eventjs.EventDispatcher {
 
 	}
 
-	queryFirst(selector) {
+	// queryFirst(selector) {
 
-		return query(this, selector)[0] || null
-	}
+	// 	return query(this, selector)[0] || null
+	// }
 
 	updateHead(index, headValue) {
 
@@ -157,7 +157,7 @@ class Section extends eventjs.EventDispatcher {
 		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`
 		let props = propsToString(copy(this.props, { exclude: 'uid' }))
 
-		return `Section#${this.uid}{ props: ${props}, r: ${r}, b: ${b} }`
+		return `Section#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
 
 	}
 
@@ -313,13 +313,22 @@ export class Timeline {
 	// shorthands (returning previous methods result)
 
 	query(selector) { return this.rootSection.query(selector) }
-	queryFirst(selector) { return this.rootSection.queryFirst(selector) }
+	// queryFirst(selector) { return this.rootSection.queryFirst(selector) }
 
-	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0 }) {
+	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
 
-		let props = copy(arguments[0], { recursive: false, exclude: 'position, width, align, order' })
+		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, expand' })
 
-		return this.createSection(this.currentSection, { position, width, align, order }, props)
+		if (typeof parent === 'string')
+			parent = this.query(parent)
+
+		if (Array.isArray(parent))
+			parent = parent[0]
+
+		if (!parent)
+			parent = this.currentSection
+
+		return this.createSection(parent, { position, width, align, order, expand }, props)
 
 		return null
 
