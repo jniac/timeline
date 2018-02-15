@@ -13,9 +13,11 @@ import { now, readonlyProperties, clamp } from './timeline.utils.js'
 let timelines = []
 let timelineUID = 0
 
-export class Timeline {
+export class Timeline extends eventjs.EventDispatcher {
 
 	constructor(rootWidth = 1) {
+
+		super()
 
 		readonlyProperties(this, {
 
@@ -60,7 +62,7 @@ export class Timeline {
 
 		this.updateCost = dt
 
-		
+		this.dispatchEvent('update')
 
 	}
 
@@ -74,7 +76,7 @@ export class Timeline {
 
 	}
 
-	// shorthands (returning previous methods result)
+	// shorthands
 
 	query(selector) { return this.rootSection.query(selector) }
 

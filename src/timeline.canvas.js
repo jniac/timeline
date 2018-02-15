@@ -70,6 +70,8 @@ export class TimelineCanvas {
 
 		})
 
+		timeline.on('update', event => this.draw())
+
 	}
 
 	draw() {
