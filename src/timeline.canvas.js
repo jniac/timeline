@@ -90,17 +90,17 @@ export class TimelineCanvas {
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
 
 		let margin = 10
-		let space = timeline.rootSection.space
+		let space = timeline.rootDivision.space
 		let scale = (width / ratio - 2 * margin) / space.bounds.width
 		let x = margin + space.range.min * scale
 
-		timeline.rootSection.walk(section => {
+		timeline.rootDivision.walk(division => {
 
-			let space = section.space
+			let space = division.space
 			let y = 20 + 20 * space.depth
 			drawSpace(space, x, y, scale)
 
-			for (let head of section.heads)
+			for (let head of division.heads)
 				lineV(1, x + head.global * scale, y, 10)
 
 		})

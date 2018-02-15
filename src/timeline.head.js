@@ -151,7 +151,7 @@ export class Head extends Mobile {
 
 			let index = this.getIndex()
 			
-			this.timeline.rootSection.walk(section => section.updateHead(index, this.position))
+			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
 
 		// }
 

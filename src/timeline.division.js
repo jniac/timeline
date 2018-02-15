@@ -4,10 +4,10 @@ import query, { copy, propsToString } from './query.js'
 import { now, readonlyProperties, clamp } from './timeline.utils.js'
 import { Space } from './timeline.space.js'
 
-let sectionMap = new WeakMap()
-let sectionUID = 0
+let divisionMap = new WeakMap()
+let divisionUID = 0
 
-export class Section extends eventjs.EventDispatcher {
+export class Division extends eventjs.EventDispatcher {
 
 	constructor(timeline, parent, spaceProps = null, props = null) {
 
@@ -15,7 +15,7 @@ export class Section extends eventjs.EventDispatcher {
 
 		readonlyProperties(this, {
 
-			uid: sectionUID++,
+			uid: divisionUID++,
 			space: new Space(spaceProps),
 			props: Object.assign({}, props),
 			heads: [],
@@ -30,7 +30,7 @@ export class Section extends eventjs.EventDispatcher {
 
 		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true })
 
-		sectionMap.set(this.space, this)
+		divisionMap.set(this.space, this)
 
 		if (parent) {
 			console.log(parent)
@@ -123,12 +123,12 @@ export class Section extends eventjs.EventDispatcher {
 	}
 
 	// traps:
-	get parent() { return this.space.parent && sectionMap.get(this.space.parent) }
-	get children() { return this.space.children && this.space.children.map(v => sectionMap.get(v)) }
+	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
+	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 
 	walk(callback) {
 
-		this.space.walk(space => callback(sectionMap.get(space)))
+		this.space.walk(space => callback(divisionMap.get(space)))
 
 		return this
 
@@ -140,7 +140,7 @@ export class Section extends eventjs.EventDispatcher {
 		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`
 		let props = propsToString(copy(this.props, { exclude: 'uid' }))
 
-		return `Section#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
+		return `Division#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
 
 	}
 

@@ -3,7 +3,7 @@ import query, { copy, propsToString } from './query.js'
 import { Double, Range } from './primitives.js'
 
 import { Head } from './timeline.head.js'
-import { Section } from './timeline.section.js'
+import { Division } from './timeline.division.js'
 
 import { now, readonlyProperties, clamp } from './timeline.utils.js'
 
@@ -22,12 +22,12 @@ export class Timeline extends eventjs.EventDispatcher {
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootSection: this.createSection(null, { width: rootWidth }),
+			rootDivision: this.createDivision(null, { width: rootWidth }),
 			heads: [],
 
 		})
 
-		this.currentSection = this.rootSection
+		this.currentDivision = this.rootDivision
 
 		Object.assign(this, {
 
@@ -53,7 +53,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		let t = now()
 
-		this.rootSection.space.resolveSpace()
+		this.rootDivision.space.resolveSpace()
 
 		for (let head of this.heads)
 			head.update()
@@ -66,21 +66,21 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	}
 
-	createSection(parent = this.rootSection, spaceProps, props = null) {
+	createDivision(parent = this.rootDivision, spaceProps, props = null) {
 
-		let section = new Section(this, parent, spaceProps, props)
+		let division = new Division(this, parent, spaceProps, props)
 
-		this.lastSection = section
+		this.lastDivision = division
 
-		return section
+		return division
 
 	}
 
 	// shorthands
 
-	query(selector) { return this.rootSection.query(selector) }
+	query(selector) { return this.rootDivision.query(selector) }
 
-	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
+	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
 
 		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, expand' })
 
@@ -91,9 +91,9 @@ export class Timeline extends eventjs.EventDispatcher {
 			parent = parent[0]
 
 		if (!parent)
-			parent = this.currentSection
+			parent = this.currentDivision
 
-		return this.createSection(parent, { position, width, align, order, expand }, props)
+		return this.createDivision(parent, { position, width, align, order, expand }, props)
 
 		return null
 
