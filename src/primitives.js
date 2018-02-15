@@ -117,7 +117,16 @@ export class Range {
 
 	constructor(min = 0, max = 1) {
 
-		Object.assign(this, { min, max })
+		this.set(min, max)
+
+	}
+
+	set(min, max) {
+
+		this.min = min
+		this.max = max
+
+		return this
 
 	}
 
@@ -148,12 +157,25 @@ export class Range {
 		
 	}
 
-	intersection(other) {
+	intersection(other, clone = false) {
 
-		if (!this.intersects(other))
-			return new Range(NaN, NaN)
+		let target = clone ? this.clone() : this
 
-		return new Range(Math.max(this.min, other.min), Math.min(this.max, other.max))
+		if (!target.intersects(other))
+			return target.set(NaN, NaN)
+
+		return target.set(Math.max(this.min, other.min), Math.min(this.max, other.max))
+
+	}
+
+	union(other, clone = false) {
+
+		let target = clone ? this.clone() : this
+
+		if (this.isVoid())
+			return target.copy(other)
+
+		return target.set(Math.min(this.min, other.min), Math.max(this.max, other.max))
 
 	}
 
@@ -211,4 +233,9 @@ export class Range {
 	}
 
 }
+
+let A = new Range(10, 20)
+let B = new Range(25, 30)
+console.log(A.union(B))
+
 

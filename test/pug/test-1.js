@@ -34,10 +34,10 @@ timeline.division({ width: 200, order: -Infinity })
 timeline.division({ width: 200, order: Infinity })
 
 timeline.division({ name: 'exp', expand: 'EXPAND' })
-timeline.division({ parent: 'first:name=exp' })
-timeline.division({ parent: 'first:name=exp', name:'foo', width: '200%' })
+// timeline.division({ parent: 'first:name=exp' })
+// timeline.division({ parent: 'first:name=exp', name:'foo', width: '200%' })
 
-timeline.division({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })
+// timeline.division({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })
 
 
 timeline.rootDivision.space.resolveSpace()

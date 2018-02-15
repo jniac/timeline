@@ -117,6 +117,8 @@ export class Space {
 
 		let { parent, range, position, width, align, children } = this
 
+		// self layout:
+
 		let fixedParent = this.getFixedParent()
 
 		let rangeWidth = !fixedParent
@@ -125,11 +127,16 @@ export class Space {
 
 		let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute
 
+		this.globalPosition = offset + (parent ? parent.range.interpolate(position.relative) : position.relative) + position.absolute
+
 		range.min = !parent
 			? offset + alignOffset + position.relative + position.absolute
 			: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
 
 		range.width = rangeWidth
+
+		if (this.expand === ExpandEnum.EXPAND)
+			this.range.copy(this.bounds)
 
 		this.bounds.copy(this.range)
 
@@ -144,19 +151,21 @@ export class Space {
 			
 			child.resolveSpace(childOffset)
 
-			if (child.layout === LayoutEnum.STACKED)
+			if (child.layout === LayoutEnum.STACKED) {
+
 				childOffset += child.range.width
 
-			if (this.bounds.min > child.bounds.min)
-				this.bounds.min = child.bounds.min
+				if (this.expand === ExpandEnum.EXPAND)
+					this.range.union(child.range)
 
-			if (this.bounds.max < child.bounds.max)
-				this.bounds.max = child.bounds.max
+			}
+
+			this.bounds.union(child.bounds)
 
 		}
 
-		if (this.expand === ExpandEnum.EXPAND)
-			this.range.copy(this.bounds)
+		// if (this.expand === ExpandEnum.EXPAND)
+		// 	this.range.copy(this.bounds)
 
 		return this
 

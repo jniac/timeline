@@ -6,7 +6,8 @@ export function copy(object, { recursive = false, exclude = null } = {}) {
 	if (typeof object !== 'object')
 		return object
 
-	let result = new object.constructor()
+	// let result = new object.constructor()
+	let result = {}
 
 	if (exclude && typeof exclude === 'string')
 		exclude = exclude.split(/,\s|,|\s/)

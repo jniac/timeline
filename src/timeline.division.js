@@ -7,6 +7,27 @@ import { Space } from './timeline.space.js'
 let divisionMap = new WeakMap()
 let divisionUID = 0
 
+export class DivisionProps {
+
+	constructor(division, props) {
+
+		Object.assign(this, props)
+
+		Object.defineProperties(this, {
+
+			root: {
+
+				enumerable: true,
+				get() { return !division.space.parent } 
+
+			},
+
+		})
+
+	}
+
+}
+
 export class Division extends eventjs.EventDispatcher {
 
 	constructor(timeline, parent, spaceProps = null, props = null) {
@@ -17,7 +38,8 @@ export class Division extends eventjs.EventDispatcher {
 
 			uid: divisionUID++,
 			space: new Space(spaceProps),
-			props: Object.assign({}, props),
+			// props: Object.assign({}, props),
+			props: new DivisionProps(this, props),
 			heads: [],
 
 		})
@@ -103,7 +125,7 @@ export class Division extends eventjs.EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0
 
-		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues }
+		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline }
 
 		if (isNaN(oldValues.global))
 			this.dispatchEvent(`init-head${index}`, eventData)

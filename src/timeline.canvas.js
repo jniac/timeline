@@ -39,6 +39,11 @@ function drawSpace(space, dx, dy, scale) {
 	ctx.stroke()
 	ctx.beginPath()
 
+	ctx.fillStyle = 'black'
+	ctx.arc(dx + scale * space.globalPosition, dy + 9, 2, 0, 2 * Math.PI)
+	ctx.fill()
+	ctx.beginPath()
+
 }
 
 function drawBounds() {

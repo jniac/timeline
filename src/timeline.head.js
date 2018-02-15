@@ -145,7 +145,7 @@ export class Head extends Mobile {
 
 		super.update()
 
-		// if (force || this.forceUpdate || this.hasMoved) {
+		if (force || this.forceUpdate || this.hasMoved) {
 
 			this.forceUpdate = false
 
@@ -153,7 +153,7 @@ export class Head extends Mobile {
 			
 			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
 
-		// }
+		}
 
 	}
 
