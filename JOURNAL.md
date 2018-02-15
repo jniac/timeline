@@ -1,6 +1,6 @@
 
 
-## Thu Feb 15 2018
+# Thu Feb 15 2018
 
 **Renamed inside event to 'progress':**  
 inside is not as meaningfull as progress
@@ -29,7 +29,7 @@ Currently `Section` is built on top of `Space`. `Section` is the operative part 
 ...in order to allow simpler timeline agregation later.
 
 
-## Mon Feb 14 2018
+# Mon Feb 14 2018
 
 ### Space: changed children disposition  
 Introducing `ExpandEnum(FIXED, EXPAND)`.  
@@ -38,7 +38,7 @@ This implies that parent Space can now **inherit size** from children.
 Such parent cannot be referent to children relative dimensions. So to compute relative dimensions, `resolveSpace()` now searches for a fixed parent via `getFixedParent`.
 
 
-## Fri Feb 9 2018
+# Fri Feb 9 2018
 
 ### Goals:
 
