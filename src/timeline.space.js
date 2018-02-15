@@ -14,7 +14,7 @@ const LayoutEnum = new Enum(
 const ExpandEnum = new Enum(
 
 	'FIXED',			// width is fixed (from 'width' property)
-	'EXPANDABLE',		// width is computed from content
+	'EXPAND',			// width is computed from content
 
 )
 
@@ -97,12 +97,6 @@ export class Space {
 
 	}
 
-	// getRelative(value) {
-
-	// 	return (value - this.range.min) / this.range.width
-
-	// }
-
 	resolve(value) { return this.range.min + this.range.width * value.relative + value.absolute }
 
 	resolveValue(absoluteValue, relativeValue = 0) { return this.range.min + this.range.width * relativeValue + absoluteValue }
@@ -152,7 +146,7 @@ export class Space {
 
 		}
 
-		if (this.expand === ExpandEnum.EXPANDABLE)
+		if (this.expand === ExpandEnum.EXPAND)
 			this.range.copy(this.bounds)
 
 		return this

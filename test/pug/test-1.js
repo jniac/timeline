@@ -50,7 +50,7 @@ timeline.section({ position: '50%', width: 0, align: 0, })
 timeline.section({ width: 200, order: -Infinity })
 timeline.section({ width: 200, order: Infinity })
 
-timeline.section({ name: 'exp', expand: 'EXPANDABLE' })
+timeline.section({ name: 'exp', expand: 'EXPAND' })
 timeline.section({ parent: 'first:name=exp' })
 timeline.section({ parent: 'first:name=exp', name:'foo', width: '200%' })
 
