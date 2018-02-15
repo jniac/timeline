@@ -30,10 +30,9 @@ for (let section of document.querySelectorAll('.wrapper section')) {
 
 	timeline.section({ width: '100%', section })
 
-		.on(/init|inside|exit/, event => {
+		.on(/init|progress/, event => {
 
-			let x = 1 - event.values.relativeClamp
-			event.target.props.section.style.transform = `translateX(${x * 100}%)`
+			event.target.props.section.style.transform = `translateX(${(1 - event.progress) * 100}%)`
 
 		})
 
@@ -41,7 +40,7 @@ for (let section of document.querySelectorAll('.wrapper section')) {
 
 timeline.section({ position: '50%', width: 0, align: 0, })
 	.addTo('uid=3')
-	.on(/leave/, event => {
+	.on(/pass/, event => {
 
 		document.querySelector('section:nth-child(3)').style.color = event.direction === 1 ? 'white' : null
 
@@ -86,5 +85,9 @@ export let timelineCanvas = new TimelineCanvas(timeline)
 timelineCanvas.draw()
 
 document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
+
+timeline.update()
+
+console.log('test-1 ::: init')
 
 
