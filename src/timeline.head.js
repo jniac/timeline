@@ -1,4 +1,11 @@
 
+/**
+ * class to simulate a the movement of a Mobile from 2 variables:
+ * • velocity
+ * • friction
+ *
+ * key function: destination = position - velocity / log(friction)
+ */
 class Mobile {
 
 	constructor() {
@@ -27,8 +34,9 @@ class Mobile {
 
 		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this
 
+		// integral
+		position += velocity * (friction ** dt - 1) / Math.log(friction)
 		velocity *= friction ** dt
-		position += (velocity + velocityOld) / 2 * dt
 
 		let hasMoved = position !== positionOld
 
@@ -43,16 +51,45 @@ class Mobile {
 
 	}
 
+	setFriction(value, dt = 1) {
+
+		this.friction = value ** (1 / dt)
+
+	}
+
+	/**
+	 * F*** powerful, i can't remind how it works, but it works!
+	 */
+	getDestination({ position, velocity, friction } = this) {
+
+		return position + -velocity / Math.log(friction)
+
+	}
+
+	getVelocityForDestination(destination, { position, friction } = this) {
+
+		return (position - destination) * Math.log(friction)
+
+	}
+
+	getFrictionForDestination(destination, { position, velocity } = this) {
+
+		return Math.exp(velocity / (position - destination))
+
+	}
+
+	get destination() { return this.getDestination() }
+
 }
 
-export class Head {
+export class Head extends Mobile {
 
 	constructor(timeline) {
 
+		super()
+
 		this.color = 'red'
 		this.timeline = timeline
-
-		this.mobile = new Mobile()
 
 	}
 
@@ -67,25 +104,25 @@ export class Head {
 	get index() { return this.getIndex() }
 
 	// value interface for easier handling
-	get value() { return this.mobile.position }
+	get value() { return this.position }
 	set value(value) { 
 
-		this.mobile.forcedPosition = value
+		this.forcedPosition = value
 		this.forceUpdate = true
 
 	}
 
 	update(force = false) {
 
-		this.mobile.update()
+		super.update()
 
-		if (force || this.forceUpdate || this.mobile.hasMoved) {
+		if (force || this.forceUpdate || this.hasMoved) {
 
 			this.forceUpdate = false
 
 			let index = this.getIndex()
 			
-			this.timeline.rootSection.walk(section => section.updateHead(index, this.mobile.position))
+			this.timeline.rootSection.walk(section => section.updateHead(index, this.position))
 
 		}
 
