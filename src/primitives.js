@@ -123,8 +123,8 @@ export class Range {
 
 	copy(other) {
 
-		this.min = min
-		this.max = max
+		this.min = other.min
+		this.max = other.max
 
 		return this
 
