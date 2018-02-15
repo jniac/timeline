@@ -5,7 +5,7 @@ export let now = typeof performance === 'object'
 export const readonlyProperties = (target, properties, options = {}) => {
 
 	for (let [key, value] of Object.entries(properties))
-		Object.defineProperty(target, key, { value, ...options })
+		Object.defineProperty(target, key, Object.assign({ value }, options))
 
 }
 

@@ -212,8 +212,3 @@ export class Range {
 
 }
 
-let A = new Range(1, 2)
-let B = new Range(2.5, 3)
-// let B = new Range(NaN, NaN)
-
-console.log(A.intersection(B).isVoid())

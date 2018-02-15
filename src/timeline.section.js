@@ -17,7 +17,7 @@ export class Section extends eventjs.EventDispatcher {
 
 			uid: sectionUID++,
 			space: new Space(spaceProps),
-			props: { ...props },
+			props: Object.assign({}, props),
 			heads: [],
 
 		})

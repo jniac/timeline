@@ -1,2 +1,9 @@
 # timeline
-Timeline utility (for scrolling, tweening etc.)
+Timeline model (for scrolling, tweening etc.)
+
+
+# build
+```shell
+rollup -c
+```
+et voilà!

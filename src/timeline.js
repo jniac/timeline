@@ -1,3 +1,4 @@
+import * as eventjs from './event.js'
 import query, { copy, propsToString } from './query.js'
 import { Double, Range } from './primitives.js'
 
@@ -59,6 +60,8 @@ export class Timeline {
 
 		this.updateCost = dt
 
+		
+
 	}
 
 	createSection(parent = this.rootSection, spaceProps, props = null) {
@@ -71,22 +74,9 @@ export class Timeline {
 
 	}
 
-	// appendSection(width, props = null) {
-
-	// 	let position = this.currentSection === this.rootSection
-	// 		? 0
-	// 		: '100%'
-
-	// 	let section = this.createSection(position, width, this.currentSection, props)
-
-	// 	return section
-
-	// }
-
 	// shorthands (returning previous methods result)
 
 	query(selector) { return this.rootSection.query(selector) }
-	// queryFirst(selector) { return this.rootSection.queryFirst(selector) }
 
 	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
 
