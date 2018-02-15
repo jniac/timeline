@@ -2,8 +2,8 @@
 
 ## Thu Feb 15 2018
 
-#### Renamed inside event to 'progress'
-*inside is not as meaningfull as progress*
+**Renamed inside event to 'progress':**  
+inside is not as meaningfull as progress
 
 ---
 
