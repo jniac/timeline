@@ -2,6 +2,22 @@
 
 # Thu Feb 15 2018
 
+### Added physics to Head
+`position`, `velocity`, `friction` are set simulate the movement of a Mobile.
+```javascript
+// integrals to accurate position update:
+position += velocity * (friction ** dt - 1) / Math.log(friction)
+
+// key feature: anticipate destination with
+destination = position + -velocity / Math.log(friction)
+
+// easy move
+head.shoot(destination)
+```
+
+
+---
+
 **Renamed inside event to 'progress':**  
 inside is not as meaningfull as progress
 ```javascript
