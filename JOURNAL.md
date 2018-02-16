@@ -1,10 +1,6 @@
 
 # Fri Feb 2018
 
-**Mth**  
-Good name for a Math lib ?  
-(have to found a quite-definitive solution for math functions)
-
 - Head 
 Should head avatars declared in `Division` permit to modify head position directly (from absolute/relative property)?  
 Example:
@@ -16,6 +12,15 @@ Overkill?
 - Flex
 What about a flex layout?  
 Children can get portions of available size from their associated weight.
+
+---
+
+**TimelineCanvas**  
+Added arrow to figure children contribution to parent width.
+
+**Mth.js**  
+Good name for a Math lib ?  
+(have to found a quite-definitive solution for math functions)
 
 **SpaceProperty**  
 `Double` should not be declared in `primitives.js`, `Double` is not as generic as `Range`. `Range` is like `Point`, it could be used in many different cases, for different usages. That's why `timeline.space-property.js`has been created. However, while re-writing `Double` in `SpaceProperty` i was asking myself if `SpaceProperty` should allow other declaration than the couple `absolute/relative`. I started to add `mode`, which could be used in that way: `position: 'free:10 50%', width: 'content'`. I can not decide if it's a good or bad idea.  
