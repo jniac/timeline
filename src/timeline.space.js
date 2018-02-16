@@ -131,6 +131,8 @@ export class Space {
 
 	resolveSpace(stackOffset = 0) {
 
+		this.children.sort((a, b) => a.order - b.order || a.index - b.index)
+
 		this.resolveWidth()
 		this.resolvePosition()
 

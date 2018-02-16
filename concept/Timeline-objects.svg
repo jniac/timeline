@@ -94,75 +94,158 @@
 	<text transform="matrix(1 0 0 1 198.565 -219.0457)" class="st6" style="font-size:12px;">-100%</text>
 </g>
 <rect x="157.7" y="-435.9" class="st1" width="326.4" height="283.8"/>
-<text transform="matrix(1 0 0 1 426.7871 309)" class="st6 st7">globalWidth</text>
-<text transform="matrix(1 0 0 1 590 183)" class="st6 st7">resolve</text>
-<text transform="matrix(1 0 0 1 570.5 374.2497)"><tspan x="0" y="0" class="st6 st8">this.positionMode.is.FREE : parent.range.width</tspan><tspan x="0" y="16.8" class="st6 st8">this.positionMode.is.STACK : parent.width</tspan></text>
-<text transform="matrix(1 0 0 1 819.9433 586)" class="st6 st8">align does not operate in STACK mode</text>
-<text transform="matrix(1 0 0 1 819.9433 628.4999)" class="st6 st8">align can shift range in FREE mode</text>
-<text transform="matrix(1 0 0 1 434.4932 384.2498)" class="st6 st8">this.width</text>
-<text transform="matrix(1 0 0 1 417.7788 716.4113)" class="st9 st6 st8">position= -50 || -10%</text>
-<text transform="matrix(1 0 0 1 252.5 585.9999)" class="st6 st8">STACK</text>
-<text transform="matrix(1 0 0 1 252.5 628.4999)" class="st6 st8">FREE</text>
+<text transform="matrix(1 0 0 1 923.6056 93.2163)" class="st6 st7">globalWidth</text>
+<text transform="matrix(1 0 0 1 1197.1349 93.2162)" class="st6 st7">resolve</text>
 <g>
-	<line class="st1" x1="530.5" y1="365.2" x2="559" y2="393.7"/>
-	<line class="st1" x1="559" y1="365.2" x2="530.5" y2="393.7"/>
+	<text transform="matrix(1 0 0 1 628.2915 649.565)" class="st6 st8">initial space</text>
 </g>
 <g>
-	<line class="st1" x1="313" y1="580" x2="472" y2="580"/>
-	<line class="st1" x1="313" y1="590" x2="313" y2="570"/>
-	<circle class="st1" cx="313" cy="597" r="2.5"/>
-	<circle cx="313" cy="580" r="2"/>
-	<line class="st1" x1="472" y1="590" x2="472" y2="570"/>
+	<text transform="matrix(1 0 0 1 1212.5649 683.5085)" class="st9 st6 st8">stacked inherit from n - 2</text>
 </g>
 <g>
-	<line class="st1" x1="472" y1="580" x2="631" y2="580"/>
-	<circle class="st1" cx="472" cy="597" r="2.5"/>
-	<circle cx="472" cy="580" r="2"/>
-	<line class="st1" x1="472" y1="590" x2="472" y2="570"/>
-	<line class="st1" x1="631" y1="590" x2="631" y2="570"/>
+	<text transform="matrix(1 0 0 1 1352.2441 809.3444)"><tspan x="0" y="0" class="st9 st6 st8">free inherit from </tspan><tspan x="0" y="16.8" class="st9 st6 st8">n - 1 computed range</tspan></text>
 </g>
 <g>
-	<line class="st1" x1="405" y1="623.5" x2="564" y2="623.5"/>
-	<circle class="st1" cx="435.5" cy="640.5" r="2.5"/>
-	<circle cx="435.5" cy="623.5" r="2"/>
-	<line class="st1" x1="405" y1="633.5" x2="405" y2="613.5"/>
-	<line class="st1" x1="564" y1="633.5" x2="564" y2="613.5"/>
+	<text transform="matrix(1 0 0 1 1200.8281 975.2214)"><tspan x="0" y="0" class="st9 st6 st8">bounds range is for searches &amp; queries,</tspan><tspan x="0" y="16.8" class="st9 st6 st8">not for design</tspan></text>
 </g>
 <g>
-	<line class="st1" x1="631" y1="580" x2="790" y2="580"/>
-	<circle class="st1" cx="631" cy="597" r="2.5"/>
-	<circle cx="631" cy="580" r="2"/>
-	<line class="st1" x1="631" y1="590" x2="631" y2="570"/>
-	<line class="st1" x1="790" y1="590" x2="790" y2="570"/>
-</g>
-<text transform="matrix(1 0 0 1 252.5 747.9999)" class="st6 st8">STACK</text>
-<text transform="matrix(1 0 0 1 252.5 790.4999)" class="st6 st8">FREE</text>
-<g>
-	<line class="st1" x1="313" y1="742" x2="472" y2="742"/>
-	<line class="st1" x1="313" y1="752" x2="313" y2="732"/>
-	<circle class="st1" cx="313" cy="759" r="2.5"/>
-	<circle cx="313" cy="742" r="2"/>
-	<line class="st1" x1="472" y1="752" x2="472" y2="732"/>
+	<text transform="matrix(1 0 0 1 603.0874 815.3439)" class="st6 st8">produced ranges:</text>
 </g>
 <g>
-	<line class="st10" x1="442" y1="742" x2="601" y2="742"/>
-	<circle class="st10" cx="442" cy="759" r="2.5"/>
-	<circle class="st9" cx="442" cy="742" r="2"/>
-	<line class="st10" x1="442" y1="752" x2="442" y2="732"/>
-	<line class="st10" x1="601" y1="752" x2="601" y2="732"/>
+	<text transform="matrix(1 0 0 1 409.8423 842.1195)" class="st6 st8">initial (referent for stacked children)</text>
 </g>
 <g>
-	<line class="st1" x1="405" y1="785.5" x2="564" y2="785.5"/>
-	<circle class="st1" cx="435.5" cy="802.5" r="2.5"/>
-	<circle cx="435.5" cy="785.5" r="2"/>
-	<line class="st1" x1="405" y1="795.5" x2="405" y2="775.5"/>
-	<line class="st1" x1="564" y1="795.5" x2="564" y2="775.5"/>
+	<text transform="matrix(1 0 0 1 519.0669 860.283)" class="st6 st8">computed(from width rules)</text>
 </g>
 <g>
-	<line class="st1" x1="631" y1="742" x2="790" y2="742"/>
-	<circle class="st1" cx="631" cy="759" r="2.5"/>
-	<circle cx="631" cy="742" r="2"/>
-	<line class="st1" x1="631" y1="752" x2="631" y2="732"/>
-	<line class="st1" x1="790" y1="752" x2="790" y2="732"/>
+	<text transform="matrix(1 0 0 1 552.6724 878.6174)" class="st6 st8">bounds (from children)</text>
 </g>
+<g>
+	<text transform="matrix(1 0 0 1 603.0874 711.9044)" class="st6 st8">stacked children</text>
+</g>
+<g>
+	<text transform="matrix(1 0 0 1 628.2847 760.8817)" class="st6 st8">free children</text>
+</g>
+<text transform="matrix(1 0 0 1 1067.3185 158.466)"><tspan x="0" y="0" class="st6 st8">this.positionMode.is.FREE : parent.range.width</tspan><tspan x="0" y="16.8" class="st6 st8">this.positionMode.is.STACK : parent.width</tspan></text>
+<text transform="matrix(1 0 0 1 737.509 305.5)" class="st6 st8">align does not operate in STACK mode</text>
+<text transform="matrix(1 0 0 1 737.509 347.9999)" class="st6 st8">align can shift range in FREE mode</text>
+<text transform="matrix(1 0 0 1 614.0093 409.8256)" class="st6 st8">align can shift range in FREE mode</text>
+<text transform="matrix(1 0 0 1 931.3116 168.4661)" class="st6 st8">this.width</text>
+<text transform="matrix(1 0 0 1 335.3446 435.9113)" class="st9 st6 st8">position= -50 || -10%</text>
+<text transform="matrix(1 0 0 1 170.0658 305.4998)" class="st6 st8">STACK</text>
+<text transform="matrix(1 0 0 1 170.0658 347.9998)" class="st6 st8">FREE</text>
+<g>
+	<line class="st1" x1="1027.3" y1="149.5" x2="1055.8" y2="178"/>
+	<line class="st1" x1="1055.8" y1="149.5" x2="1027.3" y2="178"/>
+</g>
+<g>
+	<line class="st1" x1="230.6" y1="299.5" x2="389.6" y2="299.5"/>
+	<line class="st1" x1="230.6" y1="309.5" x2="230.6" y2="289.5"/>
+	<circle class="st1" cx="230.6" cy="316.5" r="2.5"/>
+	<circle cx="230.6" cy="299.5" r="2"/>
+	<line class="st1" x1="389.6" y1="309.5" x2="389.6" y2="289.5"/>
+</g>
+<g>
+	<line class="st1" x1="389.6" y1="299.5" x2="548.6" y2="299.5"/>
+	<circle class="st1" cx="389.6" cy="316.5" r="2.5"/>
+	<circle cx="389.6" cy="299.5" r="2"/>
+	<line class="st1" x1="389.6" y1="309.5" x2="389.6" y2="289.5"/>
+	<line class="st1" x1="548.6" y1="309.5" x2="548.6" y2="289.5"/>
+</g>
+<g>
+	<line class="st1" x1="322.6" y1="343" x2="481.6" y2="343"/>
+	<circle class="st1" cx="353.1" cy="360" r="2.5"/>
+	<circle cx="353.1" cy="343" r="2"/>
+	<line class="st1" x1="322.6" y1="353" x2="322.6" y2="333"/>
+	<line class="st1" x1="481.6" y1="353" x2="481.6" y2="333"/>
+</g>
+<g>
+	<line class="st1" x1="796.8" y1="756.9" x2="955.8" y2="756.9"/>
+	<circle class="st1" cx="827.3" cy="773.9" r="2.5"/>
+	<circle cx="827.3" cy="756.9" r="2"/>
+	<line class="st1" x1="796.8" y1="766.9" x2="796.8" y2="746.9"/>
+	<line class="st1" x1="955.8" y1="766.9" x2="955.8" y2="746.9"/>
+</g>
+<g>
+	<line class="st1" x1="1261.1" y1="756.9" x2="1420.1" y2="756.9"/>
+	<circle class="st1" cx="1291.6" cy="773.9" r="2.5"/>
+	<circle cx="1291.6" cy="756.9" r="2"/>
+	<line class="st1" x1="1261.1" y1="766.9" x2="1261.1" y2="746.9"/>
+	<line class="st1" x1="1420.1" y1="766.9" x2="1420.1" y2="746.9"/>
+</g>
+<g>
+	<line class="st1" x1="548.6" y1="299.5" x2="707.6" y2="299.5"/>
+	<circle class="st1" cx="548.6" cy="316.5" r="2.5"/>
+	<circle cx="548.6" cy="299.5" r="2"/>
+	<line class="st1" x1="548.6" y1="309.5" x2="548.6" y2="289.5"/>
+	<line class="st1" x1="707.6" y1="309.5" x2="707.6" y2="289.5"/>
+</g>
+<g>
+	<line class="st1" x1="857.1" y1="709.9" x2="1016.1" y2="709.9"/>
+	<line class="st1" x1="857.1" y1="719.9" x2="857.1" y2="699.9"/>
+	<circle class="st1" cx="857.1" cy="726.9" r="2.5"/>
+	<circle cx="857.1" cy="709.9" r="2"/>
+	<line class="st1" x1="1016.1" y1="719.9" x2="1016.1" y2="699.9"/>
+</g>
+<g>
+	<line class="st1" x1="1016.1" y1="709.9" x2="1175.1" y2="709.9"/>
+	<circle class="st1" cx="1016.1" cy="726.9" r="2.5"/>
+	<circle cx="1016.1" cy="709.9" r="2"/>
+	<line class="st1" x1="1016.1" y1="719.9" x2="1016.1" y2="699.9"/>
+	<line class="st1" x1="1175.1" y1="719.9" x2="1175.1" y2="699.9"/>
+</g>
+<g>
+	<line class="st1" x1="1175.1" y1="709.9" x2="1334.1" y2="709.9"/>
+	<circle class="st1" cx="1175.1" cy="726.9" r="2.5"/>
+	<circle cx="1175.1" cy="709.9" r="2"/>
+	<line class="st1" x1="1175.1" y1="719.9" x2="1175.1" y2="699.9"/>
+	<line class="st1" x1="1334.1" y1="719.9" x2="1334.1" y2="699.9"/>
+</g>
+<text transform="matrix(1 0 0 1 170.0658 467.4998)" class="st6 st8">STACK</text>
+<text transform="matrix(1 0 0 1 170.0658 509.9998)" class="st6 st8">FREE</text>
+<g>
+	<line class="st1" x1="230.6" y1="461.5" x2="389.6" y2="461.5"/>
+	<line class="st1" x1="230.6" y1="471.5" x2="230.6" y2="451.5"/>
+	<circle class="st1" cx="230.6" cy="478.5" r="2.5"/>
+	<circle cx="230.6" cy="461.5" r="2"/>
+	<line class="st1" x1="389.6" y1="471.5" x2="389.6" y2="451.5"/>
+</g>
+<g>
+	<line class="st10" x1="359.6" y1="461.5" x2="518.6" y2="461.5"/>
+	<circle class="st10" cx="359.6" cy="478.5" r="2.5"/>
+	<circle class="st9" cx="359.6" cy="461.5" r="2"/>
+	<line class="st10" x1="359.6" y1="471.5" x2="359.6" y2="451.5"/>
+	<line class="st10" x1="518.6" y1="471.5" x2="518.6" y2="451.5"/>
+</g>
+<g>
+	<line class="st1" x1="322.6" y1="505" x2="481.6" y2="505"/>
+	<circle class="st1" cx="353.1" cy="522" r="2.5"/>
+	<circle cx="353.1" cy="505" r="2"/>
+	<line class="st1" x1="322.6" y1="515" x2="322.6" y2="495"/>
+	<line class="st1" x1="481.6" y1="515" x2="481.6" y2="495"/>
+</g>
+<g>
+	<line class="st1" x1="548.6" y1="461.5" x2="707.6" y2="461.5"/>
+	<circle class="st1" cx="548.6" cy="478.5" r="2.5"/>
+	<circle cx="548.6" cy="461.5" r="2"/>
+	<line class="st1" x1="548.6" y1="471.5" x2="548.6" y2="451.5"/>
+	<line class="st1" x1="707.6" y1="471.5" x2="707.6" y2="451.5"/>
+</g>
+<g>
+	<line class="st1" x1="854.6" y1="646.6" x2="1200.8" y2="646.6"/>
+	<line class="st1" x1="854.6" y1="842.1" x2="1200.8" y2="842.1"/>
+	<line class="st1" x1="854.6" y1="557.4" x2="1200.8" y2="557.4"/>
+	<line class="st1" x1="854.6" y1="860.3" x2="1334.1" y2="860.3"/>
+	<line class="st1" x1="796.8" y1="878.6" x2="1420.1" y2="878.6"/>
+	<circle class="st1" cx="854.6" cy="663.6" r="2.5"/>
+	<circle cx="854.6" cy="646.6" r="2"/>
+	<line class="st1" x1="854.6" y1="656.6" x2="854.6" y2="636.6"/>
+	<line class="st1" x1="1200.8" y1="656.6" x2="1200.8" y2="636.6"/>
+</g>
+<path class="st10" d="M943.5,562.4c0,0,26.7,25.5,28.8,67.2c2.1,41.7-28.8,73.3-28.8,73.3"/>
+<path class="st10" d="M1071.7,702.9c-9.9-107.5-128.1-140.5-128.1-140.5"/>
+<path class="st10" d="M1199.8,702.9C1177,588.1,943.5,562.4,943.5,562.4"/>
+<path class="st10" d="M921.5,760.9c13.3,51,92.1,94.6,92.1,94.6"/>
+<path class="st10" d="M1095.6,883.6c13.3,51,92.1,94.6,92.1,94.6"/>
+<path class="st10" d="M1345.8,760.9c-11.7,54.5-91.2,94.6-91.2,94.6"/>
 </svg>
