@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1920 1080" style="enable-background:new 0 0 1920 1080;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F7D0E1;}
+	.st1{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st2{fill:none;stroke:#000000;stroke-width:5;stroke-miterlimit:10;}
+	.st3{fill:#F74E78;}
+	.st4{fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+	.st5{fill:none;stroke:#F74E78;stroke-miterlimit:10;}
+	.st6{font-family:'RobotoMono-Regular';}
+	.st7{font-size:24px;}
+	.st8{font-size:14px;}
+	.st9{fill:#FF0000;}
+	.st10{fill:none;stroke:#FF0000;stroke-miterlimit:10;}
+</style>
+<rect class="st0" width="1920" height="1080"/>
+<g>
+	<line class="st1" x1="485.2" y1="-767.3" x2="1624.2" y2="-767.3"/>
+</g>
+<line class="st1" x1="614.2" y1="-756.3" x2="614.2" y2="-777.3"/>
+<line class="st2" x1="649.4" y1="-756.3" x2="649.4" y2="-777.3"/>
+<line class="st2" x1="485.5" y1="-588.8" x2="485.5" y2="-609.8"/>
+<line class="st2" x1="1187.6" y1="-588.8" x2="1187.6" y2="-609.8"/>
+<line class="st2" x1="1629.5" y1="-450.3" x2="1629.5" y2="-471.3"/>
+<line class="st1" x1="1117.2" y1="-756.8" x2="1117.2" y2="-776.8"/>
+<line class="st1" x1="1372.7" y1="-589.3" x2="1372.7" y2="-609.3"/>
+<line class="st2" x1="614.7" y1="-767.3" x2="1117.7" y2="-767.3"/>
+<text transform="matrix(1 0 0 1 606.2192 -862.8088)" class="st6" style="font-size:18px;">position</text>
+<text transform="matrix(1 0 0 1 578.0037 -696.8181)" class="st3 st6" style="font-size:12px;">2 children</text>
+<text transform="matrix(1 0 0 1 966.9812 -562.3251)" class="st3 st6" style="font-size:12px;">1 child</text>
+<text transform="matrix(1 0 0 1 608.6086 -731.8088)" class="st6" style="font-size:18px;">0</text>
+<text transform="matrix(1 0 0 1 1112.6086 -731.8088)" class="st6" style="font-size:18px;">1</text>
+<text transform="matrix(1 0 0 1 839.0051 -862.8088)" class="st6" style="font-size:18px;">width</text>
+<text transform="matrix(1 0 0 1 837.2048 -733.8088)" class="st6" style="font-size:12px;">relative</text>
+<text transform="matrix(1 0 0 1 431.5008 -862.8088)" class="st6" style="font-size:18px;">bounds.min</text>
+<text transform="matrix(1 0 0 1 198.2662 -387.1866)" class="st6" style="font-size:18px;">align:</text>
+<line class="st1" x1="485.2" y1="-795.8" x2="485.7" y2="-843.8"/>
+<line class="st1" x1="649.1" y1="-795.8" x2="649.6" y2="-843.8"/>
+<text transform="matrix(1 0 0 1 1570.5007 -862.8088)" class="st6" style="font-size:18px;">bounds.max</text>
+<line class="st1" x1="1624.2" y1="-795.8" x2="1624.7" y2="-843.8"/>
+<path class="st1" d="M1117.2-786.3c0-57.5-251.5,20-251.5-65.5c0,85.5-251.5,8-251.5,65.5"/>
+<line class="st4" x1="627.7" y1="-737.8" x2="827.7" y2="-737.8"/>
+<line class="st4" x1="906.5" y1="-737.8" x2="1106.5" y2="-737.8"/>
+<polyline class="st1" points="495.5,-757.3 485.5,-757.3 485.5,-777.3 495.5,-777.3 "/>
+<polyline class="st1" points="1614.2,-777.3 1624.2,-777.3 1624.2,-757.3 1614.2,-757.3 "/>
+<g>
+	<line class="st2" x1="485.2" y1="-599.3" x2="865.7" y2="-599.3"/>
+</g>
+<polyline class="st1" points="495.5,-589.3 485.5,-589.3 485.5,-609.3 495.5,-609.3 "/>
+<polyline class="st1" points="855.7,-609.3 865.7,-609.3 865.7,-589.3 855.7,-589.3 "/>
+<line class="st2" x1="198.6" y1="-318.8" x2="198.6" y2="-339.8"/>
+<g>
+	<line class="st2" x1="198.3" y1="-329.3" x2="438.8" y2="-329.3"/>
+</g>
+<polyline class="st1" points="208.6,-319.3 198.6,-319.3 198.6,-339.3 208.6,-339.3 "/>
+<polyline class="st1" points="428.8,-339.3 438.8,-339.3 438.8,-319.3 428.8,-319.3 "/>
+<line class="st2" x1="318.7" y1="-253.7" x2="318.7" y2="-274.7"/>
+<g>
+	<line class="st2" x1="198.3" y1="-264.2" x2="438.8" y2="-264.2"/>
+</g>
+<polyline class="st1" points="208.6,-254.2 198.6,-254.2 198.6,-274.2 208.6,-274.2 "/>
+<polyline class="st1" points="428.8,-274.2 438.8,-274.2 438.8,-254.2 428.8,-254.2 "/>
+<line class="st2" x1="438.8" y1="-188.5" x2="438.8" y2="-209.5"/>
+<g>
+	<line class="st2" x1="198.3" y1="-199" x2="438.8" y2="-199"/>
+</g>
+<polyline class="st1" points="208.6,-189 198.6,-189 198.6,-209 208.6,-209 "/>
+<polyline class="st1" points="428.8,-209 438.8,-209 438.8,-189 428.8,-189 "/>
+<g>
+	<line class="st2" x1="1249" y1="-460.8" x2="1629.5" y2="-460.8"/>
+</g>
+<polyline class="st1" points="1259.3,-450.8 1249.3,-450.8 1249.3,-470.8 1259.3,-470.8 "/>
+<polyline class="st1" points="1619.5,-470.8 1629.5,-470.8 1629.5,-450.8 1619.5,-450.8 "/>
+<g>
+	<line class="st2" x1="992.2" y1="-599.3" x2="1372.7" y2="-599.3"/>
+</g>
+<g>
+	<line class="st1" x1="992.2" y1="-599.3" x2="1629.5" y2="-599.3"/>
+</g>
+<polyline class="st1" points="1002.5,-589.3 992.5,-589.3 992.5,-609.3 1002.5,-609.3 "/>
+<polyline class="st1" points="1619.5,-609.3 1629.5,-609.3 1629.5,-589.3 1619.5,-589.3 "/>
+<path class="st5" d="M614-675.2c0,52.5-128.8,0-128.8,52.5"/>
+<path class="st5" d="M614-675.2c0,26.2,63.4,26.2,286.8,26.2c219.9,0,286.8,0,286.8,26.2"/>
+<path class="st5" d="M993.2-541.3c0,26.2,70.4,26.2,318.2,26.2c243.9,0,318.2,0,318.2,26.2"/>
+<g>
+	<text transform="matrix(1 0 0 1 198.565 -349.2689)" class="st6" style="font-size:12px;">100%</text>
+</g>
+<g>
+	<text transform="matrix(1 0 0 1 198.565 -284.1572)" class="st6" style="font-size:12px;">0%</text>
+</g>
+<g>
+	<text transform="matrix(1 0 0 1 198.565 -219.0457)" class="st6" style="font-size:12px;">-100%</text>
+</g>
+<rect x="157.7" y="-435.9" class="st1" width="326.4" height="283.8"/>
+<text transform="matrix(1 0 0 1 426.7871 309)" class="st6 st7">globalWidth</text>
+<text transform="matrix(1 0 0 1 590 183)" class="st6 st7">resolve</text>
+<text transform="matrix(1 0 0 1 570.5 374.2497)"><tspan x="0" y="0" class="st6 st8">this.positionMode.is.FREE : parent.range.width</tspan><tspan x="0" y="16.8" class="st6 st8">this.positionMode.is.STACK : parent.width</tspan></text>
+<text transform="matrix(1 0 0 1 819.9433 586)" class="st6 st8">align does not operate in STACK mode</text>
+<text transform="matrix(1 0 0 1 819.9433 628.4999)" class="st6 st8">align can shift range in FREE mode</text>
+<text transform="matrix(1 0 0 1 434.4932 384.2498)" class="st6 st8">this.width</text>
+<text transform="matrix(1 0 0 1 417.7788 716.4113)" class="st9 st6 st8">position= -50 || -10%</text>
+<text transform="matrix(1 0 0 1 252.5 585.9999)" class="st6 st8">STACK</text>
+<text transform="matrix(1 0 0 1 252.5 628.4999)" class="st6 st8">FREE</text>
+<g>
+	<line class="st1" x1="530.5" y1="365.2" x2="559" y2="393.7"/>
+	<line class="st1" x1="559" y1="365.2" x2="530.5" y2="393.7"/>
+</g>
+<g>
+	<line class="st1" x1="313" y1="580" x2="472" y2="580"/>
+	<line class="st1" x1="313" y1="590" x2="313" y2="570"/>
+	<circle class="st1" cx="313" cy="597" r="2.5"/>
+	<circle cx="313" cy="580" r="2"/>
+	<line class="st1" x1="472" y1="590" x2="472" y2="570"/>
+</g>
+<g>
+	<line class="st1" x1="472" y1="580" x2="631" y2="580"/>
+	<circle class="st1" cx="472" cy="597" r="2.5"/>
+	<circle cx="472" cy="580" r="2"/>
+	<line class="st1" x1="472" y1="590" x2="472" y2="570"/>
+	<line class="st1" x1="631" y1="590" x2="631" y2="570"/>
+</g>
+<g>
+	<line class="st1" x1="405" y1="623.5" x2="564" y2="623.5"/>
+	<circle class="st1" cx="435.5" cy="640.5" r="2.5"/>
+	<circle cx="435.5" cy="623.5" r="2"/>
+	<line class="st1" x1="405" y1="633.5" x2="405" y2="613.5"/>
+	<line class="st1" x1="564" y1="633.5" x2="564" y2="613.5"/>
+</g>
+<g>
+	<line class="st1" x1="631" y1="580" x2="790" y2="580"/>
+	<circle class="st1" cx="631" cy="597" r="2.5"/>
+	<circle cx="631" cy="580" r="2"/>
+	<line class="st1" x1="631" y1="590" x2="631" y2="570"/>
+	<line class="st1" x1="790" y1="590" x2="790" y2="570"/>
+</g>
+<text transform="matrix(1 0 0 1 252.5 747.9999)" class="st6 st8">STACK</text>
+<text transform="matrix(1 0 0 1 252.5 790.4999)" class="st6 st8">FREE</text>
+<g>
+	<line class="st1" x1="313" y1="742" x2="472" y2="742"/>
+	<line class="st1" x1="313" y1="752" x2="313" y2="732"/>
+	<circle class="st1" cx="313" cy="759" r="2.5"/>
+	<circle cx="313" cy="742" r="2"/>
+	<line class="st1" x1="472" y1="752" x2="472" y2="732"/>
+</g>
+<g>
+	<line class="st10" x1="442" y1="742" x2="601" y2="742"/>
+	<circle class="st10" cx="442" cy="759" r="2.5"/>
+	<circle class="st9" cx="442" cy="742" r="2"/>
+	<line class="st10" x1="442" y1="752" x2="442" y2="732"/>
+	<line class="st10" x1="601" y1="752" x2="601" y2="732"/>
+</g>
+<g>
+	<line class="st1" x1="405" y1="785.5" x2="564" y2="785.5"/>
+	<circle class="st1" cx="435.5" cy="802.5" r="2.5"/>
+	<circle cx="435.5" cy="785.5" r="2"/>
+	<line class="st1" x1="405" y1="795.5" x2="405" y2="775.5"/>
+	<line class="st1" x1="564" y1="795.5" x2="564" y2="775.5"/>
+</g>
+<g>
+	<line class="st1" x1="631" y1="742" x2="790" y2="742"/>
+	<circle class="st1" cx="631" cy="759" r="2.5"/>
+	<circle cx="631" cy="742" r="2"/>
+	<line class="st1" x1="631" y1="752" x2="631" y2="732"/>
+	<line class="st1" x1="790" y1="752" x2="790" y2="732"/>
+</g>
+</svg>

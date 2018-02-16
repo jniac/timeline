@@ -21,11 +21,13 @@ function lineV(thickness, x, y, height, off = .5) {
 
 }
 
-function drawSpace(space, dx, dy, scale) {
+function drawSpace(space, dx, dy, scale,) {
 
 	let x, w
 
-	ctx.strokeStyle = 'black'
+	let color = space.color || 'black'
+
+	ctx.strokeStyle = color
 
 	x = dx + scale * space.range.min
 	w = scale * space.range.width
@@ -39,7 +41,7 @@ function drawSpace(space, dx, dy, scale) {
 	ctx.stroke()
 	ctx.beginPath()
 
-	ctx.fillStyle = 'black'
+	ctx.fillStyle = color
 	ctx.arc(dx + scale * space.globalPosition, dy + 9, 2, 0, 2 * Math.PI)
 	ctx.fill()
 	ctx.beginPath()
@@ -97,7 +99,7 @@ export class TimelineCanvas {
 		let margin = 10
 		let space = timeline.rootDivision.space
 		let scale = (width / ratio - 2 * margin) / space.bounds.width
-		let x = margin + space.range.min * scale
+		let x = margin + -space.bounds.min * scale
 
 		timeline.rootDivision.walk(division => {
 

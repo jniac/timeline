@@ -11,9 +11,38 @@ export const readonlyProperties = (target, properties, options = {}) => {
 
 export const clamp = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x
 
+
+
+/**
+ * key can be compared via 'is':
+ * 
+ * let e = new Enum('FOO', 'BAR')
+ * let key = e.FOO
+ * key.is.FOO // true
+ * key.is.BAR // false
+ *
+ */
 class EnumKey {
 
-	constructor(props) { Object.freeze(Object.assign(this, props)) }
+	constructor(enumInstance, index, keys) { 
+
+		Object.assign(this, {
+
+			enum: enumInstance,
+			name: keys[index],
+			index,
+			is: keys.reduce((r, v, i) => Object.defineProperty(r, v, {
+
+				value: i === index,
+				enumerable: true,
+
+			}), {}),
+
+		})
+
+		Object.freeze(this)
+	
+	}
 
 	toString() { return this.name }
 
@@ -22,12 +51,12 @@ class EnumKey {
 export class Enum {
 
 	constructor(...keys) {
-		
+
 		for (let [index, key] of keys.entries()) {
 
 			Object.defineProperty(this, key, {
 
-				value: new EnumKey({ name:key, index, enum:this }),
+				value: new EnumKey(this, index, keys),
 				enumerable: true,
 
 			})

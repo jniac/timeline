@@ -54,10 +54,8 @@ export class Division extends eventjs.EventDispatcher {
 
 		divisionMap.set(this.space, this)
 
-		if (parent) {
-			console.log(parent)
+		if (parent)
 			parent.space.addChild(this.space)
-		}
 
 	}
 

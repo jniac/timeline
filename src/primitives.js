@@ -94,6 +94,26 @@ export class Double {
 
 	}
 
+	solve(relativeReference) {
+
+		return (relativeReference || 0) * this.relative + this.absolute
+
+	}
+
+	/**
+	 * alignment is solved that way:
+	 *
+	 * relative === -1 		=> 		-relativeReference (+ absolute)
+	 * relative === 0 		=> 		-relativeReference / 2 (+ absolute)
+	 * relative === 1 		=> 		0 (+ absolute)
+	 *
+	 */
+	solveAlign(relativeReference) {
+
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+
+	}
+
 	toString() {
 
 		return this.absolute === 0 && this.relative === 0
@@ -234,8 +254,5 @@ export class Range {
 
 }
 
-let A = new Range(10, 20)
-let B = new Range(25, 30)
-console.log(A.union(B))
 
 

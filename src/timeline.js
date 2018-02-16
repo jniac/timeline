@@ -22,7 +22,9 @@ export class Timeline extends eventjs.EventDispatcher {
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootDivision: this.createDivision(null, { width: rootWidth }),
+			rootDivision: this.createDivision(null, { width: rootWidth, 
+				// widthMode: 'CONTENT',
+			}),
 			heads: [],
 
 		})
@@ -80,9 +82,9 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	query(selector) { return this.rootDivision.query(selector) }
 
-	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
+	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
 
-		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, expand' })
+		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' })
 
 		if (typeof parent === 'string')
 			parent = this.query(parent)
@@ -93,7 +95,7 @@ export class Timeline extends eventjs.EventDispatcher {
 		if (!parent)
 			parent = this.currentDivision
 
-		return this.createDivision(parent, { position, width, align, order, expand }, props)
+		return this.createDivision(parent, { position, width, align, order, positionMode, widthMode }, props)
 
 		return null
 

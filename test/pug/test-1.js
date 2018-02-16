@@ -33,8 +33,8 @@ timeline.division({ position: '50%', width: 0, align: 0, })
 timeline.division({ width: 200, order: -Infinity })
 timeline.division({ width: 200, order: Infinity })
 
-timeline.division({ name: 'exp', expand: 'EXPAND' })
-// timeline.division({ parent: 'first:name=exp' })
+timeline.division({ name: 'exp', widthMode: 'ELASTIC' })
+timeline.division({ parent: 'first:name=exp' })
 // timeline.division({ parent: 'first:name=exp', name:'foo', width: '200%' })
 
 // timeline.division({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })

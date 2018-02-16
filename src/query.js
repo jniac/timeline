@@ -123,10 +123,10 @@ export function query(object, selector, { firstOnly = false, propsDelegate = 'pr
 
 	}
 
-	if (selector.indexOf('first:') === 0) {
+	if (/^f:|^first:/.test(selector)) {
 
 		firstOnly = true
-		selector = selector.slice(6)
+		selector = selector.replace(/^f:|^first:/, '')
 
 	}
 
