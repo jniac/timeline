@@ -1,6 +1,6 @@
 
 
-# Thu Feb 15 2018
+# Tue Feb 15 2018
 
 **Renamed Section to 'Division':**  
 The sense of *division* is more neutral than *section*, refers to more simple objects.  
@@ -51,7 +51,7 @@ Currently `Section` is built on top of `Space`. `Section` is the operative part 
 ...in order to allow simpler timeline agregation later.
 
 
-# Mon Feb 14 2018
+# Wed Feb 14 2018
 
 ### Space: changed children disposition  
 Introducing `ExpandEnum(FIXED, EXPAND)`.  
