@@ -1,11 +1,17 @@
 
 
-# Thu Feb 15 2018
+# Tue Feb 15 2018
+
+**Renamed Section to 'Division':**  
+The sense of *division* is more neutral than *section*, refers to more simple objects.  
+Section term will be reserved to portions of timeline (`Division` instances) that have to 'hold' `Head` instances when the timeline is being altered (because of element resizing or removing).`
+
+---
 
 ### Added physics to Head
-`position`, `velocity`, `friction` are set simulate the movement of a Mobile.
+`position`, `velocity`, `friction` simulate the movement of a Mobile.
 ```javascript
-// integrals to accurate position update:
+// integrals for accurate position updates:
 position += velocity * (friction ** dt - 1) / Math.log(friction)
 
 // key feature: anticipate destination with
@@ -45,7 +51,7 @@ Currently `Section` is built on top of `Space`. `Section` is the operative part 
 ...in order to allow simpler timeline agregation later.
 
 
-# Mon Feb 14 2018
+# Wed Feb 14 2018
 
 ### Space: changed children disposition  
 Introducing `ExpandEnum(FIXED, EXPAND)`.  
