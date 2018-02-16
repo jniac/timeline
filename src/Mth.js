@@ -1,4 +1,4 @@
-export const mmmath = {
+export const Mth = {
 
 	enu: {
 
@@ -11,6 +11,15 @@ export const mmmath = {
 
 			for (let i = 0; i <= count; i++)
 				yield start + d * i / count
+
+		},
+
+		*for(n) {
+
+			let i = 0
+
+			while(i < n)
+				yield i++
 
 		}
 

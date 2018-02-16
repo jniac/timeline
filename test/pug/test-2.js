@@ -8,8 +8,8 @@ import { TimelineCanvas } from '../../../src/timeline.canvas.js'
 import { bench } from '../../../src/bench.js'
 export { bench }
 
-import { mmmath } from '../../../src/mmmath.js'
-export { mmmath }
+import { Mth } from '../../../src/Mth.js'
+export { Mth }
 
 export let timeline = new Timeline(800)
 
