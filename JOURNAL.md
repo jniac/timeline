@@ -3,11 +3,10 @@
 
 - Head 
 Should head avatars declared in `Division` permit to modify head position directly (from absolute/relative property)?  
-Example:
+Overkill? Example:
 ```javasctipt
 division.heads[0].position.relative += .01
 ```
-Overkill?
 
 - Flex
 What about a flex layout?  
