@@ -5,10 +5,13 @@
 Way way way more logic. Now, there are two recursive functions, to compute width first, then position.  
 Still not totally convinced, by the current architecture. It's better though.
 
+**Added 'root' to Space instances**  
+Trivial implementation (`child.root = this.root` in `addChild()`). Great opportunity.
+
 ---
 
 - Should `Division` inherits from `Space` instead of having a member `space:Space` ?
-- Should `Timeline` inherits from `Space` which whould inherits from `Space` ? (easier integration of timeline)
+- Should `Timeline` inherits from `Division` which whould inherits from `Space` ? (easier integration of timeline)
 
 # Tue Feb 15 2018
 
