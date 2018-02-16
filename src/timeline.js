@@ -23,7 +23,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 			uid: timelineUID++,
 			rootDivision: this.createDivision(null, { width: rootWidth, 
-				// widthMode: 'CONTENT',
+				widthMode: 'CONTENT',
 			}),
 			heads: [],
 

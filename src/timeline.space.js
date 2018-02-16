@@ -60,6 +60,7 @@ export class Space {
 
 			// hierarchy:
 
+			root: this,
 			parent: null,
 			index: -1,
 			children: [],
@@ -80,6 +81,7 @@ export class Space {
 		if (child.parent)
 			child.parent.removeChild(child)
 
+		child.root = this.root
 		child.parent = this
 		child.index = this.children.length
 		this.children.push(child)
@@ -93,6 +95,7 @@ export class Space {
 		if (child.parent !== this)
 			throw 'child argument is not a child of this'
 
+		child.root = this
 		child.parent = null
 		child.index = -1
 		this.children.splice(this.children.indexOf(child), 1)
@@ -121,15 +124,7 @@ export class Space {
 
 	}
 
-	// resolve(value) { return this.range.min + this.range.width * value.relative + value.absolute }
-
-	// resolveValue(absoluteValue, relativeValue = 0) { return this.range.min + this.range.width * relativeValue + absoluteValue }
-
-	/**
-	 * recursive
-	 */
-
-	resolveSpace(stackOffset = 0) {
+	resolveSpace() {
 
 		this.children.sort((a, b) => a.order - b.order || a.index - b.index)
 
@@ -142,10 +137,12 @@ export class Space {
 
 		let space = this.parent
 
-		while(space && space.widthMode.is.CONTENT && space.parent)
+		while(space && space.widthMode.is.CONTENT)
 			space = space.parent
 
-		return space ? space.globalWidth : 800
+		// important if no fixed parent is found: 
+		// globalWidth is computed from root.width
+		return space ? space.globalWidth : this.root.width.solve(0)
 
 	}
 
@@ -212,7 +209,7 @@ export class Space {
 	}
 
 
-	// resolveSpace(offset = 0) {
+	// resolveSpace() {
 
 	// 	let { parent, range, position, width, align, children } = this
 

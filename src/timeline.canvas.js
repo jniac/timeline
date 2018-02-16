@@ -3,9 +3,9 @@ let ctx, timeline
 
 function lineH(thickness, x, y, width, off = 0) {
 
-	ctx.lineWidth = thickness
 	ctx.moveTo(x - width * off, y)
 	ctx.lineTo(x + width * (1 - off), y)
+	ctx.lineWidth = thickness
 	ctx.stroke()
 	ctx.beginPath()
 
@@ -13,13 +13,25 @@ function lineH(thickness, x, y, width, off = 0) {
 
 function lineV(thickness, x, y, height, off = .5) {
 
-	ctx.lineWidth = thickness
 	ctx.moveTo(x, y - height * off)
 	ctx.lineTo(x, y + height * (1 - off))
+	ctx.lineWidth = thickness
 	ctx.stroke()
 	ctx.beginPath()
 
 }
+
+function arrowUp(thickness, x, y, size = 10) {
+
+	ctx.moveTo(x - size, y + size / 2)
+	ctx.lineTo(x, y - size / 2)
+	ctx.lineTo(x + size, y + size / 2)
+	ctx.lineWidth = thickness
+	ctx.stroke()
+	ctx.beginPath()
+
+}
+
 
 function drawSpace(space, dx, dy, scale,) {
 
@@ -45,6 +57,12 @@ function drawSpace(space, dx, dy, scale,) {
 	ctx.arc(dx + scale * space.globalPosition, dy + 9, 2, 0, 2 * Math.PI)
 	ctx.fill()
 	ctx.beginPath()
+
+	if (space.widthMode.is.CONTENT) {
+		arrowUp(1, dx + scale * space.range.interpolate(.5), dy + 10, 7)
+		arrowUp(1, dx + scale * space.range.interpolate(.5) - 17, dy + 10, 7)
+		arrowUp(1, dx + scale * space.range.interpolate(.5) + 17, dy + 10, 7)
+	}
 
 }
 
