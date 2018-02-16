@@ -8,6 +8,9 @@ import { TimelineCanvas } from '../../../src/timeline.canvas.js'
 import { bench } from '../../../src/bench.js'
 export { bench }
 
+import { mmmath } from '../../../src/mmmath.js'
+export { mmmath }
+
 export let timeline = new Timeline(800)
 
 timeline.division({ width: '50%' })
