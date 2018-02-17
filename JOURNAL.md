@@ -1,14 +1,14 @@
 
 # Fri Feb 2018
 
-- Head 
-Should head avatars declared in `Division` permit to modify head position directly (from absolute/relative property)?  
-Overkill? Example:
+- **Head**  
+Should head avatars, currently declared in `Division`, allow to modify head position directly (from absolute/relative property)? Overkill?  
+Example:
 ```javasctipt
 division.heads[0].position.relative += .01
 ```
 
-- Flex
+- **Flex**
 What about a flex layout?  
 Children can get portions of available size from their associated weight.
 
