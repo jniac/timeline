@@ -62,9 +62,11 @@ export class Space {
 
 			root: this,
 			parent: null,
-			index: -1,
 			children: [],
 			floatChildren: [],
+
+			childrenUniqueIdentifierCount: 0,
+			childUniqueIdentifier: -1,
 
 			// debug:
 
@@ -83,7 +85,7 @@ export class Space {
 
 		child.root = this.root
 		child.parent = this
-		child.index = this.children.length
+		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++
 		this.children.push(child)
 
 		return this
@@ -97,7 +99,7 @@ export class Space {
 
 		child.root = this
 		child.parent = null
-		child.index = -1
+		child.childUniqueIdentifier = -1
 		this.children.splice(this.children.indexOf(child), 1)
 
 		return this
@@ -126,7 +128,7 @@ export class Space {
 
 	resolveSpace() {
 
-		this.children.sort((a, b) => a.order - b.order || a.index - b.index)
+		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		this.resolveWidth()
 		this.resolvePosition()
@@ -152,7 +154,7 @@ export class Space {
 
 			this.globalWidth = 0
 
-			for (let child of this.children) {
+			for (let child of this.sortedChildren) {
 
 				child.resolveWidth()
 
@@ -165,7 +167,7 @@ export class Space {
 
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth())
 
-			for (let child of this.children)
+			for (let child of this.sortedChildren)
 				child.resolveWidth()
 
 		}
@@ -195,7 +197,7 @@ export class Space {
 
 		let childStackOffset = 0
 
-		for (let child of this.children) {
+		for (let child of this.sortedChildren) {
 
 			child.resolvePosition(childStackOffset)
 
@@ -238,7 +240,7 @@ export class Space {
 
 	// 	// children:
 
-	// 	children.sort((a, b) => a.order - b.order || a.index - b.index)
+	// 	children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 	// 	let childOffset = 0
 	// 	this.floatChildren.length = 0
