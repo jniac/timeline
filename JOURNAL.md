@@ -1,6 +1,34 @@
 
 # Fri Feb 2018
 
+- **Head**  
+Should head avatars, currently declared in `Division`, allow to modify head position directly (from absolute/relative property)? Overkill?  
+Example:
+```javasctipt
+division.heads[0].position.relative += .01
+```
+
+- **Flex**
+What about a flex layout?  
+Children can get portions of available size from their associated weight.
+
+---
+
+**TimelineCanvas**  
+Added arrow to figure children contribution to parent width.
+
+**Mth.js**  
+Good name for a Math lib ?  
+(have to found a quite-definitive solution for math functions)
+
+**SpaceProperty**  
+`Double` should not be declared in `primitives.js`, `Double` is not as generic as `Range`. `Range` is like `Point`, it could be used in many different cases, for different usages. That's why `timeline.space-property.js`has been created. However, while re-writing `Double` in `SpaceProperty` i was asking myself if `SpaceProperty` should allow other declaration than the couple `absolute/relative`. I started to add `mode`, which could be used in that way: `position: 'free:10 50%', width: 'content'`. I can not decide if it's a good or bad idea.  
+Good idea: it will allow more concise declaration (`free: 10 50%`).  
+Bad idea: does it really make sense to associate any numeric property to a string? Can a large amount of properties be concerned? beyond position & width?  
+(to be continued)
+
+---
+
 ### Totally rewritten Space width/position calculations
 Way way way more logic. Now, there are two recursive functions, to compute width first, then position.  
 Still not totally convinced, by the current architecture. It's better though.
