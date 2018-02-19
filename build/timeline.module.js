@@ -1,550 +1,3 @@
-// utils
-
-function copy(object, { recursive = false, exclude = null } = {}) {
-
-	if (typeof object !== 'object')
-		return object
-
-	let result = new object.constructor();
-
-	if (exclude && typeof exclude === 'string')
-		exclude = exclude.split(/,\s|,|\s/);
-
-	for (let k in object) {
-
-		if (exclude.includes(k))
-			continue
-
-		let value = object[k];
-
-		if (recursive && typeof value === 'object')
-			value = copy(value, { recursive, exclude });
-
-		result[k] = value;
-
-	}
-
-	return result
-
-}
-
-function propsToString(props) {
-
-	let entries = Object.entries(props);
-
-	if (!entries.length)
-		return '{}'
-
-	return `{ ${entries.map(([k, v]) => {
-
-		if (v === true)
-			return k
-
-		return k + ': ' + v
-
-	}).join(', ')} }`
-
-}
-
-/*
-
-query(object, 'page enabled')
-query(object, 'page enabled > stop')
-query(object, 'page enabled pagination.number>0 > stop')
-query(object, 'page enabled pagination[number>0] > stop')
-query(object, 'stop name=bob')
-
-*/
-
-const SelectorOp = {
-
-	'=': 	(lhs, rhs) => String(lhs) === String(rhs),
-	'!=': 	(lhs, rhs) => String(lhs) !== String(rhs),
-	'>': 	(lhs, rhs) => parseFloat(lhs) > parseFloat(rhs),
-	'>=': 	(lhs, rhs) => parseFloat(lhs) >= parseFloat(rhs),
-	'<': 	(lhs, rhs) => parseFloat(lhs) < parseFloat(rhs),
-	'<=': 	(lhs, rhs) => parseFloat(lhs) <= parseFloat(rhs),
-
-};
-
-function makeTest(str) {
-
-	let [, key, op, rhs] = str.match(/([\w-]+|\*)(=|!=|>|>=|<|<=)?([\w-]+)?/);
-
-	if (key === '*')
-		return object => true
-
-	return op
-		? object => SelectorOp[op](object[key], rhs)
-		: object => object.hasOwnProperty(key)
-
-}
-
-function getChildren(object, childrenDelegate, includeSelf) {
-
-	let array = includeSelf ? [object] : [];
-
-	let children = childrenDelegate(object);
-
-	if (children)
-		for (let child of children)
-			array.push(...getChildren(child, childrenDelegate, true));
-
-	return array
-
-}
-
-/**
- * returns children objects matching selector
- * selector rules:
- *
- *    • Match only the first result (the result will not be necessarily iterable)
- *    'first:[str]' 
- *
- *    • Match children
- *    '[str] > [str]' 
- *
- */
-function query(object, selector, { firstOnly = false, propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
-
-	if (typeof propsDelegate === 'string') {
-
-		let key = propsDelegate;
-		propsDelegate = object => object[key];
-		
-	}
-
-	if (typeof childrenDelegate === 'string') {
-
-		let key = childrenDelegate;
-		childrenDelegate = object => object[key];
-
-	}
-
-	if (selector.indexOf('first:') === 0) {
-
-		firstOnly = true;
-		selector = selector.slice(6);
-
-	}
-
-	let includeSelf = true;
-
-	if (/^\s*>\s+/.test(selector)) {
-
-		selector = selector.replace(/^\s*>\s+/, '');
-		includeSelf = false;
-
-	}
-
-	let stages = selector
-		.split(/\s+>\s+/)
-		.map(str => str
-			.split(/\s+/)
-			.map(str => makeTest(str)));
-
-	let array, candidates = getChildren(object, childrenDelegate, includeSelf);
-
-	for (let [index, stage] of stages.entries()) {
-
-		array = [];
-
-		for (let candidate of candidates) {
-
-			let props = propsDelegate(candidate);
-
-			if (stage.every(test => test(props)))
-				array.push(candidate);
-
-		}
-
-		candidates = [].concat(...array.map(candidate => childrenDelegate(candidate) || []));
-
-	}
-
-	return firstOnly ? array[0] || null : array
-
-}
-
-const percent = /%/;
-const spaces = /\s/;
-
-/**
- *
- * Double
- * 
- * Most of the lines are about parsing input values:
- * 
- * x 			> new Double(x, 1)
- * '100' 		> new Double(100, 0)
- * '100%' 		> new Double(0, 1)
- * '0 1' 		> new Double(0, 1)
- * '50 50%' 	> new Double(50, .5)
- * '50% 50%' 	> new Double(.5, .5)
- * [x, y] 		> new Double(x, y)
- * 
- */
-
-class Double {
-
-	static isDouble(value) {
-
-		return value.hasOwnProperty('absolute') && value.hasOwnProperty('relative')
-
-	}
-
-	static parsePercent(value) {
-
-		return parseFloat(value) * (percent.test(value) ? .01 : 1)
-
-	}
-
-	static parse(value, relativeValue = null) {
-
-		if (Double.isDouble(value))
-			return value
-
-		return new Double().parse(value, relativeValue)
-
-	}
-
-	constructor(absolute = 0, relative = 0) {
-
-		this.absolute = absolute;
-		this.relative = relative;
-
-	}
-
-	parse(value, relativeValue = null) {
-
-		if (relativeValue)
-			return this.set(Double.parsePercent(value), Double.parsePercent(relativeValue))
-
-		if (value instanceof Array)
-			return this.set(Double.parsePercent(value[0]), Double.parsePercent(value[1]))
-
-		switch(typeof value) {
-
-			case 'number':
-
-				return this.set(value, 0)
-
-			case 'string':
-				
-				if (spaces.test(value))
-					return Double.parse(value.split(spaces))
-
-				return percent.test(value)
-					? this.set(0, parseFloat(value) / 100)
-					: this.set(parseFloat(value), 0)
-
-			default:
-
-				return this.set(0, 0)
-
-		}
-
-	}
-
-	set(absolute, relative) {
-
-		if (typeof absolute === 'number' && typeof relative === 'number') {
-
-			this.absolute = absolute;
-			this.relative = relative;
-
-			return this
-
-		}
-
-		return this.parse(absolute, relative)
-
-	}
-
-	toString() {
-
-		return this.absolute === 0 && this.relative === 0
-			? '0'
-			: this.relative === 0
-			? this.absolute.toFixed(1)
-			: this.absolute === 0
-			? (this.relative * 100).toFixed(1) + '%'
-			: this.absolute.toFixed(1) + ' ' + (this.relative * 100).toFixed(1) + '%'
-
-	}
-
-}
-
-
-
-
-/** Class representing an interval [min, max] */
-
-class Range {
-
-	constructor(min = 0, max = 1) {
-
-		Object.assign(this, { min, max });
-
-	}
-
-	isVoid() {
-
-		return isNaN(this.min) || isNaN(this.max)
-
-	}
-
-	copy(other) {
-
-		this.min = other.min;
-		this.max = other.max;
-
-		return this
-
-	}
-
-	clone() {
-
-		return new Range(this.min, this.max)
-
-	}
-
-	intersects(other) {
-
-		return !(other.max < this.min || other.min > this.max)
-		
-	}
-
-	intersection(other) {
-
-		if (!this.intersects(other))
-			return new Range(NaN, NaN)
-
-		return new Range(Math.max(this.min, other.min), Math.min(this.max, other.max))
-
-	}
-
-	contains(x) {
-
-		return x >= this.min && x <= this.max
-
-	}
-
-	/**
-	 * interpolate a value to local bound
-	 * @param {number} x the ratio, if x = 0: interpolate(x) = min, if x = 1: interpolate(x) = max
-	 * @param {boolean} clamp should the result be clamp to [min, max]?
-	 */
-	interpolate(x, clamp = false) {
-
-		if (clamp)
-			x = x < 0 ? 0 : x > 1 ? 1 : x;
-
-		return this.min + (this.max - this.min) * x
-
-	}
-
-	/**
-	 * return the ratio of x inside the range
-	 * @param {number} x the value, if x = min: interpolate(x) = 0, if x = max: interpolate(x) = 1
-	 * @param {boolean} clamp should the result be clamp to [0, 1]?
-	 */
-	ratio(x, clamp = false) {
-
-		if (clamp) {
-
-			if (x < this.min)
-				return 0
-
-			if (x > this.max)
-				return 1
-
-		}
-
-		return (x - this.min) / (this.max - this.min)
-
-	}
-
-	get width() { return this.max - this.min }
-	set width(value) { this.max = this.min + value; }
-
-	toString(type = null) {
-
-		if (type === 1)
-			return this.min.toFixed(0) + '~' + this.max.toFixed(0)
-
-		return '[' + this.min.toFixed(1) + ', ' + this.max.toFixed(1) + ']'
-
-	}
-
-}
-
-/**
- * Class to simulate the movement of a Mobile from 2 variables:
- * • velocity
- * • friction
- *
- * key function: destination = position - velocity / log(friction)
- */
-class Mobile {
-
-	constructor() {
-
-		Object.assign(this, {
-
-			// classic physic properties
-			position: 0,
-			velocity: 0,	// px / s
-			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
-
-			hasMoved: false,
-			positionOld: 0,
-			velocityOld: 0,
-			
-			// target
-			forcedPosition: NaN,
-			// target: NaN,
-			// computedFriction: .1,
-
-		});
-
-	}
-
-	update(dt = 1 / 60) {
-
-		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this;
-
-		// integral
-		position += velocity * (friction ** dt - 1) / Math.log(friction);
-		velocity *= friction ** dt;
-
-		let hasMoved = position !== positionOld;
-
-		if (!isNaN(this.forcedPosition)) {
-
-			position = this.forcedPosition;
-			this.forcedPosition = NaN;
-
-		}
-
-		Object.assign(this, { position, positionOld, velocity, velocityOld, hasMoved });
-
-	}
-
-	setFriction(value, dt = 1) {
-
-		this.friction = value ** (1 / dt);
-
-	}
-
-	setPosition(value, { computeVelocity = true, dt = 1 / 60 } = {}) {
-
-		let d = value - this.positionOld;
-		this.position = value;
-		this.velocity = d ** (1 / dt);
-
-	}
-
-	/**
-	 * F*** powerful, i can't remind how it works, but it works!
-	 */
-	getDestination({ position, velocity, friction } = this) {
-
-		return position + -velocity / Math.log(friction)
-
-	}
-
-	getVelocityForDestination(destination, { position, friction } = this) {
-
-		return (position - destination) * Math.log(friction)
-
-	}
-
-	getFrictionForDestination(destination, { position, velocity } = this) {
-
-		return Math.exp(velocity / (position - destination))
-
-	}
-
-	get destination() { return this.getDestination() }
-
-	shoot(destination) {
-
-		this.velocity = this.getVelocityForDestination(destination);
-
-		return this
-
-	}
-
-}
-
-
-
-
-
-
-
-
-
-
-/**
- * Extends Mobile to add Timeline integration.
- */
-
-class Head extends Mobile {
-
-	constructor(timeline) {
-
-		super();
-
-		this.color = 'red';
-		this.timeline = timeline;
-
-	}
-
-	getIndex() {
-
-		return this.timeline
-			? this.timeline.heads.indexOf(this)
-			: -1
-
-	}
-
-	get index() { return this.getIndex() }
-
-	// value interface for easier handling
-	get value() { return this.position }
-	set value(value) { 
-
-		this.forcedPosition = value;
-		this.forceUpdate = true;
-
-	}
-
-	update(force = false) {
-
-		super.update();
-
-		if (force || this.forceUpdate || this.hasMoved) {
-
-			this.forceUpdate = false;
-
-			let index = this.getIndex();
-			
-			this.timeline.rootSection.walk(section => section.updateHead(index, this.position));
-
-		}
-
-	}
-
-	toString() {
-
-		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
-
-	}
-
-}
-
 /**
  * event.js module
  * a very permissive event module, with great options
@@ -995,6 +448,596 @@ class EventDispatcher { }
 
 Object.assign(EventDispatcher.prototype, EventDispatcherPrototype);
 
+// utils
+
+function copy(object, { recursive = false, exclude = null } = {}) {
+
+	if (typeof object !== 'object')
+		return object
+
+	// let result = new object.constructor()
+	let result = {};
+
+	if (exclude && typeof exclude === 'string')
+		exclude = exclude.split(/,\s|,|\s/);
+
+	for (let k in object) {
+
+		if (exclude.includes(k))
+			continue
+
+		let value = object[k];
+
+		if (recursive && typeof value === 'object')
+			value = copy(value, { recursive, exclude });
+
+		result[k] = value;
+
+	}
+
+	return result
+
+}
+
+function propsToString(props) {
+
+	let entries = Object.entries(props);
+
+	if (!entries.length)
+		return '{}'
+
+	return `{ ${entries.map(([k, v]) => {
+
+		if (v === true)
+			return k
+
+		return k + ': ' + v
+
+	}).join(', ')} }`
+
+}
+
+/*
+
+query(object, 'page enabled')
+query(object, 'page enabled > stop')
+query(object, 'page enabled pagination.number>0 > stop')
+query(object, 'page enabled pagination[number>0] > stop')
+query(object, 'stop name=bob')
+
+*/
+
+const SelectorOp = {
+
+	'=': 	(lhs, rhs) => String(lhs) === String(rhs),
+	'!=': 	(lhs, rhs) => String(lhs) !== String(rhs),
+	'>': 	(lhs, rhs) => parseFloat(lhs) > parseFloat(rhs),
+	'>=': 	(lhs, rhs) => parseFloat(lhs) >= parseFloat(rhs),
+	'<': 	(lhs, rhs) => parseFloat(lhs) < parseFloat(rhs),
+	'<=': 	(lhs, rhs) => parseFloat(lhs) <= parseFloat(rhs),
+
+};
+
+function makeTest(str) {
+
+	let [, key, op, rhs] = str.match(/([\w-]+|\*)(=|!=|>|>=|<|<=)?([\w-]+)?/);
+
+	if (key === '*')
+		return object => true
+
+	return op
+		? object => SelectorOp[op](object[key], rhs)
+		: object => object.hasOwnProperty(key)
+
+}
+
+function getChildren(object, childrenDelegate, includeSelf) {
+
+	let array = includeSelf ? [object] : [];
+
+	let children = childrenDelegate(object);
+
+	if (children)
+		for (let child of children)
+			array.push(...getChildren(child, childrenDelegate, true));
+
+	return array
+
+}
+
+/**
+ * returns children objects matching selector
+ * selector rules:
+ *
+ *    • Match only the first result (the result will not be necessarily iterable)
+ *    'first:[str]' 
+ *
+ *    • Match children
+ *    '[str] > [str]' 
+ *
+ */
+function query(object, selector, { firstOnly = false, propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
+
+	if (typeof propsDelegate === 'string') {
+
+		let key = propsDelegate;
+		propsDelegate = object => object[key];
+		
+	}
+
+	if (typeof childrenDelegate === 'string') {
+
+		let key = childrenDelegate;
+		childrenDelegate = object => object[key];
+
+	}
+
+	if (/^f:|^first:/.test(selector)) {
+
+		firstOnly = true;
+		selector = selector.replace(/^f:|^first:/, '');
+
+	}
+
+	let includeSelf = true;
+
+	if (/^\s*>\s+/.test(selector)) {
+
+		selector = selector.replace(/^\s*>\s+/, '');
+		includeSelf = false;
+
+	}
+
+	let stages = selector
+		.split(/\s+>\s+/)
+		.map(str => str
+			.split(/\s+/)
+			.map(str => makeTest(str)));
+
+	let array, candidates = getChildren(object, childrenDelegate, includeSelf);
+
+	for (let [index, stage] of stages.entries()) {
+
+		array = [];
+
+		for (let candidate of candidates) {
+
+			let props = propsDelegate(candidate);
+
+			if (stage.every(test => test(props)))
+				array.push(candidate);
+
+		}
+
+		candidates = [].concat(...array.map(candidate => childrenDelegate(candidate) || []));
+
+	}
+
+	return firstOnly ? array[0] || null : array
+
+}
+
+const percent = /%/;
+const spaces = /\s/;
+
+/**
+ *
+ * Double
+ * 
+ * Most of the lines are about parsing input values:
+ * 
+ * x 			> new Double(x, 1)
+ * '100' 		> new Double(100, 0)
+ * '100%' 		> new Double(0, 1)
+ * '0 1' 		> new Double(0, 1)
+ * '50 50%' 	> new Double(50, .5)
+ * '50% 50%' 	> new Double(.5, .5)
+ * [x, y] 		> new Double(x, y)
+ * 
+ */
+
+class Double {
+
+	static isDouble(value) {
+
+		return value.hasOwnProperty('absolute') && value.hasOwnProperty('relative')
+
+	}
+
+	static parsePercent(value) {
+
+		return parseFloat(value) * (percent.test(value) ? .01 : 1)
+
+	}
+
+	static parse(value, relativeValue = null) {
+
+		if (Double.isDouble(value))
+			return value
+
+		return new Double().parse(value, relativeValue)
+
+	}
+
+	constructor(absolute = 0, relative = 0) {
+
+		this.absolute = absolute;
+		this.relative = relative;
+
+	}
+
+	parse(value, relativeValue = null) {
+
+		if (relativeValue)
+			return this.set(Double.parsePercent(value), Double.parsePercent(relativeValue))
+
+		if (value instanceof Array)
+			return this.set(Double.parsePercent(value[0]), Double.parsePercent(value[1]))
+
+		switch(typeof value) {
+
+			case 'number':
+
+				return this.set(value, 0)
+
+			case 'string':
+				
+				if (spaces.test(value))
+					return Double.parse(value.split(spaces))
+
+				return percent.test(value)
+					? this.set(0, parseFloat(value) / 100)
+					: this.set(parseFloat(value), 0)
+
+			default:
+
+				return this.set(0, 0)
+
+		}
+
+	}
+
+	set(absolute, relative) {
+
+		if (typeof absolute === 'number' && typeof relative === 'number') {
+
+			this.absolute = absolute;
+			this.relative = relative;
+
+			return this
+
+		}
+
+		return this.parse(absolute, relative)
+
+	}
+
+	solve(relativeReference) {
+
+		return (relativeReference || 0) * this.relative + this.absolute
+
+	}
+
+	/**
+	 * alignment is solved that way:
+	 *
+	 * relative === -1 		=> 		-relativeReference (+ absolute)
+	 * relative === 0 		=> 		-relativeReference / 2 (+ absolute)
+	 * relative === 1 		=> 		0 (+ absolute)
+	 *
+	 */
+	solveAlign(relativeReference) {
+
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+
+	}
+
+	toString() {
+
+		return this.absolute === 0 && this.relative === 0
+			? '0'
+			: this.relative === 0
+			? this.absolute.toFixed(1)
+			: this.absolute === 0
+			? (this.relative * 100).toFixed(1) + '%'
+			: this.absolute.toFixed(1) + ' ' + (this.relative * 100).toFixed(1) + '%'
+
+	}
+
+}
+
+
+
+
+/** Class representing an interval [min, max] */
+
+class Range {
+
+	constructor(min = 0, max = 1) {
+
+		this.set(min, max);
+
+	}
+
+	set(min, max) {
+
+		this.min = min;
+		this.max = max;
+
+		return this
+
+	}
+
+	isVoid() {
+
+		return isNaN(this.min) || isNaN(this.max)
+
+	}
+
+	copy(other) {
+
+		this.min = other.min;
+		this.max = other.max;
+
+		return this
+
+	}
+
+	clone() {
+
+		return new Range(this.min, this.max)
+
+	}
+
+	intersects(other) {
+
+		return !(other.max < this.min || other.min > this.max)
+		
+	}
+
+	intersection(other, clone = false) {
+
+		let target = clone ? this.clone() : this;
+
+		if (!target.intersects(other))
+			return target.set(NaN, NaN)
+
+		return target.set(Math.max(this.min, other.min), Math.min(this.max, other.max))
+
+	}
+
+	union(other, clone = false) {
+
+		let target = clone ? this.clone() : this;
+
+		if (this.isVoid())
+			return target.copy(other)
+
+		return target.set(Math.min(this.min, other.min), Math.max(this.max, other.max))
+
+	}
+
+	contains(x) {
+
+		return x >= this.min && x <= this.max
+
+	}
+
+	/**
+	 * interpolate a value to local bound
+	 * @param {number} x the ratio, if x = 0: interpolate(x) = min, if x = 1: interpolate(x) = max
+	 * @param {boolean} clamp should the result be clamp to [min, max]?
+	 */
+	interpolate(x, clamp = false) {
+
+		if (clamp)
+			x = x < 0 ? 0 : x > 1 ? 1 : x;
+
+		return this.min + (this.max - this.min) * x
+
+	}
+
+	/**
+	 * return the ratio of x inside the range
+	 * @param {number} x the value, if x = min: interpolate(x) = 0, if x = max: interpolate(x) = 1
+	 * @param {boolean} clamp should the result be clamp to [0, 1]?
+	 */
+	ratio(x, clamp = false) {
+
+		if (clamp) {
+
+			if (x < this.min)
+				return 0
+
+			if (x > this.max)
+				return 1
+
+		}
+
+		return (x - this.min) / (this.max - this.min)
+
+	}
+
+	get width() { return this.max - this.min }
+	set width(value) { this.max = this.min + value; }
+
+	toString(type = null) {
+
+		if (type === 1)
+			return this.min.toFixed(0) + '~' + this.max.toFixed(0)
+
+		return '[' + this.min.toFixed(1) + ', ' + this.max.toFixed(1) + ']'
+
+	}
+
+}
+
+/**
+ * Class to simulate the movement of a Mobile from 2 variables:
+ * • velocity
+ * • friction
+ *
+ * key function: destination = position - velocity / log(friction)
+ */
+class Mobile {
+
+	constructor() {
+
+		Object.assign(this, {
+
+			// classic physic properties
+			position: 0,
+			velocity: 0,	// px / s
+			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
+
+			hasMoved: false,
+			positionOld: 0,
+			velocityOld: 0,
+			
+			// target
+			forcedPosition: NaN,
+			// target: NaN,
+			// computedFriction: .1,
+
+		});
+
+	}
+
+	update(dt = 1 / 60) {
+
+		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this;
+
+		// integral
+		position += velocity * (friction ** dt - 1) / Math.log(friction);
+		velocity *= friction ** dt;
+
+		let hasMoved = position !== positionOld;
+
+		if (!isNaN(this.forcedPosition)) {
+
+			position = this.forcedPosition;
+			this.forcedPosition = NaN;
+
+		}
+
+		Object.assign(this, { position, positionOld, velocity, velocityOld, hasMoved });
+
+	}
+
+	setFriction(value, dt = 1) {
+
+		this.friction = value ** (1 / dt);
+
+	}
+
+	setPosition(value, { computeVelocity = true, dt = 1 / 60 } = {}) {
+
+		let d = value - this.positionOld;
+		this.position = value;
+		this.velocity = d ** (1 / dt);
+
+	}
+
+	/**
+	 * F*** powerful, i can't remind how it works, but it works!
+	 */
+	getDestination({ position, velocity, friction } = this) {
+
+		return position + -velocity / Math.log(friction)
+
+	}
+
+	getVelocityForDestination(destination, { position, friction } = this) {
+
+		return (position - destination) * Math.log(friction)
+
+	}
+
+	getFrictionForDestination(destination, { position, velocity } = this) {
+
+		return Math.exp(velocity / (position - destination))
+
+	}
+
+	get destination() { return this.getDestination() }
+
+	shoot(destination) {
+
+		this.velocity = this.getVelocityForDestination(destination);
+
+		return this
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ * Extends Mobile to add Timeline integration.
+ */
+
+class Head extends Mobile {
+
+	constructor(timeline) {
+
+		super();
+
+		this.color = 'red';
+		this.timeline = timeline;
+
+	}
+
+	getIndex() {
+
+		return this.timeline
+			? this.timeline.heads.indexOf(this)
+			: -1
+
+	}
+
+	get index() { return this.getIndex() }
+
+	// value interface for easier handling
+	get value() { return this.position }
+	set value(value) { 
+
+		this.forcedPosition = value;
+		this.forceUpdate = true;
+
+	}
+
+	update(force = false) {
+
+		super.update();
+
+		if (force || this.forceUpdate || this.hasMoved) {
+
+			this.forceUpdate = false;
+
+			let index = this.getIndex();
+			
+			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position));
+
+		}
+
+	}
+
+	toString() {
+
+		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
+
+	}
+
+}
+
 let now = typeof performance === 'object' 
 	? performance.now.bind(performance)
 	: Date.now.bind(Date);
@@ -1008,9 +1051,38 @@ const readonlyProperties = (target, properties, options = {}) => {
 
 
 
+
+
+/**
+ * key can be compared via 'is':
+ * 
+ * let e = new Enum('FOO', 'BAR')
+ * let key = e.FOO
+ * key.is.FOO // true
+ * key.is.BAR // false
+ *
+ */
 class EnumKey {
 
-	constructor(props) { Object.freeze(Object.assign(this, props)); }
+	constructor(enumInstance, index, keys) { 
+
+		Object.assign(this, {
+
+			enum: enumInstance,
+			name: keys[index],
+			index,
+			is: keys.reduce((r, v, i) => Object.defineProperty(r, v, {
+
+				value: i === index,
+				enumerable: true,
+
+			}), {}),
+
+		});
+
+		Object.freeze(this);
+	
+	}
 
 	toString() { return this.name }
 
@@ -1019,12 +1091,12 @@ class EnumKey {
 class Enum {
 
 	constructor(...keys) {
-		
+
 		for (let [index, key] of keys.entries()) {
 
 			Object.defineProperty(this, key, {
 
-				value: new EnumKey({ name:key, index, enum:this }),
+				value: new EnumKey(this, index, keys),
 				enumerable: true,
 
 			});
@@ -1048,18 +1120,48 @@ class Enum {
 
 }
 
-const LayoutEnum = new Enum(
+/**
+ *
+ * SpaceProperty
+ * 
+ * Most of the lines are about parsing input values:
+ * 
+ * x 			> new Double(x, 1)
+ * '100' 		> new Double(100, 0)
+ * '100%' 		> new Double(0, 1)
+ * '0 1' 		> new Double(0, 1)
+ * '50 50%' 	> new Double(50, .5)
+ * '50% 50%' 	> new Double(.5, .5)
+ * [x, y] 		> new Double(x, y)
+ * 
+ */
 
-	'ABSOLUTE', 		// only position define space global position
-	'STACKED',			// position is affected by index in children array
+
+	// console.log('' + new SpaceProperty('content'))
+	// console.log('' + SpaceProperty.ensure(2))
+	// console.log('' + SpaceProperty.ensure('200%'))
+	// console.log('' + SpaceProperty.ensure('300 200%'))
+
+	// let p1 = new SpaceProperty('bob')
+	// console.log(SpaceProperty.ensure(p1) === p1)
+
+const PositionMode = new Enum(
+
+	'STACK',			// position depends on previous spaces
+	'FREE', 			// position depends on [this.position] and [this.parent.range]
 );
 
-const ExpandEnum = new Enum(
+const WidthMode = new Enum(
 
-	'FIXED',			// width is fixed (from 'width' property)
-	'EXPAND',			// width is computed from content
+	'FIXED',			// width is fixed (by 'width' property)
+	'CONTENT',			// width is computed from content
+
+	// TODO, implement:
+	'FLEX',				// width is fixed (by 'width' property), but children width is computed from their contribution among the available width
 
 );
+
+console.log(WidthMode.FIXED.name === 'FIXED');
 
 
 
@@ -1068,34 +1170,47 @@ let spaceUID = 0;
 
 class Space {
 
-	constructor({ position = 0, width = '100%', align = '100%', order = 0, layout, expand } = {}) {
+	constructor({ position = 0, width = '100%', align = '100%', order = 0, positionMode, widthMode } = {}) {
 
 		readonlyProperties(this, {
 
 			uid: spaceUID++,
 
-			range: new Range(0, 1),
-			bounds: new Range(0, 0),
-
-			// design
-			position: new Double().set(position),
-			width: new Double().set(width),
-			align: new Double().set(align), // 100% = align left, 0% = center, -100% = align right
-
 		});
 
 		Object.assign(this, {
 
-			// design
-			layout: LayoutEnum[layout] || LayoutEnum.STACKED,
-			expand: ExpandEnum[expand] || ExpandEnum.FIXED,
-			order,
+			// design:
+			
+			positionMode: PositionMode[positionMode] || PositionMode.STACK,
+			position: new Double().set(position),
+			globalPosition: NaN,
 
-			// hierarchy
+			widthMode: WidthMode[widthMode] || WidthMode.FIXED,
+			width: new Double().set(width),
+			globalWidth: 0,
+			
+			order,
+			align: new Double().set(align), // 100% = align left, 0% = center, -100% = align right
+
+			// maths:
+
+			range: new Range(0, 1),
+			bounds: new Range(0, 0),
+
+			// hierarchy:
+
+			root: this,
 			parent: null,
-			index: -1,
 			children: [],
-			floatChildren: [],
+			sortedChildren: [],
+
+			childrenUniqueIdentifierCount: 0,
+			childUniqueIdentifier: -1,
+
+			// debug:
+
+			color: null,
 
 		});
 
@@ -1108,8 +1223,9 @@ class Space {
 		if (child.parent)
 			child.parent.removeChild(child);
 
+		child.root = this.root;
 		child.parent = this;
-		child.index = this.children.length;
+		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++;
 		this.children.push(child);
 
 		return this
@@ -1121,8 +1237,9 @@ class Space {
 		if (child.parent !== this)
 			throw 'child argument is not a child of this'
 
+		child.root = this;
 		child.parent = null;
-		child.index = -1;
+		child.childUniqueIdentifier = -1;
 		this.children.splice(this.children.indexOf(child), 1);
 
 		return this
@@ -1142,68 +1259,155 @@ class Space {
 
 		let parent = this.parent;
 
-		while(parent && parent.expand !== ExpandEnum.FIXED)
+		while(parent && parent.widthMode !== WidthMode.FIXED)
 			parent = parent.parent;
 
 		return parent
 
 	}
 
-	resolve(value) { return this.range.min + this.range.width * value.relative + value.absolute }
+	resolveSpace() {
 
-	resolveValue(absoluteValue, relativeValue = 0) { return this.range.min + this.range.width * relativeValue + absoluteValue }
+		this.resolveWidth();
+		this.resolvePosition();
 
-	/**
-	 * recursive
-	 */
-	resolveSpace(offset = 0) {
+	}
 
-		let { parent, range, position, width, align, children } = this;
+	getParentGlobalWidth() {
 
-		let fixedParent = this.getFixedParent();
+		let space = this.parent;
 
-		let rangeWidth = !fixedParent
-			? width.relative + width.absolute
-			: fixedParent.range.width * width.relative + width.absolute;
+		while(space && space.widthMode.is.CONTENT)
+			space = space.parent;
 
-		let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute;
+		// important if no fixed parent is found: 
+		// globalWidth is computed from root.width
+		return space ? space.globalWidth : this.root.width.solve(0)
 
-		range.min = !parent
-			? offset + alignOffset + position.relative + position.absolute
-			: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute;
+	}
 
-		range.width = rangeWidth;
+	resolveWidth() {
 
-		this.bounds.copy(this.range);
+		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier);
 
-		// children:
+		if (this.widthMode.is.CONTENT) {
 
-		children.sort((a, b) => a.order - b.order || a.index - b.index);
+			this.globalWidth = 0;
 
-		let childOffset = 0;
-		this.floatChildren.length = 0;
+			for (let child of this.sortedChildren) {
 
-		for (let child of children) {
-			
-			child.resolveSpace(childOffset);
+				child.resolveWidth();
 
-			if (child.layout === LayoutEnum.STACKED)
-				childOffset += child.range.width;
+				if (child.positionMode.is.STACK)
+					this.globalWidth += child.globalWidth;
 
-			if (this.bounds.min > child.bounds.min)
-				this.bounds.min = child.bounds.min;
+			}
 
-			if (this.bounds.max < child.bounds.max)
-				this.bounds.max = child.bounds.max;
+		} else {
+
+			this.globalWidth = this.width.solve(this.getParentGlobalWidth());
+
+			for (let child of this.sortedChildren)
+				child.resolveWidth();
 
 		}
 
-		if (this.expand === ExpandEnum.EXPAND)
-			this.range.copy(this.bounds);
+	}
 
-		return this
+	resolvePosition(stackOffset = 0) {
+
+		if (this.positionMode.is.FREE) {
+
+			// this.globalPosition = (this.parent && this.parent.globalPosition || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0)
+			this.globalPosition = (this.parent && this.parent.range.min || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0);
+
+			let alignOffset = this.align.solveAlign(this.globalWidth);
+			this.range.min = this.globalPosition + alignOffset;
+			this.range.max = this.globalPosition + alignOffset + this.globalWidth;
+
+		} else {
+
+			this.globalPosition = (this.parent && this.parent.globalPosition || 0) + stackOffset + this.position.solve(this.parent && this.parent.globalWidth || 0);
+			this.range.min = this.globalPosition;
+			this.range.max = this.globalPosition + this.globalWidth;
+
+		}
+
+		this.bounds.copy(this.range);
+
+		let childStackOffset = 0;
+
+		for (let child of this.sortedChildren) {
+
+			child.resolvePosition(childStackOffset);
+
+			if (child.positionMode.is.STACK)
+				childStackOffset += child.globalWidth;
+
+			this.bounds.union(child.bounds);
+
+		}
 
 	}
+
+
+	// resolveSpace() {
+
+	// 	let { parent, range, position, width, align, children } = this
+
+	// 	// self positionMode:
+
+	// 	let fixedParent = this.getFixedParent()
+
+	// 	let rangeWidth = !fixedParent
+	// 		? width.relative + width.absolute
+	// 		: fixedParent.range.width * width.relative + width.absolute
+
+	// 	let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute
+
+	// 	this.globalPosition = offset + (parent ? parent.range.interpolate(position.relative) : position.relative) + position.absolute
+
+	// 	range.min = !parent
+	// 		? offset + alignOffset + position.relative + position.absolute
+	// 		: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
+
+	// 	range.width = rangeWidth
+
+	// 	if (this.widthMode === WidthMode.CONTENT)
+	// 		this.range.copy(this.bounds)
+
+	// 	this.bounds.copy(this.range)
+
+	// 	// children:
+
+	// 	children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
+
+	// 	let childOffset = 0
+	// 	this.floatChildren.length = 0
+
+	// 	for (let child of children) {
+			
+	// 		child.resolveSpace(childOffset)
+
+	// 		if (child.positionMode === PositionMode.STACK) {
+
+	// 			childOffset += child.range.width
+
+	// 			if (this.widthMode === WidthMode.CONTENT)
+	// 				this.range.union(child.range)
+
+	// 		}
+
+	// 		this.bounds.union(child.bounds)
+
+	// 	}
+
+	// 	// if (this.widthMode === WidthMode.CONTENT)
+	// 	// 	this.range.copy(this.bounds)
+
+	// 	return this
+
+	// }
 
 	walk(callback) {
 
@@ -1228,16 +1432,37 @@ class Space {
 
 	toString() {
 
-		return `Space#${this.uid} {${this.layout} d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)}}`
+		return `Space#${this.uid} {${this.positionMode} d:${this.depth}, p:${this.position.toString()}, w:${this.width.toString()} r:${this.range.toString(1)}, b:${this.bounds.toString(1)}}`
 
 	}
 
 }
 
-let sectionMap = new WeakMap();
-let sectionUID = 0;
+let divisionMap = new WeakMap();
+let divisionUID = 0;
 
-class Section extends EventDispatcher {
+class DivisionProps {
+
+	constructor(division, props) {
+
+		Object.assign(this, props);
+
+		Object.defineProperties(this, {
+
+			root: {
+
+				enumerable: true,
+				get() { return !division.space.parent } 
+
+			},
+
+		});
+
+	}
+
+}
+
+class Division extends EventDispatcher {
 
 	constructor(timeline, parent, spaceProps = null, props = null) {
 
@@ -1245,9 +1470,10 @@ class Section extends EventDispatcher {
 
 		readonlyProperties(this, {
 
-			uid: sectionUID++,
+			uid: divisionUID++,
 			space: new Space(spaceProps),
-			props: Object.assign({}, props),
+			// props: Object.assign({}, props),
+			props: new DivisionProps(this, props),
 			heads: [],
 
 		});
@@ -1260,12 +1486,10 @@ class Section extends EventDispatcher {
 
 		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true });
 
-		sectionMap.set(this.space, this);
+		divisionMap.set(this.space, this);
 
-		if (parent) {
-			console.log(parent);
+		if (parent)
 			parent.space.addChild(this.space);
-		}
 
 	}
 
@@ -1332,7 +1556,7 @@ class Section extends EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0;
 
-		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues };
+		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline };
 
 		if (isNaN(oldValues.global))
 			this.dispatchEvent(`init-head${index}`, eventData);
@@ -1352,12 +1576,12 @@ class Section extends EventDispatcher {
 	}
 
 	// traps:
-	get parent() { return this.space.parent && sectionMap.get(this.space.parent) }
-	get children() { return this.space.children && this.space.children.map(v => sectionMap.get(v)) }
+	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
+	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 
 	walk(callback) {
 
-		this.space.walk(space => callback(sectionMap.get(space)));
+		this.space.walk(space => callback(divisionMap.get(space)));
 
 		return this
 
@@ -1369,7 +1593,7 @@ class Section extends EventDispatcher {
 		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`;
 		let props = propsToString(copy(this.props, { exclude: 'uid' }));
 
-		return `Section#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
+		return `Division#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
 
 	}
 
@@ -1378,19 +1602,23 @@ class Section extends EventDispatcher {
 let timelines = [];
 let timelineUID = 0;
 
-class Timeline {
+class Timeline extends EventDispatcher {
 
 	constructor(rootWidth = 1) {
+
+		super();
 
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootSection: this.createSection(null, { width: rootWidth }),
+			rootDivision: this.createDivision(null, { width: rootWidth, 
+				widthMode: 'CONTENT',
+			}),
 			heads: [],
 
 		});
 
-		this.currentSection = this.rootSection;
+		this.currentDivision = this.rootDivision;
 
 		Object.assign(this, {
 
@@ -1416,7 +1644,7 @@ class Timeline {
 
 		let t = now();
 
-		this.rootSection.space.resolveSpace();
+		this.rootDivision.space.resolveSpace();
 
 		for (let head of this.heads)
 			head.update();
@@ -1425,25 +1653,27 @@ class Timeline {
 
 		this.updateCost = dt;
 
-	}
-
-	createSection(parent = this.rootSection, spaceProps, props = null) {
-
-		let section = new Section(this, parent, spaceProps, props);
-
-		this.lastSection = section;
-
-		return section
+		this.dispatchEvent('update');
 
 	}
 
-	// shorthands (returning previous methods result)
+	createDivision(parent = this.rootDivision, spaceProps, props = null) {
 
-	query(selector) { return this.rootSection.query(selector) }
+		let division = new Division(this, parent, spaceProps, props);
 
-	section({ parent = null, position = 0, width = '100%', align = '100%', order = 0, expand }) {
+		this.lastDivision = division;
 
-		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, expand' });
+		return division
+
+	}
+
+	// shorthands
+
+	query(selector) { return this.rootDivision.query(selector) }
+
+	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
+
+		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' });
 
 		if (typeof parent === 'string')
 			parent = this.query(parent);
@@ -1452,9 +1682,9 @@ class Timeline {
 			parent = parent[0];
 
 		if (!parent)
-			parent = this.currentSection;
+			parent = this.currentDivision;
 
-		return this.createSection(parent, { position, width, align, order, expand }, props)
+		return this.createDivision(parent, { position, width, align, order, positionMode, widthMode }, props)
 
 		return null
 

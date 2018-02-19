@@ -1,21 +1,21 @@
-import { Timeline } from '../../../src/timeline.js'
+import { Timeline } from '../../src/timeline.js'
 export { Timeline }
-import { query, copy } from '../../../src/query.js'
+import { query, copy } from '../../src/query.js'
 export { query, copy } 
-import { UIEventHandler } from '../../../src/UIEventHandler.js'
+import { UIEventHandler } from '../../src/UIEventHandler.js'
 
-import { TimelineCanvas } from '../../../src/timeline.canvas.js'
-import { bench } from '../../../src/bench.js'
+import { TimelineCanvas } from '../../src/timeline.canvas.js'
+import { bench } from '../../src/bench.js'
 export { bench }
 
-import { Mth } from '../../../src/Mth.js'
+import { Mth } from '../../src/Mth.js'
 export { Mth }
 
 export let timeline = new Timeline(800)
 
 timeline.division({ width: '50%' })
 timeline.division({ width: '50%', position: 20, name: 'pink', widthMode: 'CONTENT' }).space.color = '#FEB0B4'
-timeline.division({ width: '50%' })
+// timeline.division({ width: '50%' })
 
 	timeline.division({ parent: 'name=pink', width: '50%' })
 	timeline.division({ parent: 'name=pink', width: '50%' })

@@ -63,7 +63,7 @@ export class Space {
 			root: this,
 			parent: null,
 			children: [],
-			floatChildren: [],
+			sortedChildren: [],
 
 			childrenUniqueIdentifierCount: 0,
 			childUniqueIdentifier: -1,
@@ -128,8 +128,6 @@ export class Space {
 
 	resolveSpace() {
 
-		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
-
 		this.resolveWidth()
 		this.resolvePosition()
 
@@ -149,6 +147,8 @@ export class Space {
 	}
 
 	resolveWidth() {
+
+		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		if (this.widthMode.is.CONTENT) {
 
