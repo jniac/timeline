@@ -1,3 +1,9 @@
+# Mon Feb 19 2018
+**removed sortedChildren!**<br>
+Too hard to maintain (sortedChildren is empty before the first resolveSpace() call). `childUniqueIdentifier` is preserved. `children` is sorted on each addChild call. So Division.query() will return Division instances in the same order as Spaces instances.
+
+[begin to implement `Space` queries based on range (overlaping, nearest)]
+
 # Sun Feb 18 2018
 **added sortedChildren & childUniqueIdentifier properties to `Space`**  <br/>
 Important! Since a property (`space.order`) is dedicated to the order in which each child will be computed, since `Array.sort()` [is not stable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort), space.children is cloned first (`array.concat()`) and sorted using `childUniqueIdentifier` to guarantee determinism :
