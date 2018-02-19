@@ -1,5 +1,13 @@
+# Sun Feb 18 2018
+**added sortedChildren & childUniqueIdentifier properties to `Space`**  <br/>
+Important! Since a property (`space.order`) is dedicated to the order in which each child will be computed, since `Array.sort()` [is not stable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort), space.children is cloned first (`array.concat()`) and sorted using `childUniqueIdentifier` to guarantee determinism :
+```javascript
+this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
+```
+So, if 2 children have the same order, they will be ordered according to their order of arrival.
 
-# Fri Feb 2018
+
+# Fri Feb 16 2018
 
 - **Head**  
 Should head avatars, currently declared in `Division`, allow to modify head position directly (from absolute/relative property)? Overkill?  
