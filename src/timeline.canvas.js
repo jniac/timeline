@@ -109,7 +109,7 @@ export class TimelineCanvas {
 
 	}
 
-	highlight(highlighted = null, { activeColor = 'red', greyedColor = '#ddd', highlightBranch = true } = {}) {
+	highlight(highlighted = null, { activeColor = 'red', greyedColor = '#ddd', branch = true } = {}) {
 
 		if (typeof highlighted === 'string')
 			highlighted = this.timeline.query(highlighted)
@@ -119,7 +119,7 @@ export class TimelineCanvas {
 			highlighted,
 			activeColor,
 			greyedColor,
-			highlightBranch,
+			highlightBranch: branch,
 
 		})
 

@@ -8,7 +8,7 @@ timelineCanvas.highlight(divisionOrSelector, options)
 options = {
     activeColor: 'red',     // the highlight color 
     greyedColor: '#ddd',    // the greyed color
-    highlightBranch: true,  // should the whole branch holding the highlighted be highlighted w activeColor?
+    branch: true,  // should the whole branch holding the highlighted be highlighted w activeColor?
 }
 ```
 
