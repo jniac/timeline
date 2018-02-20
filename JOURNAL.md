@@ -1,3 +1,41 @@
+# Tue Feb 20 2018
+### Added highlight() to TimelineCanvas (Debug)
+Added hierarchy test (isParentOf, isChildOf) to `Space`.
+```javascript
+timelineCanvas.highlight(divisionOrSelector, options)
+```
+```javascript
+options = {
+    activeColor: 'red',     // the highlight color 
+    greyedColor: '#ddd',    // the greyed color
+    highlightBranch: true,  // should the whole branch holding the highlighted be highlighted w activeColor?
+}
+```
+
+### Working Proof of concept
+The result is ambiguous, the tool is powerful, but the syntax is still quite complicated:
+```javascript
+timeline.division({ 
+    circle, 
+    positionMode: 'FREE', 
+    position: (100 * index / (n - 1)) + '%',    // 0%, 33.3%, 66.6%, 100%
+    width: [-10, (100 / (n - 1)) + '%'],        // 33.3% - 10, hard to decipher right?
+    align: '0%', 
+    page: true,
+})
+    .addTo('svgWrapper')
+    .on(/enter/, event => {
+
+        event.target.props.circle.r.baseVal.value = 16
+
+    })
+    .on(/exit/, event => {
+
+        event.target.props.circle.r.baseVal.value = 8
+
+    })
+```
+
 # Mon Feb 19 2018
 **removed sortedChildren!**<br>
 Too hard to maintain (sortedChildren is empty before the first resolveSpace() call). `childUniqueIdentifier` is preserved. `children` is sorted on each addChild call. So Division.query() will return Division instances in the same order as Spaces instances.

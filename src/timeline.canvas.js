@@ -42,11 +42,11 @@ function arrowUp(x, y, { color, size = 10, thickness = 1 } = {}) {
 }
 
 
-function drawSpace(space, dx, dy, scale,) {
+function drawSpace(space, dx, dy, scale, color) {
 
 	let x, w
 
-	let color = space.color || 'black'
+	color = color || space.color || 'black'
 
 	ctx.strokeStyle = color
 
@@ -69,8 +69,9 @@ function drawSpace(space, dx, dy, scale,) {
 
 	if (space.widthMode.is.CONTENT) {
 		arrowUp(dx + scale * space.range.interpolate(.5), dy + 10, { size: 7 })
-		arrowUp(dx + scale * space.range.interpolate(.5) - 17, dy + 10, { size: 7 })
-		arrowUp(dx + scale * space.range.interpolate(.5) + 17, dy + 10, { size: 7 })
+		lineV(dx + scale * space.range.interpolate(.5), dy + 10, 16)
+		// arrowUp(dx + scale * space.range.interpolate(.5) - 17, dy + 10, { size: 7 })
+		// arrowUp(dx + scale * space.range.interpolate(.5) + 17, dy + 10, { size: 7 })
 	}
 
 }
@@ -108,6 +109,37 @@ export class TimelineCanvas {
 
 	}
 
+	highlight(highlighted = null, { activeColor = 'red', greyedColor = '#ddd', highlightBranch = true } = {}) {
+
+		if (typeof highlighted === 'string')
+			highlighted = this.timeline.query(highlighted)
+
+		Object.assign(this, {
+
+			highlighted,
+			activeColor,
+			greyedColor,
+			highlightBranch,
+
+		})
+
+	}
+
+	testHighlight(division, { highlighted } = this) {
+
+		if (!highlighted)
+			return false
+
+		if (Array.isArray(highlighted))
+			return highlighted.some(highlighted => this.testHighlight(division, { highlighted }))
+
+		if (division === highlighted)
+			return true
+
+		return this.highlightBranch && (division.isParentOf(highlighted) || division.isChildOf(highlighted))
+
+	}
+
 	draw() {
 
 		({ ctx, timeline } = this)
@@ -142,7 +174,14 @@ export class TimelineCanvas {
 		timeline.rootDivision.walk(division => {
 
 			let y = 20 + 20 * division.space.depth
-			drawSpace(division.space, x, y, scale)
+			let color
+
+			if (this.highlighted)
+				color = this.testHighlight(division)
+					? this.activeColor
+					: this.greyedColor
+
+			drawSpace(division.space, x, y, scale, color)
 
 		})
 

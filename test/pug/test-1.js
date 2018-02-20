@@ -41,9 +41,18 @@ timeline.division({ width: '80%', svgWrapper: true })
 
 	})
 
-for (let [index, circle] of document.querySelectorAll('svg circle.step').entries()) {
+;[...document.querySelectorAll('svg circle.step')].forEach((circle, index, array) => {
 
-	timeline.division({ circle, position: (100 * index / 3) + '%', positionMode: 'FREE', width: '25%', align: '0%', page: true })
+	let n = array.length
+
+	timeline.division({ 
+		circle, 
+		positionMode: 'FREE', 
+		position: (100 * index / (n - 1)) + '%', 
+		width: [-10, (100 / (n - 1)) + '%'], 
+		align: '0%', 
+		page: true,
+	})
 		.addTo('svgWrapper')
 		.on(/enter/, event => {
 
@@ -56,7 +65,7 @@ for (let [index, circle] of document.querySelectorAll('svg circle.step').entries
 
 		})
 
-}
+})
 
 
 

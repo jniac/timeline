@@ -168,6 +168,8 @@ export class Division extends eventjs.EventDispatcher {
 	// traps:
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
+	isParentOf(division) { return this.space.isParentOf(division.space) }
+	isChildOf(division) { return this.space.isChildOf(division.space) }
 
 	walk(callback) {
 
