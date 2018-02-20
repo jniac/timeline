@@ -6,7 +6,7 @@ export const Mth = {
 
 	},
 
-	enu: {
+	gen: {
 
 		*step(start, end, { step, count }) {
 
@@ -20,7 +20,7 @@ export const Mth = {
 
 		},
 
-		*for(n) {
+		*int(n) {
 
 			let i = 0
 
