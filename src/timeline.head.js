@@ -1,4 +1,33 @@
 
+class Variable extends Array {
+
+	constructor({ length, value = 0 }) {
+
+		super()
+
+		this.sum = value * length
+
+		for (let i = 0; i < length; i++)
+			this[i] = value
+
+		this.value = value
+
+	}
+
+	setNewValue(value) {
+
+		this.value = value
+
+		this.sum += -this.shift() + value
+
+		this.push(value)
+
+	}
+
+	get average() { return this.sum / this.length }
+
+}
+
 /**
  * Class to simulate the movement of a Mobile from 2 variables:
  * • velocity
@@ -26,6 +55,8 @@ class Mobile {
 			// target: NaN,
 			// computedFriction: .1,
 
+			velocityVar: new Variable({ length: 5 }), 
+
 		})
 
 	}
@@ -34,20 +65,27 @@ class Mobile {
 
 		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this
 
-		// integral
-		position += velocity * (friction ** dt - 1) / Math.log(friction)
-		velocity *= friction ** dt
-
-		let hasMoved = position !== positionOld
-
 		if (!isNaN(this.forcedPosition)) {
 
-			position = this.forcedPosition
+			this.setPosition(this.forcedPosition)
 			this.forcedPosition = NaN
+
+			position = this.position
+			velocity = this.velocity
+
+		} else {
+
+			// integral
+			position += velocity * (friction ** dt - 1) / Math.log(friction)
+			velocity *= friction ** dt
 
 		}
 
+		let hasMoved = position !== positionOld
+
 		Object.assign(this, { position, positionOld, velocity, velocityOld, hasMoved })
+
+		this.velocityVar.setNewValue(velocity)
 
 	}
 
@@ -61,14 +99,14 @@ class Mobile {
 
 		let d = value - this.positionOld
 		this.position = value
-		this.velocity = d ** (1 / dt)
+		this.velocity = d / dt
 
 	}
 
 	/**
 	 * F*** powerful, i can't remind how it works, but it works!
 	 */
-	getDestination({ position, velocity, friction } = this) {
+	getDestination({ position = this.position, velocity = this.velocity, friction = this.friction } = {}) {
 
 		return position + -velocity / Math.log(friction)
 
@@ -138,6 +176,7 @@ export class Head extends Mobile {
 
 		this.forcedPosition = value
 		this.forceUpdate = true
+		// this.setPosition(value)
 
 	}
 
@@ -154,6 +193,25 @@ export class Head extends Mobile {
 			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
 
 		}
+
+	}
+
+	velocityCorrectionForNearest(selector) {
+
+		this.forcedPosition = NaN
+
+		let velocityBefore = this.velocity
+
+		let destination = this.getDestination({ velocity: this.velocityVar.average })
+
+		let nearest = this.timeline.nearest(destination, selector)
+
+		if (nearest)
+			this.shoot(nearest.space.globalPosition)
+
+		let velocityRatio = this.velocity / velocityBefore
+
+		console.log('velocity shift:', (100 * velocityRatio).toFixed(1) + '%')
 
 	}
 

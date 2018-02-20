@@ -13,31 +13,66 @@ export { Mth }
 
 export let timeline = new Timeline(800)
 
-for (let section of document.querySelectorAll('.wrapper section')) {
+timeline.division({ width: 0, page: true, order: Infinity, name:'end' })
 
-	timeline.division({ width: '100%', section, page: true })
+for (let [index, section] of document.querySelectorAll('.wrapper section').entries()) {
 
+	if (index === 0)
+		continue
+
+	let wrapperDivision = timeline.division({ widthMode: 'CONTENT', wrapper: true, sectionIndex: index })
+
+	timeline.division({ width: '100%', section, page: true, sectionIndex: index })
+		.addTo(wrapperDivision)
 		.on(/init|progress/, event => {
 
-			event.target.props.section.style.transform = `translateX(${(1 - event.progress) * 100}%)`
+			event.target.props.section.style.transform = `translateX(${((1 - event.progress) * 100).toFixed(1)}%)`
 
 		})
 
 }
 
-timeline.division({ position: '50%', width: 0, align: 0, })
-	.addTo('uid=3')
-	.on(/pass/, event => {
+// add SVG Step
+timeline.division({ width: '80%', svgWrapper: true })
+	.addTo('wrapper sectionIndex=1')
+	.on(/init|progress/, event => {
 
-		document.querySelector('section:nth-child(3)').style.color = event.direction === 1 ? 'white' : null
+		document.querySelector('svg circle.cursor').cx.baseVal.valueInSpecifiedUnits = 20 + 60 * event.progress
 
 	})
 
-timeline.division({ width: 200, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity })
-timeline.division({ width: 200, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity })
+for (let [index, circle] of document.querySelectorAll('svg circle.step').entries()) {
 
-timeline.division({ name: 'exp', widthMode: 'ELASTIC' })
-timeline.division({ parent: 'first:name=exp' })
+	timeline.division({ circle, position: (100 * index / 3) + '%', positionMode: 'FREE', width: '25%', align: '0%', page: true })
+		.addTo('svgWrapper')
+		.on(/enter/, event => {
+
+			event.target.props.circle.r.baseVal.value = 16
+
+		})
+		.on(/exit/, event => {
+
+			event.target.props.circle.r.baseVal.value = 8
+
+		})
+
+}
+
+
+
+timeline.division({ position: '50%', width: 0, align: 0, })
+	.addTo('sectionIndex=3')
+	.on(/pass/, event => {
+
+		event.target.parent.props.section.style.color = event.direction === 1 ? 'white' : null
+
+	})
+
+timeline.division({ width: 400, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity })
+timeline.division({ width: 400, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity })
+
+// timeline.division({ name: 'exp', widthMode: 'CONTENT' })
+// timeline.division({ parent: 'first:name=exp' })
 // timeline.division({ parent: 'first:name=exp', name:'foo', width: '200%' })
 
 // timeline.division({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })
@@ -46,7 +81,7 @@ timeline.division({ parent: 'first:name=exp' })
 timeline.rootDivision.space.resolveSpace()
 timeline.head.value = 0
 
-export let handler = new UIEventHandler(document.body)
+export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
 // handler.on(/^((?!-x).)*$/, event => console.log(event.type))
 // handler.on(/swipe/, event => console.log(event.type))
@@ -56,11 +91,21 @@ handler.on('wheel', event => {
 	// console.log(event.type, event.dx)
 	timeline.head.value += event.dx
 
-	timelineCanvas.draw()
+	// timelineCanvas.draw()
 
 })
 
+handler.on('drag', event => {
 
+	timeline.head.value += -event.dx
+
+})
+
+handler.on('drag-end', event => {
+
+	timeline.head.velocityCorrectionForNearest('page')
+
+})
 
 
 

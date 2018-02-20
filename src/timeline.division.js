@@ -87,6 +87,29 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
+	nearest(position, selector = '*') {
+
+		let array = this.query(selector)
+
+		if (!array.length)
+			return null
+
+		let distance = Math.abs(array[0].space.globalPosition - position)
+		let best = { division: array[0], distance }
+
+		for (let i = 1, division; division = array[i]; i++) {
+
+			distance = Math.abs(division.space.globalPosition - position)
+
+			if (distance < best.distance)
+				best = { division, distance }
+
+		}
+
+		return best.division
+
+	}
+
 	// queryFirst(selector) {
 
 	// 	return query(this, selector)[0] || null

@@ -82,6 +82,8 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	query(selector) { return this.rootDivision.query(selector) }
 
+	nearest(...args) { return this.rootDivision.nearest(...args)}
+
 	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
 
 		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' })

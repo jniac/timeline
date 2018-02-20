@@ -12,7 +12,15 @@ block style
 block stage
 
 	.wrapper
-		section(style='background-color:#A5D5FF') hello
-		section(style='background-color:#FFE5B6') how are
-		section(style='background-color:#FEB0B4') you ?
+		section(style='background-color:#e9eef5') drag horizontally between section
+		section.big(style='background-color:#A5D5FF') hello
+			svg
+				line(stroke='black', stroke-width=4, x1='20%', y1='50%', x2='80%', y2='50%')
+				circle.step(cx='20%', cy='50%', r=8)
+				circle.step(cx='40%', cy='50%', r=8)
+				circle.step(cx='60%', cy='50%', r=8)
+				circle.step(cx='80%', cy='50%', r=8)
+				circle.cursor(cx='20%', cy='50%', r=40, fill='none', stroke='black', stroke-width=4)
+		section.big(style='background-color:#FFE5B6') how are
+		section.big(style='background-color:#FEB0B4') you ?
 		.border

@@ -1,452 +1,4 @@
-/**
- * event.js module
- * a very permissive event module, with great options
- * second version built on WeakMap
- * inspired by jQuery (chaining, iterations), express (flexibility) etc.
- *
- *
- *
- * WARNINGS & VULNERABILITIES:
- *
- * • For some unknow reasons a killed Listener is sometimes called or killed (a second time!)
- *       " if (this.killed)
- *            return "
- *       is a good patch, but the bug is not fixed
- *
- * • When removing a listener, if the listener has been added with a "thisArg" 
- *       it could currently be removed without specifying a value for "thisArg" (since off/removeEventListener() could be used with nothing more than a type parameters)
- *       this is dangerous since differents listeners could match the same criteria (two instance of a same class / prototype have striclty equal members 
- *       (because actually belonging to that class / prototype)).
- *       When specifying a callback to removeEventListener AND NOT a thisArg, should be considered as not matching listeners that HAVE a thisArg ?
- * 
- */
-
-const isIterable = obj => obj ? (typeof obj[Symbol.iterator] === 'function') : false;
-
-const whitespace = obj => typeof obj === 'string' && /\s/.test(obj);
-
-let weakmap = new WeakMap();
-
-
-
-function createListenersArray(target) {
-
-	let listeners = [];
-
-	weakmap.set(target, listeners);
-
-	return listeners
-
-}
-
-function deleteListenersArray(target) {
-
-	weakmap.delete(target);
-
-	
-
-}
-
-function getAllListeners(target, createMode = false) {
-
-	return weakmap.get(target) || (createMode ? createListenersArray(target) : null)
-
-}
-
-function getListenersMatching(target, type, callback = null, options = null) {
-
-	let listeners = weakmap.get(target);
-
-	if (!listeners)
-		return []
-
-	let result = [];
-
-	for (let listener of listeners)
-		if (listener.match(type, callback, options))
-			result.push(listener);
-
-	return result
-
-}
-
-function addEventListener(target, type, callback, options = undefined) {
-
-	if (!callback) {
-
-		console.log('event.js: addEventListener callback is null! (ignored)');
-		return
-
-	}
-
-	if (isIterable(target)) {
-
-		for (let element of target)
-			addEventListener(element, type, callback, options);
-
-		return target
-
-	}
-
-	if (whitespace(type)) {
-
-		for (let sub of type.split(/\s/))
-			addEventListener(target, sub, callback, options);
-
-		return target
-
-	}
-
-	let listener = new Listener(getAllListeners(target, true), type, callback, options);
-
-	return target
-
-}
-
-function once(target, type, callback, options = { }) {
-
-	options.max = 1;
-
-	return addEventListener(target, type, callback, options)
-
-}
-
-function removeEventListener(target, type, callback = null, options = { }) {
-
-	if (isIterable(target)) {
-
-		for (let element of target)
-			removeEventListener(element, type, callback);
-
-		return target
-
-	}
-
-	if (whitespace(type)) {
-
-		for (let sub of type.split(/\s/))
-			removeEventListener(target, type, callback);
-
-		return target
-
-	}
-
-	for (let listener of getListenersMatching(target, type, callback, options))
-		listener.kill();
-
-	return target
-
-}
-
-function clearEventListener(target) {
-
-	let listeners = weakmap.get(target);
-
-	if (!listeners)
-		return target
-
-	while(listeners.length)
-		listeners.pop().kill();
-
-	deleteListenersArray(target);
-
-	return target
-
-}
-
-function dispatchEvent(target, event, eventOptions = null) {
-
-	if (!target || !event)
-		return target
-
-	if (isIterable(target)) {
-
-		for (let element of target)
-			dispatchEvent(element, event, eventOptions);
-
-		return target
-
-	}
-
-	// fast skip test (x20 speed on target with no listeners: 0.0030ms to 0.00015ms)
-	if (!weakmap.has(target) && !event.propagateTo && (!eventOptions || !eventOptions.propagateTo))
-		return target
-
-	if (typeof event === 'string') {
-
-		if (whitespace(event)) {
-
-			for (let sub of event.split(/\s/))
-				dispatchEvent(target, sub, eventOptions);
-
-			return target
-
-		}
-
-		return dispatchEvent(target, new Event(target, event, eventOptions))
-
-	}
-
-
-
-	event.currentTarget = target;
-
-	// let listeners = getListenersMatching(target, event.type).sort((A, B) => B.priority - A.priority)
-	let listeners = getListenersMatching(target, event.type);
-
-	for (let listener of listeners) {
-
-		listener.call(event);
-
-		if (event.canceled)
-			break
-
-	}
-
-	if (event.propagateTo)
-		dispatchEvent(event.propagateTo(event.currentTarget), event);
-
-	return target
-
-}
-
-
-
-
-
-
-
-
-
-const EventOptions = {
-
-	cancelable: true,
-	priority: 0,
-	propagateTo: null,
-
-};
-
-class Event {
-
-	constructor(target, type, options) {
-
-		options = Object.assign({}, EventOptions, options);
-
-		Object.defineProperty(this, 'target', { 
-
-			value: target,
-
-		});
-
-		Object.defineProperty(this, 'currentTarget', { 
-
-			writable: true,
-			value: target,
-
-		});
-
-		Object.defineProperty(this, 'type', {
-
-			enumerable: true,
-			value: type,
-
-		});
-
-		for (let k in options) {
-
-			Object.defineProperty(this, k, { 
-				
-				enumerable: k in EventOptions,
-				value: options[k],
-
-			});
-
-		}
-
-		Object.defineProperty(this, 'canceled', {
-
-			writable: this.cancelable,
-			value: false,
-
-		});
-
-	}
-
-	cancel() {
-
-		if (this.cancelable)
-			this.canceled = true;
-
-	}
-
-}
-
-
-
-let ListenerDefaultOptions = {
-
-	priority: 0,
-	insertFirst: false,
-
-};
-
-class Listener {
-
-	constructor(array, type, callback, options = {}) {
-
-		this.count = 0;
-
-		this.array = array;
-		// this.array.push(this)
-
-		this.type = type;
-		this.callback = callback;
-
-		this.enabled = true;
-
-		// options
-		Object.assign(this, ListenerDefaultOptions, options);
-
-		let index = this.array.findIndex(listener => this.insertFirst ? 
-			listener.priority <= this.priority : 
-			listener.priority < this.priority);
-
-		if (index === -1)
-			this.array.push(this);
-		else
-			this.array.splice(index, 0, this);
-
-	}
-
-	match(str, callback = null, options = null) {
-
-		if (options !== null && this.match(str, callback)) {
-
-			for (let k in options)
-				if (this[k] !== options[k])
-					return false
-
-			return true
-
-		}
-
-		if (callback !== null)
-			return this.match(str) && this.callback === callback
-
-		if (this.type instanceof RegExp)
-			return this.type.test(str)
-
-		if (this.type instanceof Array)
-			return this.type.indexOf(str) !== -1
-
-		if (typeof this.type === 'function')
-			return this.type(str)
-
-		return this.type === str
-
-	}
-
-	call(event) {
-
-		if (this.killed)
-			return
-
-		this.callback.call(this.thisArg || event.currentTarget, event, ...(this.args || []));
-
-		this.count++;
-
-		if (this.count === this.max)
-			this.kill();
-
-	}
-
-	kill() {
-
-		if (this.killed)
-			return
-
-		let index = this.array.indexOf(this);
-
-		this.array.splice(index, 1);
-
-		delete this.array;
-		delete this.type;
-		delete this.callback;
-		delete this.options;
-
-		this.killed = true;
-
-	}
-
-}
-
-
-
-
-
-
-
-let EventDispatcherPrototype = {
-
-	getAllListeners(createMode = false) {
-
-		return getAllListeners(this, createMode)
-
-	},
-
-	clearEventListener() {
-
-		return clearEventListener(this)
-
-	},
-	
-	addEventListener(type, callback, options = undefined) { 
-
-		return addEventListener(this, type, callback, options) 
-
-	},
-
-	on(type, callback, options = undefined) { 
-
-		return addEventListener(this, type, callback, options) 
-
-	},
-
-	once(type, callback, options = { }) { 
-
-		return once(this, type, callback, options) 
-
-	},
-
-	removeEventListener(type, callback = undefined, options = undefined) { 
-
-		return removeEventListener(this, type, callback, options) 
-
-	},
-
-	off(type, callback = undefined, options = undefined) { 
-
-		return removeEventListener(this, type, callback, options) 
-
-	},
-
-	dispatchEvent(event, eventOptions = null) { 
-
-		return dispatchEvent(this, event, eventOptions) 
-
-	},
-
-};
-
-
-
-
-
-
-
-class EventDispatcher { }
-
-Object.assign(EventDispatcher.prototype, EventDispatcherPrototype);
+import { EventDispatcher } from './event.js';
 
 // utils
 
@@ -872,6 +424,35 @@ class Range {
 
 }
 
+class Variable extends Array {
+
+	constructor({ length, value = 0 }) {
+
+		super();
+
+		this.sum = value * length;
+
+		for (let i = 0; i < length; i++)
+			this[i] = value;
+
+		this.value = value;
+
+	}
+
+	setNewValue(value) {
+
+		this.value = value;
+
+		this.sum += -this.shift() + value;
+
+		this.push(value);
+
+	}
+
+	get average() { return this.sum / this.length }
+
+}
+
 /**
  * Class to simulate the movement of a Mobile from 2 variables:
  * • velocity
@@ -899,6 +480,8 @@ class Mobile {
 			// target: NaN,
 			// computedFriction: .1,
 
+			velocityVar: new Variable({ length: 5 }), 
+
 		});
 
 	}
@@ -907,20 +490,27 @@ class Mobile {
 
 		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this;
 
-		// integral
-		position += velocity * (friction ** dt - 1) / Math.log(friction);
-		velocity *= friction ** dt;
-
-		let hasMoved = position !== positionOld;
-
 		if (!isNaN(this.forcedPosition)) {
 
-			position = this.forcedPosition;
+			this.setPosition(this.forcedPosition);
 			this.forcedPosition = NaN;
+
+			position = this.position;
+			velocity = this.velocity;
+
+		} else {
+
+			// integral
+			position += velocity * (friction ** dt - 1) / Math.log(friction);
+			velocity *= friction ** dt;
 
 		}
 
+		let hasMoved = position !== positionOld;
+
 		Object.assign(this, { position, positionOld, velocity, velocityOld, hasMoved });
+
+		this.velocityVar.setNewValue(velocity);
 
 	}
 
@@ -934,14 +524,14 @@ class Mobile {
 
 		let d = value - this.positionOld;
 		this.position = value;
-		this.velocity = d ** (1 / dt);
+		this.velocity = d / dt;
 
 	}
 
 	/**
 	 * F*** powerful, i can't remind how it works, but it works!
 	 */
-	getDestination({ position, velocity, friction } = this) {
+	getDestination({ position = this.position, velocity = this.velocity, friction = this.friction } = {}) {
 
 		return position + -velocity / Math.log(friction)
 
@@ -1011,6 +601,7 @@ class Head extends Mobile {
 
 		this.forcedPosition = value;
 		this.forceUpdate = true;
+		// this.setPosition(value)
 
 	}
 
@@ -1027,6 +618,25 @@ class Head extends Mobile {
 			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position));
 
 		}
+
+	}
+
+	velocityCorrectionForNearest(selector) {
+
+		this.forcedPosition = NaN;
+
+		let velocityBefore = this.velocity;
+
+		let destination = this.getDestination({ velocity: this.velocityVar.average });
+
+		let nearest = this.timeline.nearest(destination, selector);
+
+		if (nearest)
+			this.shoot(nearest.space.globalPosition);
+
+		let velocityRatio = this.velocity / velocityBefore;
+
+		console.log('velocity shift:', (100 * velocityRatio).toFixed(1) + '%');
 
 	}
 
@@ -1161,8 +771,6 @@ const WidthMode = new Enum(
 
 );
 
-console.log(WidthMode.FIXED.name === 'FIXED');
-
 
 
 
@@ -1228,6 +836,8 @@ class Space {
 		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++;
 		this.children.push(child);
 
+		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier);
+
 		return this
 
 	}
@@ -1288,13 +898,13 @@ class Space {
 
 	resolveWidth() {
 
-		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier);
+		// this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		if (this.widthMode.is.CONTENT) {
 
 			this.globalWidth = 0;
 
-			for (let child of this.sortedChildren) {
+			for (let child of this.children) {
 
 				child.resolveWidth();
 
@@ -1307,10 +917,25 @@ class Space {
 
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth());
 
-			for (let child of this.sortedChildren)
+			for (let child of this.children)
 				child.resolveWidth();
 
 		}
+
+	}
+
+	computePosition() {
+
+		/*
+			Global position must be relative to parent.range (and not parent.globalPosition) 
+			since range can be modified by align.
+		*/
+
+		return this.parent
+
+			? this.parent.range.min + this.position.solve(this.parent.globalWidth)
+
+			: this.position.solve(0)
 
 	}
 
@@ -1318,8 +943,7 @@ class Space {
 
 		if (this.positionMode.is.FREE) {
 
-			// this.globalPosition = (this.parent && this.parent.globalPosition || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0)
-			this.globalPosition = (this.parent && this.parent.range.min || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0);
+			this.globalPosition = this.computePosition();
 
 			let alignOffset = this.align.solveAlign(this.globalWidth);
 			this.range.min = this.globalPosition + alignOffset;
@@ -1327,7 +951,7 @@ class Space {
 
 		} else {
 
-			this.globalPosition = (this.parent && this.parent.globalPosition || 0) + stackOffset + this.position.solve(this.parent && this.parent.globalWidth || 0);
+			this.globalPosition = this.computePosition() + stackOffset;
 			this.range.min = this.globalPosition;
 			this.range.max = this.globalPosition + this.globalWidth;
 
@@ -1337,7 +961,7 @@ class Space {
 
 		let childStackOffset = 0;
 
-		for (let child of this.sortedChildren) {
+		for (let child of this.children) {
 
 			child.resolvePosition(childStackOffset);
 
@@ -1349,65 +973,6 @@ class Space {
 		}
 
 	}
-
-
-	// resolveSpace() {
-
-	// 	let { parent, range, position, width, align, children } = this
-
-	// 	// self positionMode:
-
-	// 	let fixedParent = this.getFixedParent()
-
-	// 	let rangeWidth = !fixedParent
-	// 		? width.relative + width.absolute
-	// 		: fixedParent.range.width * width.relative + width.absolute
-
-	// 	let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute
-
-	// 	this.globalPosition = offset + (parent ? parent.range.interpolate(position.relative) : position.relative) + position.absolute
-
-	// 	range.min = !parent
-	// 		? offset + alignOffset + position.relative + position.absolute
-	// 		: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
-
-	// 	range.width = rangeWidth
-
-	// 	if (this.widthMode === WidthMode.CONTENT)
-	// 		this.range.copy(this.bounds)
-
-	// 	this.bounds.copy(this.range)
-
-	// 	// children:
-
-	// 	children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
-
-	// 	let childOffset = 0
-	// 	this.floatChildren.length = 0
-
-	// 	for (let child of children) {
-			
-	// 		child.resolveSpace(childOffset)
-
-	// 		if (child.positionMode === PositionMode.STACK) {
-
-	// 			childOffset += child.range.width
-
-	// 			if (this.widthMode === WidthMode.CONTENT)
-	// 				this.range.union(child.range)
-
-	// 		}
-
-	// 		this.bounds.union(child.bounds)
-
-	// 	}
-
-	// 	// if (this.widthMode === WidthMode.CONTENT)
-	// 	// 	this.range.copy(this.bounds)
-
-	// 	return this
-
-	// }
 
 	walk(callback) {
 
@@ -1518,6 +1083,29 @@ class Division extends EventDispatcher {
 	query(selector) {
 
 		return query(this, selector)
+
+	}
+
+	nearest(position, selector = '*') {
+
+		let array = this.query(selector);
+
+		if (!array.length)
+			return null
+
+		let distance = Math.abs(array[0].space.globalPosition - position);
+		let best = { division: array[0], distance };
+
+		for (let i = 1, division; division = array[i]; i++) {
+
+			distance = Math.abs(division.space.globalPosition - position);
+
+			if (distance < best.distance)
+				best = { division, distance };
+
+		}
+
+		return best.division
 
 	}
 
@@ -1670,6 +1258,8 @@ class Timeline extends EventDispatcher {
 	// shorthands
 
 	query(selector) { return this.rootDivision.query(selector) }
+
+	nearest(...args) { return this.rootDivision.nearest(...args)}
 
 	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
 

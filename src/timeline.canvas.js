@@ -1,7 +1,10 @@
 
 let ctx, timeline
 
-function lineH(thickness, x, y, width, off = 0) {
+function lineH(x, y, width, { color, off = 0, thickness = 1 } = {}) {
+
+	if (color)
+		ctx.strokeStyle = color
 
 	ctx.moveTo(x - width * off, y)
 	ctx.lineTo(x + width * (1 - off), y)
@@ -11,8 +14,11 @@ function lineH(thickness, x, y, width, off = 0) {
 
 }
 
-function lineV(thickness, x, y, height, off = .5) {
+function lineV(x, y, height, { color, off = .5, thickness = 1 } = {}) {
 
+	if (color)
+		ctx.strokeStyle = color
+	
 	ctx.moveTo(x, y - height * off)
 	ctx.lineTo(x, y + height * (1 - off))
 	ctx.lineWidth = thickness
@@ -21,8 +27,11 @@ function lineV(thickness, x, y, height, off = .5) {
 
 }
 
-function arrowUp(thickness, x, y, size = 10) {
+function arrowUp(x, y, { color, size = 10, thickness = 1 } = {}) {
 
+	if (color)
+		ctx.strokeStyle = color
+	
 	ctx.moveTo(x - size, y + size / 2)
 	ctx.lineTo(x, y - size / 2)
 	ctx.lineTo(x + size, y + size / 2)
@@ -43,9 +52,9 @@ function drawSpace(space, dx, dy, scale,) {
 
 	x = dx + scale * space.range.min
 	w = scale * space.range.width
-	lineH(3, x, dy, w)
-	lineV(1, x, dy, 10)
-	lineV(1, x + w, dy, 10)
+	lineH(x, dy, w, { thickness: 3, color })
+	lineV(x, dy, 10)
+	lineV(x + w, dy, 10)
 
 	ctx.lineWidth = 1
 	ctx.moveTo(dx + scale * space.bounds.min, dy)
@@ -59,9 +68,9 @@ function drawSpace(space, dx, dy, scale,) {
 	ctx.beginPath()
 
 	if (space.widthMode.is.CONTENT) {
-		arrowUp(1, dx + scale * space.range.interpolate(.5), dy + 10, 7)
-		arrowUp(1, dx + scale * space.range.interpolate(.5) - 17, dy + 10, 7)
-		arrowUp(1, dx + scale * space.range.interpolate(.5) + 17, dy + 10, 7)
+		arrowUp(dx + scale * space.range.interpolate(.5), dy + 10, { size: 7 })
+		arrowUp(dx + scale * space.range.interpolate(.5) - 17, dy + 10, { size: 7 })
+		arrowUp(dx + scale * space.range.interpolate(.5) + 17, dy + 10, { size: 7 })
 	}
 
 }
@@ -121,12 +130,19 @@ export class TimelineCanvas {
 
 		timeline.rootDivision.walk(division => {
 
-			let space = division.space
-			let y = 20 + 20 * space.depth
-			drawSpace(space, x, y, scale)
+			let y = 20 + 20 * division.space.depth
 
-			for (let head of division.heads)
-				lineV(1, x + head.global * scale, y, 10)
+			for (let head of division.heads) {
+				lineV(x + head.global * scale, y, 30, { color: '#D9CEEE', thickness: 11 })
+				lineV(x + head.global * scale, y, 30, { color: '#D0A8EE', thickness: 1 })
+			}
+
+		})
+
+		timeline.rootDivision.walk(division => {
+
+			let y = 20 + 20 * division.space.depth
+			drawSpace(division.space, x, y, scale)
 
 		})
 

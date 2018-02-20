@@ -21,8 +21,6 @@ const WidthMode = new Enum(
 
 )
 
-console.log(WidthMode.FIXED.name === 'FIXED')
-
 
 
 
@@ -88,6 +86,8 @@ export class Space {
 		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++
 		this.children.push(child)
 
+		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
+
 		return this
 
 	}
@@ -148,13 +148,13 @@ export class Space {
 
 	resolveWidth() {
 
-		this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
+		// this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		if (this.widthMode.is.CONTENT) {
 
 			this.globalWidth = 0
 
-			for (let child of this.sortedChildren) {
+			for (let child of this.children) {
 
 				child.resolveWidth()
 
@@ -167,10 +167,25 @@ export class Space {
 
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth())
 
-			for (let child of this.sortedChildren)
+			for (let child of this.children)
 				child.resolveWidth()
 
 		}
+
+	}
+
+	computePosition() {
+
+		/*
+			Global position must be relative to parent.range (and not parent.globalPosition) 
+			since range can be modified by align.
+		*/
+
+		return this.parent
+
+			? this.parent.range.min + this.position.solve(this.parent.globalWidth)
+
+			: this.position.solve(0)
 
 	}
 
@@ -178,8 +193,7 @@ export class Space {
 
 		if (this.positionMode.is.FREE) {
 
-			// this.globalPosition = (this.parent && this.parent.globalPosition || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0)
-			this.globalPosition = (this.parent && this.parent.range.min || 0) + this.position.solve(this.parent && this.parent.globalWidth || 0)
+			this.globalPosition = this.computePosition()
 
 			let alignOffset = this.align.solveAlign(this.globalWidth)
 			this.range.min = this.globalPosition + alignOffset
@@ -187,7 +201,7 @@ export class Space {
 
 		} else {
 
-			this.globalPosition = (this.parent && this.parent.globalPosition || 0) + stackOffset + this.position.solve(this.parent && this.parent.globalWidth || 0)
+			this.globalPosition = this.computePosition() + stackOffset
 			this.range.min = this.globalPosition
 			this.range.max = this.globalPosition + this.globalWidth
 
@@ -197,7 +211,7 @@ export class Space {
 
 		let childStackOffset = 0
 
-		for (let child of this.sortedChildren) {
+		for (let child of this.children) {
 
 			child.resolvePosition(childStackOffset)
 
@@ -209,65 +223,6 @@ export class Space {
 		}
 
 	}
-
-
-	// resolveSpace() {
-
-	// 	let { parent, range, position, width, align, children } = this
-
-	// 	// self positionMode:
-
-	// 	let fixedParent = this.getFixedParent()
-
-	// 	let rangeWidth = !fixedParent
-	// 		? width.relative + width.absolute
-	// 		: fixedParent.range.width * width.relative + width.absolute
-
-	// 	let alignOffset = rangeWidth * (align.relative - 1) / 2 + align.absolute
-
-	// 	this.globalPosition = offset + (parent ? parent.range.interpolate(position.relative) : position.relative) + position.absolute
-
-	// 	range.min = !parent
-	// 		? offset + alignOffset + position.relative + position.absolute
-	// 		: offset + alignOffset + parent.range.min + parent.range.width * position.relative + position.absolute
-
-	// 	range.width = rangeWidth
-
-	// 	if (this.widthMode === WidthMode.CONTENT)
-	// 		this.range.copy(this.bounds)
-
-	// 	this.bounds.copy(this.range)
-
-	// 	// children:
-
-	// 	children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
-
-	// 	let childOffset = 0
-	// 	this.floatChildren.length = 0
-
-	// 	for (let child of children) {
-			
-	// 		child.resolveSpace(childOffset)
-
-	// 		if (child.positionMode === PositionMode.STACK) {
-
-	// 			childOffset += child.range.width
-
-	// 			if (this.widthMode === WidthMode.CONTENT)
-	// 				this.range.union(child.range)
-
-	// 		}
-
-	// 		this.bounds.union(child.bounds)
-
-	// 	}
-
-	// 	// if (this.widthMode === WidthMode.CONTENT)
-	// 	// 	this.range.copy(this.bounds)
-
-	// 	return this
-
-	// }
 
 	walk(callback) {
 

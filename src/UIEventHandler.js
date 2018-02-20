@@ -112,15 +112,94 @@ function wheelStop(handler) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+function mouseRoutine(handler) {
+
+	requestAnimationFrame(() => mouseRoutine(handler))
+
+	let x = handler.mouseX
+	let y = handler.mouseY
+
+	handler.vars.mouseX.newValue(x)
+	handler.vars.mouseY.newValue(y)
+
+	if (handler.mouseIsDown) {
+
+		let dx = handler.vars.mouseX.derivative.value
+		let dy = handler.vars.mouseY.derivative.value
+
+		let dragX = x - handler.downMouseX
+		let dragY = y - handler.downMouseY
+
+		handler.dispatchEvent('drag', { x, y, dx, dy, dragX, dragY })
+
+	}
+
+}
+
 function mouseMove(handler, event) {
+
+	let { offsetX: x, offsetY: y } = event
+
+	handler.mouseX = x
+	handler.mouseY = y
+
+	let dx = handler.vars.mouseX.derivative.value
+	let dy = handler.vars.mouseY.derivative.value
+
+	handler.dispatchEvent('move', { x, y, dx, dy })
 
 }
 
 function mouseDown(handler, event) {
 
+	handler.mouseIsDown = true
+	handler.downMouseX = event.offsetX
+	handler.downMouseY = event.offsetY
 
+	mouseUpListener = event => mouseUp(handler, event)
+	window.addEventListener('mouseup', mouseUpListener)
 
 }
+
+let mouseUpListener
+
+function mouseUp(handler, event) {
+
+	let { offsetX: x, offsetY: y } = event
+	let dx = handler.vars.mouseX.derivative.value
+	let dy = handler.vars.mouseY.derivative.value
+
+	handler.mouseIsDown = false
+
+	window.removeEventListener('mouseup', mouseUpListener)
+
+	let averageDx = handler.vars.mouseX.derivative.average.value
+	let averageDy = handler.vars.mouseY.derivative.average.value
+
+	handler.dispatchEvent('drag-end', { x, y, dx, dy, averageDx, averageDy })
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 export class UIEventHandler extends eventjs.EventDispatcher {
 
@@ -145,6 +224,9 @@ export class UIEventHandler extends eventjs.EventDispatcher {
 			wheelSpeedSmoothX: new Variable(0, 2, 10),
 			wheelSpeedSmoothY: new Variable(0, 2, 10),
 
+			mouseX: new Variable(0, 1, 4),
+			mouseY: new Variable(0, 1, 4),
+
 		}
 
 		this.options = Object.assign({
@@ -153,10 +235,23 @@ export class UIEventHandler extends eventjs.EventDispatcher {
 
 		}, options)
 
-
-
 		element.addEventListener('wheel', event => onWheel(this, event))
+
+
+
+
+
+		Object.assign(this, {
+			
+			mouseX: 0,
+			mouseY: 0,
+
+		})
+
+		mouseRoutine(this)
+
 		element.addEventListener('mousemove', event => mouseMove(this, event))
+		element.addEventListener('mousedown', event => mouseDown(this, event))
 
 	}
 
