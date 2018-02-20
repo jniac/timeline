@@ -209,9 +209,9 @@ export class Head extends Mobile {
 		if (nearest)
 			this.shoot(nearest.space.globalPosition)
 
-		let velocityRatio = this.velocity / velocityBefore
+		this.velocityCorrection = this.velocity / velocityBefore
 
-		console.log('velocity shift:', (100 * velocityRatio).toFixed(1) + '%')
+		// console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
 
 	}
 
