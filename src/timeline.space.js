@@ -115,16 +115,37 @@ export class Space {
 
 	}
 
-	getFixedParent() {
+	isParentOf(node) {
 
-		let parent = this.parent
+		while (node) {
 
-		while(parent && parent.widthMode !== WidthMode.FIXED)
-			parent = parent.parent
+			if (node.parent === this)
+				return true
 
-		return parent
+			node = node.parent
+
+		}
+
+		return false
 
 	}
+
+	isChildOf(node) {
+
+		return node.isParentOf(this)
+
+	}
+
+	// getFixedParent() {
+
+	// 	let parent = this.parent
+
+	// 	while(parent && parent.widthMode !== WidthMode.FIXED)
+	// 		parent = parent.parent
+
+	// 	return parent
+
+	// }
 
 	resolveSpace() {
 
