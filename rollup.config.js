@@ -1,9 +1,11 @@
+import path from 'path'
+
 export default {
-	input: 'src/timeline.js',
+	input: './src/timeline.js',
 	plugins: [
 		
 	],
-	external: ['src/event.js'],
+	external: [path.resolve('./src/event.js')],
 	// sourceMap: true,
 	output: [
 		// {
