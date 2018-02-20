@@ -1,5 +1,11 @@
 export const Mth = {
 
+	clamp(x, min = 0, max = 1) {
+
+		return x < min ? min : x > max ? max : x
+
+	},
+
 	enu: {
 
 		*step(start, end, { step, count }) {

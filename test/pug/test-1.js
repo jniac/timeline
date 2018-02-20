@@ -39,6 +39,11 @@ timeline.division({ width: '80%', svgWrapper: true })
 
 		document.querySelector('svg circle.cursor').cx.baseVal.valueInSpecifiedUnits = 20 + 60 * event.progress
 
+		let circleIndex = Math.round(event.progress * 3)
+
+		for (let [index, circle] of document.querySelectorAll('svg circle.step').entries())
+			circle.r.baseVal.value = index === circleIndex ? 16 : 8
+		
 	})
 
 ;[...document.querySelectorAll('svg circle.step')].forEach((circle, index, array) => {
@@ -54,16 +59,16 @@ timeline.division({ width: '80%', svgWrapper: true })
 		page: true,
 	})
 		.addTo('svgWrapper')
-		.on(/enter/, event => {
+		// .on(/enter/, event => {
 
-			event.target.props.circle.r.baseVal.value = 16
+		// 	event.target.props.circle.r.baseVal.value = 16
 
-		})
-		.on(/exit/, event => {
+		// })
+		// .on(/exit/, event => {
 
-			event.target.props.circle.r.baseVal.value = 8
+		// 	event.target.props.circle.r.baseVal.value = 8
 
-		})
+		// })
 
 })
 
