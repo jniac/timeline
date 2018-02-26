@@ -424,16 +424,17 @@ class Range {
 
 }
 
-class Variable extends Array {
+class Variable {
 
 	constructor({ length, value = 0 }) {
 
-		super();
-
+		this.length = length;
 		this.sum = value * length;
 
+		this.array = [];
+
 		for (let i = 0; i < length; i++)
-			this[i] = value;
+			this.array[i] = value;
 
 		this.value = value;
 
@@ -443,9 +444,9 @@ class Variable extends Array {
 
 		this.value = value;
 
-		this.sum += -this.shift() + value;
+		this.sum += -this.array.shift() + value;
 
-		this.push(value);
+		this.array.push(value);
 
 	}
 
@@ -634,9 +635,9 @@ class Head extends Mobile {
 		if (nearest)
 			this.shoot(nearest.space.globalPosition);
 
-		let velocityRatio = this.velocity / velocityBefore;
+		this.velocityCorrection = this.velocity / velocityBefore;
 
-		console.log('velocity shift:', (100 * velocityRatio).toFixed(1) + '%');
+		// console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
 
 	}
 
@@ -865,16 +866,37 @@ class Space {
 
 	}
 
-	getFixedParent() {
+	isParentOf(node) {
 
-		let parent = this.parent;
+		while (node) {
 
-		while(parent && parent.widthMode !== WidthMode.FIXED)
-			parent = parent.parent;
+			if (node.parent === this)
+				return true
 
-		return parent
+			node = node.parent;
+
+		}
+
+		return false
 
 	}
+
+	isChildOf(node) {
+
+		return node.isParentOf(this)
+
+	}
+
+	// getFixedParent() {
+
+	// 	let parent = this.parent
+
+	// 	while(parent && parent.widthMode !== WidthMode.FIXED)
+	// 		parent = parent.parent
+
+	// 	return parent
+
+	// }
 
 	resolveSpace() {
 
@@ -1166,6 +1188,8 @@ class Division extends EventDispatcher {
 	// traps:
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
+	isParentOf(division) { return this.space.isParentOf(division.space) }
+	isChildOf(division) { return this.space.isChildOf(division.space) }
 
 	walk(callback) {
 
