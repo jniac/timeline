@@ -1,14 +1,15 @@
 
-class Variable extends Array {
+class Variable {
 
 	constructor({ length, value = 0 }) {
 
-		super()
-
+		this.length = length
 		this.sum = value * length
 
+		this.array = []
+
 		for (let i = 0; i < length; i++)
-			this[i] = value
+			this.array[i] = value
 
 		this.value = value
 
@@ -18,9 +19,9 @@ class Variable extends Array {
 
 		this.value = value
 
-		this.sum += -this.shift() + value
+		this.sum += -this.array.shift() + value
 
-		this.push(value)
+		this.array.push(value)
 
 	}
 
