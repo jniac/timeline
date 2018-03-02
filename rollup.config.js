@@ -17,6 +17,7 @@ export default {
 		{
 			format: 'es',
 			file: 'build/timeline.module.js',
+			banner: `/* exprimental stuff from https://github.com/jniac/timeline */\n`,
 			indent: '\t'
 		}
 	]

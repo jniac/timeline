@@ -1,3 +1,5 @@
+/* exprimental stuff from https://github.com/jniac/timeline */
+
 import { EventDispatcher } from './event.js';
 
 // utils
@@ -472,6 +474,7 @@ class Mobile {
 			velocity: 0,	// px / s
 			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
 
+			deltaPosition: 0,
 			hasMoved: false,
 			positionOld: 0,
 			velocityOld: 0,
@@ -507,9 +510,10 @@ class Mobile {
 
 		}
 
-		let hasMoved = position !== positionOld;
+		let deltaPosition = position - positionOld;
+		let hasMoved = deltaPosition !== 0;
 
-		Object.assign(this, { position, positionOld, velocity, velocityOld, hasMoved });
+		Object.assign(this, { position, positionOld, velocity, velocityOld, deltaPosition, hasMoved });
 
 		this.velocityVar.setNewValue(velocity);
 
@@ -569,7 +573,7 @@ class Mobile {
 
 
 
-
+const round = (x, precision) => Math.round(x / precision) * precision;
 
 /**
  * Extends Mobile to add Timeline integration.
@@ -583,6 +587,9 @@ class Head extends Mobile {
 
 		this.color = 'red';
 		this.timeline = timeline;
+
+		this.roundPosition = this.position;
+		this.positionRounding = .1;
 
 	}
 
@@ -610,13 +617,18 @@ class Head extends Mobile {
 
 		super.update();
 
-		if (force || this.forceUpdate || this.hasMoved) {
+		let newRoundPosition = round(this.position, this.positionRounding);
+		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
+		this.roundPosition = newRoundPosition;
+
+		if (roundPositionHasChanged || force || this.forceUpdate) {
 
 			this.forceUpdate = false;
 
 			let index = this.getIndex();
 			
-			this.timeline.rootDivision.walk(division => division.updateHead(index, this.position));
+			// this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
+			this.timeline.rootDivision.walk(division => division.updateHead(index, this.roundPosition));
 
 		}
 
