@@ -1,6 +1,6 @@
 const rePercent = /%/
 const reSpaces = /\s/
-const reMode = /^\D/
+const reMode = /^[^\d-]/
 
 function parsePercent(value) {
 
@@ -42,7 +42,8 @@ export class SpaceProperty {
 
 	set(absolute, relative, mode = null) {
 
-		this.space.setDirty()
+		if (this.space)
+			this.space.setDirty()
 
 		this.absolute = absolute
 		this.relative = relative
@@ -126,6 +127,11 @@ export class SpaceProperty {
 	}
 
 }
+
+
+console.log(new SpaceProperty().parse('-100%'))
+console.log(parsePercent('-100%'))
+
 
 	// console.log('' + new SpaceProperty('content'))
 	// console.log('' + SpaceProperty.ensure(2))

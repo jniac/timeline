@@ -84,8 +84,8 @@ timeline.division({ name:'switch', position: '50%', width: 0, align: 0, })
 
 	})
 
-timeline.division({ width: 400, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity })
-timeline.division({ width: 400, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity })
+timeline.division({ bound:true, name:'min', width: 400, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'red' })
+timeline.division({ bound:true, name:'max', width: 400, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'red' })
 
 // timeline.division({ name: 'exp', widthMode: 'CONTENT' })
 // timeline.division({ parent: 'first:name=exp' })
