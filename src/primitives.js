@@ -211,6 +211,12 @@ export class Range {
 
 	}
 
+	clamp(x) {
+
+		return x < this.min ? this.min : x > this.max ? this.max : x
+
+	}
+
 	/**
 	 * interpolate a value to local bound
 	 * @param {number} x the ratio, if x = 0: interpolate(x) = min, if x = 1: interpolate(x) = max

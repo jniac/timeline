@@ -22,7 +22,7 @@ for (let [index, section] of document.querySelectorAll('.wrapper section').entri
 
 	let wrapperDivision = timeline.division({ widthMode: 'CONTENT', wrapper: true, sectionIndex: index })
 
-	timeline.division({ width: '100%', section, page: true, sectionIndex: index })
+	timeline.division({ width: '100%', section, page: true, content: true, sectionIndex: index })
 		.addTo(wrapperDivision)
 		.on(/init|progress/, event => {
 
@@ -74,9 +74,11 @@ timeline.division({ width: '80%', svgWrapper: true })
 
 
 
-timeline.division({ position: '50%', width: 0, align: 0, })
-	.addTo('sectionIndex=3')
+timeline.division({ name:'switch', position: '50%', width: 0, align: 0, })
+	.addTo('content sectionIndex=2')
 	.on(/pass/, event => {
+
+		console.log(window.toto = event.target.parent.section)
 
 		event.target.parent.props.section.style.color = event.direction === 1 ? 'white' : null
 

@@ -126,10 +126,11 @@ export class Division extends eventjs.EventDispatcher {
 		if (isNaN(relative))
 			relative = 1
 
+		let globalClamp = this.space.range.clamp(headValue)
 		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative
 
-		let newValues = { index, global: headValue, absolute: headValue - this.space.range.min, relative, relativeClamp }
-		let oldValues = this.heads[index] || { index: -1, global: NaN, absolute: NaN, relative: NaN, relativeClamp: NaN }
+		let newValues = { index, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp }
+		let oldValues = this.heads[index] || { index: -1, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN }
 
 		this.heads[index] = newValues
 
