@@ -171,9 +171,6 @@ function query(object, selector, { firstOnly = false, propsDelegate = 'props', c
 
 }
 
-const percent = /%/;
-const spaces = /\s/;
-
 /**
  *
  * Double
@@ -190,115 +187,7 @@ const spaces = /\s/;
  * 
  */
 
-class Double {
 
-	static isDouble(value) {
-
-		return value.hasOwnProperty('absolute') && value.hasOwnProperty('relative')
-
-	}
-
-	static parsePercent(value) {
-
-		return parseFloat(value) * (percent.test(value) ? .01 : 1)
-
-	}
-
-	static parse(value, relativeValue = null) {
-
-		if (Double.isDouble(value))
-			return value
-
-		return new Double().parse(value, relativeValue)
-
-	}
-
-	constructor(absolute = 0, relative = 0) {
-
-		this.absolute = absolute;
-		this.relative = relative;
-
-	}
-
-	parse(value, relativeValue = null) {
-
-		if (relativeValue)
-			return this.set(Double.parsePercent(value), Double.parsePercent(relativeValue))
-
-		if (value instanceof Array)
-			return this.set(Double.parsePercent(value[0]), Double.parsePercent(value[1]))
-
-		switch(typeof value) {
-
-			case 'number':
-
-				return this.set(value, 0)
-
-			case 'string':
-				
-				if (spaces.test(value))
-					return Double.parse(value.split(spaces))
-
-				return percent.test(value)
-					? this.set(0, parseFloat(value) / 100)
-					: this.set(parseFloat(value), 0)
-
-			default:
-
-				return this.set(0, 0)
-
-		}
-
-	}
-
-	set(absolute, relative) {
-
-		if (typeof absolute === 'number' && typeof relative === 'number') {
-
-			this.absolute = absolute;
-			this.relative = relative;
-
-			return this
-
-		}
-
-		return this.parse(absolute, relative)
-
-	}
-
-	solve(relativeReference) {
-
-		return (relativeReference || 0) * this.relative + this.absolute
-
-	}
-
-	/**
-	 * alignment is solved that way:
-	 *
-	 * relative === -1 		=> 		-relativeReference (+ absolute)
-	 * relative === 0 		=> 		-relativeReference / 2 (+ absolute)
-	 * relative === 1 		=> 		0 (+ absolute)
-	 *
-	 */
-	solveAlign(relativeReference) {
-
-		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
-
-	}
-
-	toString() {
-
-		return this.absolute === 0 && this.relative === 0
-			? '0'
-			: this.relative === 0
-			? this.absolute.toFixed(1)
-			: this.absolute === 0
-			? (this.relative * 100).toFixed(1) + '%'
-			: this.absolute.toFixed(1) + ' ' + (this.relative * 100).toFixed(1) + '%'
-
-	}
-
-}
 
 
 
@@ -310,6 +199,12 @@ class Range {
 	constructor(min = 0, max = 1) {
 
 		this.set(min, max);
+
+	}
+
+	equals(other) {
+
+		return this.min === other.min && this.max == other.max
 
 	}
 
@@ -617,6 +512,8 @@ class Head extends Mobile {
 
 		super.update();
 
+		this.hasBeenUpdated = false;
+
 		let newRoundPosition = round(this.position, this.positionRounding);
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
 		this.roundPosition = newRoundPosition;
@@ -624,6 +521,8 @@ class Head extends Mobile {
 		if (roundPositionHasChanged || force || this.forceUpdate) {
 
 			this.forceUpdate = false;
+
+			this.hasBeenUpdated = true;
 
 			let index = this.getIndex();
 			
@@ -743,6 +642,16 @@ class Enum {
 
 }
 
+const rePercent = /%/;
+const reSpaces = /\s/;
+const reMode = /^\D/;
+
+function parsePercent(value) {
+
+	return parseFloat(value) * (rePercent.test(value) ? .01 : 1)
+
+}
+
 /**
  *
  * SpaceProperty
@@ -758,7 +667,109 @@ class Enum {
  * [x, y] 		> new Double(x, y)
  * 
  */
+class SpaceProperty {
 
+	static ensure(value) {
+
+		if (value instanceof SpaceProperty)
+			return value
+
+		return new SpaceProperty().parse(value)
+
+	}
+
+	constructor(space) {
+
+		this.space = space;
+
+	}
+
+	set(absolute, relative, mode = null) {
+
+		this.space.setDirty();
+
+		this.absolute = absolute;
+		this.relative = relative;
+		this.mode = mode;
+
+		return this
+
+	}
+
+	solve(relativeReference) {
+
+		return (relativeReference || 0) * this.relative + this.absolute
+
+	}
+
+	/**
+	 * alignment is solved that way:
+	 *
+	 * relative === -1 		=> 		-relativeReference (+ absolute)
+	 * relative === 0 		=> 		-relativeReference / 2 (+ absolute)
+	 * relative === 1 		=> 		0 (+ absolute)
+	 *
+	 */
+	solveAlign(relativeReference) {
+
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+
+	}
+
+	parse(...args) {
+
+		if (args.length === 0)
+			return this.set(0, 1, null)
+
+		if (args.length === 2)
+			return this.set(parsePercent(args[0]), parsePercent(args[1]))
+
+		if (args.length === 3)
+			return this.set(parsePercent(args[0]), parsePercent(args[1]), args[2])
+
+		let [value] = args;
+
+		if (value instanceof Array)
+			return this.set(parsePercent(value[0]), parsePercent(value[1]), value[2])
+
+		switch(typeof value) {
+
+			case 'number':
+
+				return this.set(value, 0)
+
+			case 'string':
+
+				if (reMode.test(value))
+					return this.set(0, 0, value)
+				
+				if (reSpaces.test(value))
+					return this.set(...value.split(reSpaces).map(parsePercent))
+
+				return rePercent.test(value)
+					? this.set(0, parseFloat(value) / 100)
+					: this.set(parseFloat(value), 0)
+
+			default:
+
+				return this.set(0, 0)
+
+		}
+
+	}
+
+	toString() {
+
+		return this.mode
+			? this.mode
+			: this.absolute === 0 && this.relative === 0 ? '0'
+			: this.relative === 0 ? this.absolute.toFixed(1)
+			: this.absolute === 0 ? (this.relative * 100).toFixed(1) + '%'
+			: this.absolute.toFixed(1) + ' ' + (this.relative * 100).toFixed(1) + '%'
+
+	}
+
+}
 
 	// console.log('' + new SpaceProperty('content'))
 	// console.log('' + SpaceProperty.ensure(2))
@@ -801,18 +812,23 @@ class Space {
 
 		Object.assign(this, {
 
+			// dirty pattern:
+
+			isDirty: true,
+			onUpdate: [],
+
 			// design:
 			
 			positionMode: PositionMode[positionMode] || PositionMode.STACK,
-			position: new Double().set(position),
+			position: new SpaceProperty(this).parse(position),
 			globalPosition: NaN,
 
 			widthMode: WidthMode[widthMode] || WidthMode.FIXED,
-			width: new Double().set(width),
+			width: new SpaceProperty(this).parse(width),
 			globalWidth: 0,
 			
 			order,
-			align: new Double().set(align), // 100% = align left, 0% = center, -100% = align right
+			align: new SpaceProperty(this).parse(align), // 100% = align left, 0% = center, -100% = align right
 
 			// maths:
 
@@ -837,6 +853,15 @@ class Space {
 
 	}
 
+	setDirty() {
+
+		this.isDirty = true;
+
+		if (this.root)
+			this.root.isDirty = true;
+
+	}
+
 	get depth() { return this.parent ? this.parent.depth + 1 : 0 }
 
 	addChild(child) {
@@ -851,6 +876,8 @@ class Space {
 
 		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier);
 
+		this.setDirty();
+
 		return this
 
 	}
@@ -864,6 +891,8 @@ class Space {
 		child.parent = null;
 		child.childUniqueIdentifier = -1;
 		this.children.splice(this.children.indexOf(child), 1);
+
+		this.setDirty();
 
 		return this
 
@@ -899,21 +928,24 @@ class Space {
 
 	}
 
-	// getFixedParent() {
 
-	// 	let parent = this.parent
 
-	// 	while(parent && parent.widthMode !== WidthMode.FIXED)
-	// 		parent = parent.parent
 
-	// 	return parent
 
-	// }
+	// update:
 
-	resolveSpace() {
+	update() {
 
-		this.resolveWidth();
-		this.resolvePosition();
+		this.hasBeenUpdated = false;
+
+		if (this.isDirty) {
+
+			this.updateWidth();
+			this.updatePosition();
+
+			this.hasBeenUpdated = true;
+
+		}
 
 	}
 
@@ -930,17 +962,18 @@ class Space {
 
 	}
 
-	resolveWidth() {
+	updateWidth() {
 
 		// this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		if (this.widthMode.is.CONTENT) {
 
+			// globalWidth is inherited from children (stacked ones only)
 			this.globalWidth = 0;
 
 			for (let child of this.children) {
 
-				child.resolveWidth();
+				child.updateWidth();
 
 				if (child.positionMode.is.STACK)
 					this.globalWidth += child.globalWidth;
@@ -949,10 +982,11 @@ class Space {
 
 		} else {
 
+			// globalWidth is computed from parent
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth());
 
 			for (let child of this.children)
-				child.resolveWidth();
+				child.updateWidth();
 
 		}
 
@@ -973,7 +1007,7 @@ class Space {
 
 	}
 
-	resolvePosition(stackOffset = 0) {
+	updatePosition(stackOffset = 0) {
 
 		if (this.positionMode.is.FREE) {
 
@@ -997,7 +1031,7 @@ class Space {
 
 		for (let child of this.children) {
 
-			child.resolvePosition(childStackOffset);
+			child.updatePosition(childStackOffset);
 
 			if (child.positionMode.is.STACK)
 				childStackOffset += child.globalWidth;
@@ -1005,6 +1039,11 @@ class Space {
 			this.bounds.union(child.bounds);
 
 		}
+
+		this.isDirty = false;
+		
+		for (let callback of this.onUpdate)
+			callback();
 
 	}
 
@@ -1083,6 +1122,8 @@ class Division extends EventDispatcher {
 
 		});
 
+		this.space.onUpdate.push(() => this.dispatchEvent('change'));
+
 		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true });
 
 		divisionMap.set(this.space, this);
@@ -1143,9 +1184,10 @@ class Division extends EventDispatcher {
 
 	}
 
-	// queryFirst(selector) {
+	// updateSpace(force = false) {
 
-	// 	return query(this, selector)[0] || null
+	// 	this.space.update()
+
 	// }
 
 	updateHead(index, headValue) {
@@ -1198,6 +1240,7 @@ class Division extends EventDispatcher {
 	}
 
 	// traps:
+	get root() { return this.space.root && divisionMap.get(this.space.root) }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 	isParentOf(division) { return this.space.isParentOf(division.space) }
@@ -1210,6 +1253,10 @@ class Division extends EventDispatcher {
 		return this
 
 	}
+
+
+
+
 
 	toString() {
 
@@ -1268,7 +1315,8 @@ class Timeline extends EventDispatcher {
 
 		let t = now();
 
-		this.rootDivision.space.resolveSpace();
+		this.rootDivision.space.update();
+		// this.rootDivision.updateSpace()
 
 		for (let head of this.heads)
 			head.update();
@@ -1277,7 +1325,8 @@ class Timeline extends EventDispatcher {
 
 		this.updateCost = dt;
 
-		this.dispatchEvent('update');
+		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
+			this.dispatchEvent('update');
 
 	}
 

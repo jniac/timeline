@@ -49,7 +49,7 @@ timeline.division({ widthMode: 'CONTENT', name: 'foo' })
 timeline.division({ positionMode: 'FREE', width: '50%', align:'-75%', parent: 'f:root > *', name:'zorro' })
 timeline.division({ positionMode: 'FREE', position: '50%', width: '50', align:'-0%', parent: 'name=zorro' })
 
-timeline.rootDivision.space.resolveSpace()
+timeline.rootDivision.space.update()
 
 TweenMax.fromTo(timeline.query('f:root > *').space.width, 1, { relative: .5 }, { relative: 1.5, yoyo: true, repeat: -1 })
 

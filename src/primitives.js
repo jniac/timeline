@@ -141,6 +141,12 @@ export class Range {
 
 	}
 
+	equals(other) {
+
+		return this.min === other.min && this.max == other.max
+
+	}
+
 	set(min, max) {
 
 		this.min = min

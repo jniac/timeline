@@ -38,18 +38,23 @@ export class Space {
 
 		Object.assign(this, {
 
+			// dirty pattern:
+
+			isDirty: true,
+			onUpdate: [],
+
 			// design:
 			
 			positionMode: PositionMode[positionMode] || PositionMode.STACK,
-			position: new Double().set(position),
+			position: new SpaceProperty(this).parse(position),
 			globalPosition: NaN,
 
 			widthMode: WidthMode[widthMode] || WidthMode.FIXED,
-			width: new Double().set(width),
+			width: new SpaceProperty(this).parse(width),
 			globalWidth: 0,
 			
 			order,
-			align: new Double().set(align), // 100% = align left, 0% = center, -100% = align right
+			align: new SpaceProperty(this).parse(align), // 100% = align left, 0% = center, -100% = align right
 
 			// maths:
 
@@ -74,6 +79,15 @@ export class Space {
 
 	}
 
+	setDirty() {
+
+		this.isDirty = true
+
+		if (this.root)
+			this.root.isDirty = true
+
+	}
+
 	get depth() { return this.parent ? this.parent.depth + 1 : 0 }
 
 	addChild(child) {
@@ -88,6 +102,8 @@ export class Space {
 
 		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
+		this.setDirty()
+
 		return this
 
 	}
@@ -101,6 +117,8 @@ export class Space {
 		child.parent = null
 		child.childUniqueIdentifier = -1
 		this.children.splice(this.children.indexOf(child), 1)
+
+		this.setDirty()
 
 		return this
 
@@ -136,21 +154,24 @@ export class Space {
 
 	}
 
-	// getFixedParent() {
 
-	// 	let parent = this.parent
 
-	// 	while(parent && parent.widthMode !== WidthMode.FIXED)
-	// 		parent = parent.parent
 
-	// 	return parent
 
-	// }
+	// update:
 
-	resolveSpace() {
+	update() {
 
-		this.resolveWidth()
-		this.resolvePosition()
+		this.hasBeenUpdated = false
+
+		if (this.isDirty) {
+
+			this.updateWidth()
+			this.updatePosition()
+
+			this.hasBeenUpdated = true
+
+		}
 
 	}
 
@@ -167,17 +188,18 @@ export class Space {
 
 	}
 
-	resolveWidth() {
+	updateWidth() {
 
 		// this.sortedChildren = this.children.concat().sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		if (this.widthMode.is.CONTENT) {
 
+			// globalWidth is inherited from children (stacked ones only)
 			this.globalWidth = 0
 
 			for (let child of this.children) {
 
-				child.resolveWidth()
+				child.updateWidth()
 
 				if (child.positionMode.is.STACK)
 					this.globalWidth += child.globalWidth
@@ -186,10 +208,11 @@ export class Space {
 
 		} else {
 
+			// globalWidth is computed from parent
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth())
 
 			for (let child of this.children)
-				child.resolveWidth()
+				child.updateWidth()
 
 		}
 
@@ -210,7 +233,7 @@ export class Space {
 
 	}
 
-	resolvePosition(stackOffset = 0) {
+	updatePosition(stackOffset = 0) {
 
 		if (this.positionMode.is.FREE) {
 
@@ -234,7 +257,7 @@ export class Space {
 
 		for (let child of this.children) {
 
-			child.resolvePosition(childStackOffset)
+			child.updatePosition(childStackOffset)
 
 			if (child.positionMode.is.STACK)
 				childStackOffset += child.globalWidth
@@ -242,6 +265,11 @@ export class Space {
 			this.bounds.union(child.bounds)
 
 		}
+
+		this.isDirty = false
+		
+		for (let callback of this.onUpdate)
+			callback()
 
 	}
 

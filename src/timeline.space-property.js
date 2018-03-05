@@ -34,13 +34,15 @@ export class SpaceProperty {
 
 	}
 
-	constructor(...args) {
+	constructor(space) {
 
-		this.parse(...args)
+		this.space = space
 
 	}
 
 	set(absolute, relative, mode = null) {
+
+		this.space.setDirty()
 
 		this.absolute = absolute
 		this.relative = relative

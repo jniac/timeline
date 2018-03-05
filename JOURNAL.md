@@ -1,3 +1,14 @@
+# Mon Mar 05 2018
+### isDirty implementation
+`Space` implements now isDirty design.
+`Space` has a flag `isDirty`, that determine if Space should update or not.
+`ResolveSpace` has been renamed `update`.
+`Double` is no more used, `SpaceProperty` is prefered. SpaceProperty can switch the dirty flag.  
+
+Now timeline will dispatch `update` events only if:
+- The tree has changed (some spaces props, width/position/align or hierarchy parent/children has changed)
+- One head has moved (at least one).
+
 # Tue Feb 20 2018
 ### Added highlight() to TimelineCanvas (Debug)
 Added hierarchy test (isParentOf, isChildOf) to `Space`.

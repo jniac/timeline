@@ -190,6 +190,8 @@ export class Head extends Mobile {
 
 		super.update()
 
+		this.hasBeenUpdated = false
+
 		let newRoundPosition = round(this.position, this.positionRounding)
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition
 		this.roundPosition = newRoundPosition
@@ -197,6 +199,8 @@ export class Head extends Mobile {
 		if (roundPositionHasChanged || force || this.forceUpdate) {
 
 			this.forceUpdate = false
+
+			this.hasBeenUpdated = true
 
 			let index = this.getIndex()
 			

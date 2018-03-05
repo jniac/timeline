@@ -92,7 +92,7 @@ timeline.division({ width: 400, positionMode: 'FREE', position:'100%', align: '1
 // timeline.division({ parent: 'first:name=foo', name:'foo', align: '0%', width: '100' })
 
 
-timeline.rootDivision.space.resolveSpace()
+timeline.rootDivision.space.update()
 timeline.head.value = 0
 
 export let handler = new UIEventHandler(document.querySelector('.wrapper'))

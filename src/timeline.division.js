@@ -50,6 +50,8 @@ export class Division extends eventjs.EventDispatcher {
 
 		})
 
+		this.space.onUpdate.push(() => this.dispatchEvent('change'))
+
 		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true })
 
 		divisionMap.set(this.space, this)
@@ -110,9 +112,10 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	// queryFirst(selector) {
+	// updateSpace(force = false) {
 
-	// 	return query(this, selector)[0] || null
+	// 	this.space.update()
+
 	// }
 
 	updateHead(index, headValue) {
@@ -166,6 +169,7 @@ export class Division extends eventjs.EventDispatcher {
 	}
 
 	// traps:
+	get root() { return this.space.root && divisionMap.get(this.space.root) }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 	isParentOf(division) { return this.space.isParentOf(division.space) }
@@ -178,6 +182,10 @@ export class Division extends eventjs.EventDispatcher {
 		return this
 
 	}
+
+
+
+
 
 	toString() {
 

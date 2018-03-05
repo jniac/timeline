@@ -55,7 +55,8 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		let t = now()
 
-		this.rootDivision.space.resolveSpace()
+		this.rootDivision.space.update()
+		// this.rootDivision.updateSpace()
 
 		for (let head of this.heads)
 			head.update()
@@ -64,7 +65,8 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		this.updateCost = dt
 
-		this.dispatchEvent('update')
+		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
+			this.dispatchEvent('update')
 
 	}
 
