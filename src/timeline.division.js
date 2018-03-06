@@ -192,6 +192,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	// traps:
 	get root() { return this.space.root && divisionMap.get(this.space.root) }
+	get isRoot() { return this.space.isRoot }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 	isParentOf(division) { return this.space.isParentOf(division.space) }

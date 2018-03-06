@@ -133,6 +133,12 @@ export class Space {
 
 	}
 
+	get isRoot() {
+
+		return this.root === this
+
+	}
+
 	isParentOf(node) {
 
 		while (node) {
