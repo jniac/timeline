@@ -17,6 +17,7 @@ html
 	body
 		div.console
 			pre
+				div.lines
 		div.stage
 			block stage
 
@@ -28,6 +29,8 @@ html
 
 				let consoleLog = console.log
 
+				let spanLogs = []
+
 				console.log = function(...args) {
 
 					consoleLog(...args)
@@ -36,10 +39,32 @@ html
 					span.innerHTML =  args.join(' ') + '\n'
 					consolePre.append(span)
 
-					if (consolePre.children.length > 120)
-						consolePre.removeChild(consolePre.firstElementChild)
+					spanLogs.push(span)
+					if (spanLogs.length > 120)
+						spanLogs.shift().remove()
 
 					consolePre.parentElement.scrollTop = consolePre.parentElement.scrollHeight
+
+				}
+
+				let lines = {}
+
+				console.line = function(key, ...args) {
+
+					if (!lines[key]) {
+
+						let div = document.createElement('div')
+						div.classList.add('line')
+						div.innerHTML = key + ' ' + args.join(' ')
+						document.querySelector('pre div.lines').append(div)
+
+						lines[key] = { div }
+
+					} else {
+
+						lines[key].div.innerHTML = key + ' ' + args.join(' ')
+
+					}
 
 				}
 

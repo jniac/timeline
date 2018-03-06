@@ -13,6 +13,41 @@ import { now, readonlyProperties, clamp } from './timeline.utils.js'
 let timelines = []
 let timelineUID = 0
 
+class Variable {
+
+	constructor(length = 30) {
+
+		let array = []
+
+		for (let i = 0; i < length; i++)
+			array[i] = 0
+
+		Object.assign(this, {
+			array,
+			length,
+			sum: 0,
+		})
+
+		Object.defineProperties(this, {
+			average: {
+				enumerable: true,
+				get: () => this.sum / this.length
+			}
+		})
+
+	}
+
+	add(value) {
+
+		this.array.push(value)
+		this.sum += -this.array.shift() + value
+
+		return this
+
+	}
+
+}
+
 export class Timeline extends eventjs.EventDispatcher {
 
 	constructor(rootWidth = 1) {
@@ -26,6 +61,7 @@ export class Timeline extends eventjs.EventDispatcher {
 				widthMode: 'CONTENT',
 			}),
 			heads: [],
+			updateCost: new Variable(30),
 
 		})
 
@@ -63,7 +99,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		let dt = now() - t
 
-		this.updateCost = dt
+		this.updateCost.add(dt)
 
 		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
 			this.dispatchEvent('update')

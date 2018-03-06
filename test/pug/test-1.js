@@ -13,6 +13,8 @@ export { Mth }
 
 export let timeline = new Timeline(800)
 
+timeline.on('update', event => console.line('timeline', timeline.updateCost.average.toFixed(2) + 'ms'))
+
 timeline.division({ width: 0, page: true, order: Infinity, name:'end' })
 
 for (let [index, section] of document.querySelectorAll('.wrapper section').entries()) {

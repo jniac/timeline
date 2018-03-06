@@ -1,5 +1,7 @@
-export let now = typeof performance === 'object' 
+export let now = typeof performance !== 'undefined' // web
 	? performance.now.bind(performance)
+	: typeof nativePerformanceNow !== 'undefined' // React
+	? nativePerformanceNow
 	: Date.now.bind(Date)
 
 export const readonlyProperties = (target, properties, options = {}) => {

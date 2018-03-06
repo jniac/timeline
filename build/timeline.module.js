@@ -566,8 +566,10 @@ class Head extends Mobile {
 
 }
 
-let now = typeof performance === 'object' 
+let now = typeof performance !== 'undefined' // web
 	? performance.now.bind(performance)
+	: typeof nativePerformanceNow !== 'undefined' // React
+	? nativePerformanceNow
 	: Date.now.bind(Date);
 
 const readonlyProperties = (target, properties, options = {}) => {
@@ -1321,6 +1323,41 @@ class Division extends EventDispatcher {
 let timelines = [];
 let timelineUID = 0;
 
+class Variable$1 {
+
+	constructor(length = 30) {
+
+		let array = [];
+
+		for (let i = 0; i < length; i++)
+			array[i] = 0;
+
+		Object.assign(this, {
+			array,
+			length,
+			sum: 0,
+		});
+
+		Object.defineProperties(this, {
+			average: {
+				enumerable: true,
+				get: () => this.sum / this.length
+			}
+		});
+
+	}
+
+	add(value) {
+
+		this.array.push(value);
+		this.sum += -this.array.shift() + value;
+
+		return this
+
+	}
+
+}
+
 class Timeline extends EventDispatcher {
 
 	constructor(rootWidth = 1) {
@@ -1334,6 +1371,7 @@ class Timeline extends EventDispatcher {
 				widthMode: 'CONTENT',
 			}),
 			heads: [],
+			updateCost: new Variable$1(30),
 
 		});
 
@@ -1371,7 +1409,7 @@ class Timeline extends EventDispatcher {
 
 		let dt = now() - t;
 
-		this.updateCost = dt;
+		this.updateCost.add(dt);
 
 		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
 			this.dispatchEvent('update');
