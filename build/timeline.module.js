@@ -814,7 +814,7 @@ let spaceUID = 0;
 
 class Space {
 
-	constructor({ position = 0, width = '100%', align = '100%', order = 0, positionMode, widthMode } = {}) {
+	constructor({ position = 0, width = '100%', align = '100%', order = 0, positionMode, widthMode, color = null } = {}) {
 
 		readonlyProperties(this, {
 
@@ -859,7 +859,7 @@ class Space {
 
 			// debug:
 
-			color: null,
+			color,
 
 		});
 
@@ -1118,6 +1118,9 @@ class Division extends EventDispatcher {
 
 		super();
 
+		if (props && props.color)
+			spaceProps.color = props.color;
+
 		readonlyProperties(this, {
 
 			uid: divisionUID++,
@@ -1142,6 +1145,23 @@ class Division extends EventDispatcher {
 
 		if (parent)
 			parent.space.addChild(this.space);
+
+	}
+
+	add(child) {
+
+		if (Array.isArray(child)) {
+
+			for (let child2 of child)
+				this.space.addChild(child2.space);
+
+		} else {
+
+			this.space.addChild(child.space);
+
+		}
+
+		return this
 
 	}
 

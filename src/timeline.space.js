@@ -28,7 +28,7 @@ let spaceUID = 0
 
 export class Space {
 
-	constructor({ position = 0, width = '100%', align = '100%', order = 0, positionMode, widthMode } = {}) {
+	constructor({ position = 0, width = '100%', align = '100%', order = 0, positionMode, widthMode, color = null } = {}) {
 
 		readonlyProperties(this, {
 
@@ -73,7 +73,7 @@ export class Space {
 
 			// debug:
 
-			color: null,
+			color,
 
 		})
 

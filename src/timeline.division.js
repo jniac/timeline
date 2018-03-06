@@ -34,6 +34,9 @@ export class Division extends eventjs.EventDispatcher {
 
 		super()
 
+		if (props && props.color)
+			spaceProps.color = props.color
+
 		readonlyProperties(this, {
 
 			uid: divisionUID++,
@@ -58,6 +61,23 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (parent)
 			parent.space.addChild(this.space)
+
+	}
+
+	add(child) {
+
+		if (Array.isArray(child)) {
+
+			for (let child2 of child)
+				this.space.addChild(child2.space)
+
+		} else {
+
+			this.space.addChild(child.space)
+
+		}
+
+		return this
 
 	}
 
