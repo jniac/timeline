@@ -84,9 +84,37 @@ timeline.division({ name:'switch', position: '50%', width: 0, align: 0, })
 
 	})
 
-timeline.division({ bound:true, name:'min', width: 400, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'red' })
-timeline.division({ bound:true, name:'max', width: 400, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'red' })
+
+
+// BOUNDS
+
+timeline.division({ bound:true, name:'min', width: '300%', positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'#FC4193' })
+timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'#FC4193' })
 	.add(timeline.division({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' }))
+
+timeline.query('f:name=min')
+	.on(/progress/, event => {
+
+		let element = document.querySelector('.wrapper')
+		let x = Mth.limit(1 - event.progress, .5)
+		element.style.transform = `translateX(${(x * 100).toFixed(1)}%)`
+
+		if (!dragged)
+			timeline.head.position += (timeline.rootDivision.min - timeline.head.position) / 2
+
+	})
+
+timeline.query('f:name=max')
+	.on(/progress/, event => {
+
+		let element = document.querySelector('.wrapper')
+		let x = Mth.limit(event.progress, .5)
+		element.style.transform = `translateX(${(x * -100).toFixed(1)}%)`
+
+		if (!dragged)
+			timeline.head.position += (timeline.rootDivision.max - timeline.head.position) / 2
+
+	})
 
 // timeline.division({ name: 'exp', widthMode: 'CONTENT' })
 // timeline.division({ parent: 'first:name=exp' })
@@ -112,6 +140,14 @@ handler.on('wheel', event => {
 
 })
 
+let dragged = false
+
+handler.on('drag-start', event => {
+
+	dragged = true
+
+})
+
 handler.on('drag', event => {
 
 	timeline.head.value += -event.dx
@@ -120,7 +156,10 @@ handler.on('drag', event => {
 
 handler.on('drag-end', event => {
 
-	timeline.head.velocityCorrectionForNearest('page')
+	dragged = false
+
+	if (timeline.rootDivision.contains(timeline.head.position))
+		timeline.head.velocityCorrectionForNearest('page')
 
 })
 

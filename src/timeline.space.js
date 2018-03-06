@@ -292,7 +292,7 @@ export class Space {
 
 	contains(value) {
 
-		return value >= this.range.min && value <= this.range.min + this.range.width
+		return this.range.contains(value)
 
 	}
 

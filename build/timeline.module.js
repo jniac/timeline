@@ -1078,7 +1078,7 @@ class Space {
 
 	contains(value) {
 
-		return value >= this.range.min && value <= this.range.min + this.range.width
+		return this.range.contains(value)
 
 	}
 
@@ -1280,12 +1280,19 @@ class Division extends EventDispatcher {
 	}
 
 	// traps:
+	
 	get root() { return this.space.root && divisionMap.get(this.space.root) }
 	get isRoot() { return this.space.isRoot }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
 	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
 	isParentOf(division) { return this.space.isParentOf(division.space) }
 	isChildOf(division) { return this.space.isChildOf(division.space) }
+
+	contains(value) { return this.space.contains(value) }
+	get min() { return this.space.range.min }
+	get max() { return this.space.range.max }
+	get boundsMin() { return this.space.bounds.min }
+	get boundsMax() { return this.space.bounds.max }
 
 	walk(callback) {
 

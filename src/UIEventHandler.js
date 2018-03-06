@@ -158,6 +158,13 @@ function mouseMove(handler, event) {
 
 	handler.dispatchEvent('move', { x, y, dx, dy })
 
+	if (handler.mouseIsDown && !handler.dragStartDispatched) {
+
+		handler.dragStartDispatched = true
+		handler.dispatchEvent('drag-start')
+
+	}
+
 }
 
 function mouseDown(handler, event) {
@@ -168,6 +175,7 @@ function mouseDown(handler, event) {
 
 	mouseUpListener = event => mouseUp(handler, event)
 	window.addEventListener('mouseup', mouseUpListener)
+	handler.dragStartDispatched = false
 
 }
 
