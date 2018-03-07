@@ -127,16 +127,3 @@ export class SpaceProperty {
 	}
 
 }
-
-
-console.log(new SpaceProperty().parse('-100%'))
-console.log(parsePercent('-100%'))
-
-
-	// console.log('' + new SpaceProperty('content'))
-	// console.log('' + SpaceProperty.ensure(2))
-	// console.log('' + SpaceProperty.ensure('200%'))
-	// console.log('' + SpaceProperty.ensure('300 200%'))
-
-	// let p1 = new SpaceProperty('bob')
-	// console.log(SpaceProperty.ensure(p1) === p1)

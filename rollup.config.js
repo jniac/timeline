@@ -1,5 +1,15 @@
 import path from 'path'
 
+function date() {
+
+	let date = new Date()
+
+	const f = n => n.toFixed().padStart(2, '0')
+
+	return date.getFullYear() + '-' + f(1 + date.getMonth()) + '-' + f(date.getDate())
+
+}
+
 export default {
 	input: './src/timeline.js',
 	plugins: [
@@ -17,7 +27,9 @@ export default {
 		{
 			format: 'es',
 			file: 'build/timeline.module.js',
-			banner: `/* exprimental stuff from https://github.com/jniac/timeline */\n`,
+			banner:`
+/* ${date()} */
+/* exprimental stuff from https://github.com/jniac/timeline */\n`.trim(),
 			indent: '\t'
 		}
 	]
