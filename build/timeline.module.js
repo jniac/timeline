@@ -1107,14 +1107,20 @@ class DivisionProps {
 
 		Object.defineProperties(this, {
 
-			root: {
+			isRoot: {
 
 				enumerable: true,
-				get() { return !division.space.parent } 
+				get() { return division.space.isRoot },
 
 			},
 
 		});
+
+	}
+
+	set(props) {
+
+		Object.assign(this, props);
 
 	}
 
@@ -1155,6 +1161,22 @@ class Division extends EventDispatcher {
 			parent.space.addChild(this.space);
 
 	}
+
+
+
+
+
+	// props:
+
+	setProps(props) {
+
+		this.props.set(props);
+
+		return this
+
+	}
+
+	// convenient methods:
 
 	add(child) {
 

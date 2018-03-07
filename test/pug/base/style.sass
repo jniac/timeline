@@ -18,3 +18,16 @@ div.console
 	box-shadow: inset rgba(0,0,0,.025) 1px 4px 10px 0px
 	line-height: 1.3em
 	z-index: 2
+
+	pre
+		height: 100%
+		display: flex
+		flex-direction: column
+		overflow: hidden
+
+		div.lines
+			flex: 0 0 auto
+
+		div.logs
+			flex: 1 1 0
+			overflow: hidden

@@ -18,6 +18,7 @@ html
 		div.console
 			pre
 				div.lines
+				div.logs
 		div.stage
 			block stage
 
@@ -25,25 +26,32 @@ html
 
 			(function(){
 
-				let consolePre = document.querySelector('div.console pre')
+				let divLines = document.querySelector('div.console pre div.logs')
 
 				let consoleLog = console.log
 
-				let spanLogs = []
+				let divLogs = []
+				let logCount = 0
+
+				function span(str) {
+					return `<span>${str}</span>`
+				}
 
 				console.log = function(...args) {
 
 					consoleLog(...args)
 
-					let span = document.createElement('span')
-					span.innerHTML =  args.join(' ') + '\n'
-					consolePre.append(span)
+					let div = document.createElement('div')
+					div.innerHTML = span(logCount + ' ') + span(args.join(' '))
+					divLines.append(div)
 
-					spanLogs.push(span)
-					if (spanLogs.length > 120)
-						spanLogs.shift().remove()
+					divLogs.push(div)
+					if (divLogs.length > 120)
+						divLogs.shift().remove()
 
-					consolePre.parentElement.scrollTop = consolePre.parentElement.scrollHeight
+					divLines.scrollTop = divLines.scrollHeight
+
+					logCount++
 
 				}
 
@@ -56,7 +64,7 @@ html
 						let div = document.createElement('div')
 						div.classList.add('line')
 						div.innerHTML = key + ' ' + args.join(' ')
-						document.querySelector('pre div.lines').append(div)
+						document.querySelector('div.console pre div.lines').append(div)
 
 						lines[key] = { div }
 

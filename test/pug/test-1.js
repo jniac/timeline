@@ -13,7 +13,7 @@ export { Mth }
 
 export let timeline = new Timeline(800)
 
-timeline.on('update', event => console.line('timeline', timeline.updateCost.average.toFixed(2) + 'ms'))
+timeline.on('update', event => console.line('timeline', 'update: ' + timeline.updateCost.average.toFixed(2) + 'ms'))
 
 timeline.division({ width: 0, page: true, order: Infinity, name:'end' })
 
@@ -159,6 +159,8 @@ handler.on('drag', event => {
 handler.on('drag-end', event => {
 
 	dragged = false
+
+	console.log(event.type, 'root contains:', timeline.rootDivision.contains(timeline.head.position))
 
 	if (timeline.rootDivision.contains(timeline.head.position))
 		timeline.head.velocityCorrectionForNearest('page')
