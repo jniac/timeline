@@ -10,6 +10,17 @@ function date() {
 
 }
 
+function banner() {
+	
+	return `
+
+/* ${date()} */
+/* exprimental stuff from https://github.com/jniac/timeline */\n
+
+`.trim()
+
+}
+
 export default {
 	input: './src/timeline.js',
 	plugins: [
@@ -27,9 +38,7 @@ export default {
 		{
 			format: 'es',
 			file: 'build/timeline.module.js',
-			banner:`
-/* ${date()} */
-/* exprimental stuff from https://github.com/jniac/timeline */\n`.trim(),
+			banner: banner(),
 			indent: '\t'
 		}
 	]
