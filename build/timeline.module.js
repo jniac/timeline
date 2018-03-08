@@ -1213,6 +1213,21 @@ class Division extends EventDispatcher {
 
 	}
 
+	division(propsOrQuery) {
+
+		if (typeof propsOrQuery === 'string')
+			return this.query(propsOrQuery)
+
+		// propsOrQuery are props:
+
+		let division = this.timeline.division(propsOrQuery);
+
+		this.space.addChild(division.space);
+
+		return division
+
+	}
+
 	nearest(position, selector = '*') {
 
 		let array = this.query(selector);
@@ -1453,6 +1468,9 @@ class Timeline extends EventDispatcher {
 	nearest(...args) { return this.rootDivision.nearest(...args)}
 
 	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
+
+		if (typeof arguments[0] === 'string') // it's a query!
+			return this.query(arguments[0])
 
 		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' });
 
