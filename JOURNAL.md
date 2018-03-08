@@ -1,6 +1,10 @@
 
 # Thu Mar 08 2018
 ### flexibility
+`[Division].width`
+- get: return division.space.bounds.width
+- set: trap for division.space.width.parse(value)
+
 `[Division].add({ ...props })` Division.add() can now accept props for a brand new division (no longer need to start from the timeline instance)
 
 # Mon Mar 05 2018

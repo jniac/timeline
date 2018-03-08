@@ -1303,10 +1303,18 @@ class Division extends EventDispatcher {
 	isChildOf(division) { return this.space.isChildOf(division.space) }
 
 	contains(value) { return this.space.contains(value) }
+	
 	get min() { return this.space.range.min }
 	get max() { return this.space.range.max }
+	get width() { return this.space.range.width }
+
 	get boundsMin() { return this.space.bounds.min }
 	get boundsMax() { return this.space.bounds.max }
+	get boundsWidth() { return this.space.bounds.width }
+
+	//
+
+	set width(value) { this.space.width.parse(value); }
 
 	walk(callback) {
 
