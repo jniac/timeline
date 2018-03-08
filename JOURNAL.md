@@ -1,3 +1,8 @@
+
+# Thu Mar 08 2018
+### flexibility
+`[Division].add({ ...props })` Division.add() can now accept props for a brand new division (no longer need to start from the timeline instance)
+
 # Mon Mar 05 2018
 ### isDirty implementation
 `Space` implements now isDirty design.
