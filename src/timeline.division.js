@@ -95,6 +95,9 @@ export class Division extends eventjs.EventDispatcher {
 
 		} else {
 
+			if (!(child instanceof Division))
+				child = this.timeline.division(child)
+
 			this.space.addChild(child.space)
 
 		}

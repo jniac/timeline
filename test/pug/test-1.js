@@ -92,7 +92,9 @@ timeline.division({ name:'switch', position: '50%', width: 0, align: 0, })
 
 timeline.division({ bound:true, name:'min', width: '300%', positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'#FC4193' })
 timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'#FC4193' })
-	.add(timeline.division({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' }))
+	// .add(timeline.division({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' }))
+	// there is a new option: possibility to add a brand new division from its props directly:
+	.add({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' })
 
 timeline.query('f:name=min')
 	.on(/progress/, event => {

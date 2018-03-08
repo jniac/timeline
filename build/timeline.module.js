@@ -1,4 +1,4 @@
-/* 2018-03-07 */
+/* 2018-03-08 */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1173,6 +1173,9 @@ class Division extends EventDispatcher {
 				this.space.addChild(child2.space);
 
 		} else {
+
+			if (!(child instanceof Division))
+				child = this.timeline.division(child);
 
 			this.space.addChild(child.space);
 
