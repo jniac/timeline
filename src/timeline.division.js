@@ -134,6 +134,21 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
+	division(propsOrQuery) {
+
+		if (typeof propsOrQuery === 'string')
+			return this.query(propsOrQuery)
+
+		// propsOrQuery are props:
+
+		let division = this.timeline.division(propsOrQuery)
+
+		this.space.addChild(division.space)
+
+		return division
+
+	}
+
 	nearest(position, selector = '*') {
 
 		let array = this.query(selector)

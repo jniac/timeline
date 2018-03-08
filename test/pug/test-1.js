@@ -95,6 +95,9 @@ timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE',
 	// .add(timeline.division({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' }))
 	// there is a new option: possibility to add a brand new division from its props directly:
 	.add({ positionMode: 'FREE', position:'100%', width: 0, color: 'blue' })
+	// another options is: possibility to get the brand new division
+	.division({ position: [0, .5], widthMode: 'CONTENT', color: 'coral', align: '0%' })
+	.add({ width: 400 })
 
 timeline.query('f:name=min')
 	.on(/progress/, event => {
