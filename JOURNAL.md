@@ -7,7 +7,7 @@
 &#35;3a `[Timeline].division("query")` if the first arg is a string, then Timeline.division("query") is returning the result of Timeline.query("query")
 
 &#35;2 `[Division].width`
-- `get`: return division.space.bounds.width
+- `get`: return division.space.range.width
 - `set`: trap for division.space.width.parse(value)
 
 &#35;1 `[Division].add({ ...props })` Division.add() can now accept props for a brand new division (no longer need to start from the timeline instance)
