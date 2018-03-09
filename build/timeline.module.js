@@ -1,4 +1,4 @@
-/* 2018-03-08 */
+/* 2018-03-09 */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -888,10 +888,28 @@ class Space {
 		if (child.parent !== this)
 			throw 'child argument is not a child of this'
 
-		child.root = this;
+		child.root = child;
 		child.parent = null;
 		child.childUniqueIdentifier = -1;
 		this.children.splice(this.children.indexOf(child), 1);
+
+		this.setDirty();
+
+		return this
+
+	}
+
+	removeAll() {
+
+		for (let child of this.children) {
+
+			child.root = child;
+			child.parent = null;
+			child.childUniqueIdentifier = -1;
+
+		}
+
+		this.children.length = 0;
 
 		this.setDirty();
 
@@ -1202,6 +1220,14 @@ class Division extends EventDispatcher {
 	remove() {
 
 		this.space.remove();
+
+		return this
+
+	}
+
+	removeAll() {
+
+		this.space.removeAll();
 
 		return this
 

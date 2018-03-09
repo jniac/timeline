@@ -113,10 +113,28 @@ export class Space {
 		if (child.parent !== this)
 			throw 'child argument is not a child of this'
 
-		child.root = this
+		child.root = child
 		child.parent = null
 		child.childUniqueIdentifier = -1
 		this.children.splice(this.children.indexOf(child), 1)
+
+		this.setDirty()
+
+		return this
+
+	}
+
+	removeAll() {
+
+		for (let child of this.children) {
+
+			child.root = child
+			child.parent = null
+			child.childUniqueIdentifier = -1
+
+		}
+
+		this.children.length = 0
 
 		this.setDirty()
 

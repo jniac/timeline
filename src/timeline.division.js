@@ -128,6 +128,14 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
+	removeAll() {
+
+		this.space.removeAll()
+
+		return this
+
+	}
+
 	query(selector) {
 
 		return query(this, selector)
