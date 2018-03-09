@@ -1225,9 +1225,14 @@ class Division extends EventDispatcher {
 
 	}
 
-	removeAll() {
+	removeAll(filter = null) {
 
-		this.space.removeAll();
+		for (let division of this.children) {
+
+			if (!filter || filter(division))
+				division.remove();
+
+		}
 
 		return this
 
