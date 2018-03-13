@@ -101,6 +101,9 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		this.updateCost.add(dt)
 
+		if (this.rootDivision.space.hasBeenUpdated)
+			this.dispatchEvent('division-update')
+
 		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
 			this.dispatchEvent('update')
 
