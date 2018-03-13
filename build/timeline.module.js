@@ -1,4 +1,4 @@
-/* 2018-03-09 */
+/* 2018-03-13 */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -819,7 +819,7 @@ class Space {
 			onUpdate: [],
 
 			// design:
-			
+
 			positionMode: PositionMode[positionMode] || PositionMode.STACK,
 			position: new SpaceProperty(this).parse(position),
 			globalPosition: NaN,
@@ -827,7 +827,7 @@ class Space {
 			widthMode: WidthMode[widthMode] || WidthMode.FIXED,
 			width: new SpaceProperty(this).parse(width),
 			globalWidth: 0,
-			
+
 			order,
 			align: new SpaceProperty(this).parse(align), // 100% = align left, 0% = center, -100% = align right
 
@@ -860,6 +860,8 @@ class Space {
 
 		if (this.root)
 			this.root.isDirty = true;
+
+		return this
 
 	}
 
@@ -981,7 +983,7 @@ class Space {
 		while(space && space.widthMode.is.CONTENT)
 			space = space.parent;
 
-		// important if no fixed parent is found: 
+		// important if no fixed parent is found:
 		// globalWidth is computed from root.width
 		return space ? space.globalWidth : this.root.width.solve(0)
 
@@ -1020,7 +1022,7 @@ class Space {
 	computePosition() {
 
 		/*
-			Global position must be relative to parent.range (and not parent.globalPosition) 
+			Global position must be relative to parent.range (and not parent.globalPosition)
 			since range can be modified by align.
 		*/
 
@@ -1066,7 +1068,7 @@ class Space {
 		}
 
 		this.isDirty = false;
-		
+
 		for (let callback of this.onUpdate)
 			callback();
 
@@ -1433,7 +1435,7 @@ class Timeline extends EventDispatcher {
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootDivision: this.createDivision(null, { width: rootWidth, 
+			rootDivision: this.createDivision(null, { width: rootWidth,
 				widthMode: 'CONTENT',
 			}),
 			heads: [],
@@ -1493,6 +1495,9 @@ class Timeline extends EventDispatcher {
 	}
 
 	// shorthands
+
+	get rootWidth() { return this.rootDivision.space.width.absolute }
+	set rootWidth(value) { this.rootDivision.space.setDirty().width.absolute = value; }
 
 	query(selector) { return this.rootDivision.query(selector) }
 

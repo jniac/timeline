@@ -57,7 +57,7 @@ export class Timeline extends eventjs.EventDispatcher {
 		readonlyProperties(this, {
 
 			uid: timelineUID++,
-			rootDivision: this.createDivision(null, { width: rootWidth, 
+			rootDivision: this.createDivision(null, { width: rootWidth,
 				widthMode: 'CONTENT',
 			}),
 			heads: [],
@@ -118,6 +118,9 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	// shorthands
 
+	get rootWidth() { return this.rootDivision.space.width.absolute }
+	set rootWidth(value) { this.rootDivision.space.setDirty().width.absolute = value }
+
 	query(selector) { return this.rootDivision.query(selector) }
 
 	nearest(...args) { return this.rootDivision.nearest(...args)}
@@ -160,6 +163,3 @@ function udpateTimelines() {
 }
 
 udpateTimelines()
-
-
-
