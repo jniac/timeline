@@ -119,7 +119,12 @@ export class Timeline extends eventjs.EventDispatcher {
 	// shorthands
 
 	get rootWidth() { return this.rootDivision.space.width.absolute }
-	set rootWidth(value) { this.rootDivision.space.setDirty().width.absolute = value }
+	set rootWidth(value) {
+
+		if (this.rootDivision.space.width.absolute !== value)
+			this.rootDivision.space.setDirty().width.absolute = value
+
+	}
 
 	query(selector) { return this.rootDivision.query(selector) }
 
