@@ -88,6 +88,7 @@ timeline.division({ name:'switch', position: '50%', width: 0, align: 0, color: '
 		event.target.parent.props.section.style.color = event.direction === 1 ? 'white' : null
 
 	})
+	.division({ width: 500, color: 'palevioletred', align: 0, positionMode: 'FREE' })
 
 
 

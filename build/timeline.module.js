@@ -1,4 +1,4 @@
-/* 2018-03-14 11:43 GMT(+1) */
+/* 2018-03-14 15:58 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1334,8 +1334,35 @@ class Division extends EventDispatcher {
 		let globalClamp = this.space.range.clamp(headValue);
 		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative;
 
-		let newValues = { head, index, contained, overlap, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp };
-		let oldValues = this.localHeads[index] || { head: null, index: -1, contained: false, overlap: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN };
+		let newValues = {
+
+			head,
+			index,
+			contained,
+			overlap,
+			global: headValue,
+			globalClamp,
+			absolute: headValue - this.space.range.min,
+			absoluteClamp: globalClamp - this.space.range.min,
+			relative,
+			relativeClamp,
+
+		};
+
+		let oldValues = this.localHeads[index] || {
+
+			head: null,
+			index: -1,
+			contained: false,
+			overlap: false,
+			global: NaN,
+			globalClamp: NaN,
+			absolute: NaN,
+			absoluteClamp: NaN,
+			relative: NaN,
+			relativeClamp: NaN,
+
+		};
 
 		this.localHeads[index] = newValues;
 
@@ -1354,7 +1381,7 @@ class Division extends EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0;
 
-		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline };
+		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range };
 
 		if (isNaN(oldValues.global))
 			this.dispatchEvent(`init-head${index}`, eventData);
