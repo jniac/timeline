@@ -1,4 +1,4 @@
-/* 2018-03-14 */
+/* 2018-03-14 11:43 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1371,7 +1371,7 @@ class Division extends EventDispatcher {
 		if (pass)
 			this.dispatchEvent(`pass-head${index}`, eventData);
 
-		if (overlap)
+		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-head${index}`, eventData);
 
 	}

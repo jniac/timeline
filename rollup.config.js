@@ -5,13 +5,16 @@ function date() {
 	let date = new Date()
 
 	const f = n => n.toFixed().padStart(2, '0')
+	const signed = n => n < 0 ? n.toString() : '+' + n.toString()
 
-	return date.getFullYear() + '-' + f(1 + date.getMonth()) + '-' + f(date.getDate())
+	let gmt = signed(-date.getTimezoneOffset() / 60)
+
+	return date.getFullYear() + '-' + f(1 + date.getMonth()) + '-' + f(date.getDate()) + ' ' + f(date.getHours()) + ':' + f(date.getMinutes()) + ` GMT(${gmt})`
 
 }
 
 function banner() {
-	
+
 	return `
 
 /* ${date()} */
@@ -24,7 +27,7 @@ function banner() {
 export default {
 	input: './src/timeline.js',
 	plugins: [
-		
+
 	],
 	external: [path.resolve('./src/event.js')],
 	// sourceMap: true,

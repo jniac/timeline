@@ -243,7 +243,7 @@ export class Division extends eventjs.EventDispatcher {
 		if (pass)
 			this.dispatchEvent(`pass-head${index}`, eventData)
 
-		if (overlap)
+		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-head${index}`, eventData)
 
 	}
