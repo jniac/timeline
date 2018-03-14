@@ -41,7 +41,9 @@ export class Space {
 			// dirty pattern:
 
 			isDirty: true,
+			rootUpdateCount: 0,
 			onUpdate: [],
+			updateApart: false,
 
 			// design:
 
@@ -76,22 +78,6 @@ export class Space {
 			color,
 
 		})
-
-	}
-
-	/**
-	 * setDirty is lazy, parent recursive:
-	 * parent recursive: when a space is set dirty, all his parent will become dirty too
-	 * lazy: if the parent is already dirty, the parent recursive call is skipped
-	 */
-	setDirty() {
-
-		this.isDirty = true
-
-		if (this.parent && !this.parent.isDirty)
-			this.parent.setDirty()
-
-		return this
 
 	}
 
@@ -191,16 +177,40 @@ export class Space {
 
 	// update:
 
-	update() {
+	/**
+	 * setDirty is lazy, parent recursive:
+	 * parent recursive: when a space is set dirty, all his parent will become dirty too
+	 * lazy: if the parent is already dirty, the parent recursive call is skipped
+	 */
+	setDirty() {
 
-		this.hasBeenUpdated = false
+		this.isDirty = true
+
+		if (!this.updateApart && this.parent && !this.parent.isDirty)
+			this.parent.setDirty()
+
+		return this
+
+	}
+
+	get hasBeenUpdated() {
+
+		return this.updatedAt === this.root.rootUpdateCount
+
+	}
+
+	rootUpdate() {
+
+		// this.hasBeenUpdated = false
+
+		this.rootUpdateCount++
 
 		if (this.isDirty) {
 
 			this.updateWidth()
 			this.updatePosition()
 
-			this.hasBeenUpdated = true
+			// this.hasBeenUpdated = true
 
 		}
 
@@ -298,6 +308,7 @@ export class Space {
 		}
 
 		this.isDirty = false
+		this.updatedAt = this.root.rootUpdateCount
 
 		for (let callback of this.onUpdate)
 			callback()

@@ -166,6 +166,7 @@ export class Head extends Mobile {
 		this.positionRounding = 1 / 4
 
 		this.space = new Space({ positionMode: 'FREE', width: '100%' })
+		this.space.updateApart = true // important! head move should not trigger division update cycle
 		this.timeline.rootDivision.space.addChild(this.space)
 
 	}
@@ -207,6 +208,7 @@ export class Head extends Mobile {
 			this.hasBeenUpdated = true
 
 			this.space.position.set(this.roundPosition, 0)
+			this.space.rootUpdate()
 
 		}
 

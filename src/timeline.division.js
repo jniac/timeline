@@ -237,7 +237,7 @@ export class Division extends eventjs.EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-head${index}`, eventData)
 
-		if (overlap || isInside || pass)
+		if (isInside || pass)
 			this.dispatchEvent(`progress-head${index}`, eventData)
 
 		if (pass)

@@ -5,12 +5,17 @@
 The new paradigm is quite cool, seems very powerful, but we have to be careful with side effects.  
 The *spacialized head* paradigm can solve the old problem of margin (for proximity detection),  
 
+As very often, the new paradigm was harder too implement than imagined: The Reminder below suggests to use counter to compute hasBeenUpdated, this is no more a suggestion, and has been implemented since we can not do without that flag.  
+Head's Space are updated separately, via `[Head].update()` which invoke `[Space].rootUpdate()`.
+
+NB: `[Space].rootUpdate()` has been renamed `[Space].rootUpdate()`.
+
 ### Head is spacialized!
 consequence: Division.get[children]() now need to filter children between Division and other (Head), may need an optimization there (see Reminder below)  
 
 **New Event:** *overlap*  
 Let's enter the overlap event! Fired when the head range intersects the current space range (`head.space.range.intersects(division.space.range)`).
-The overlap flag is also used to trigger the progress event.
+~~The overlap flag is also used to trigger the progress event.~~ (not anymore, not good design)
 
 - **[Reminder] Head**  
 Space has currently 2 update flags:  
@@ -18,7 +23,7 @@ Space has currently 2 update flags:
 but for external use not in a loop, we miss an option / flag, for kind of lazy methods, eg:  
 Division.get[children]() may need that kind of flag, if the space instance has changed since the last call, then compute the new array, otherwise skip computation and use the current array.  
 **WARN** that flag / option should be a number: the time of the last update, given in frames, so a frame number should be propagated from timeline to divisions/heads to spaces
-**WARN** if the option seems to make sense (flag for lazy updates), be aware that implementation will result in a more complex design, is it worth it?
+**WARN** if the option seems to make sense (flag for lazy updates), be aware that implementation will result in a more complex design, is it worth it? [Yes it is, see above]
 
 ### isDirty
 setDirty is lazy, parent recursive:  

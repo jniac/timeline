@@ -577,7 +577,9 @@ class Space {
 			// dirty pattern:
 
 			isDirty: true,
+			rootUpdateCount: 0,
 			onUpdate: [],
+			updateApart: false,
 
 			// design:
 
@@ -612,22 +614,6 @@ class Space {
 			color,
 
 		});
-
-	}
-
-	/**
-	 * setDirty is lazy, parent recursive:
-	 * parent recursive: when a space is set dirty, all his parent will become dirty too
-	 * lazy: if the parent is already dirty, the parent recursive call is skipped
-	 */
-	setDirty() {
-
-		this.isDirty = true;
-
-		if (this.parent && !this.parent.isDirty)
-			this.parent.setDirty();
-
-		return this
 
 	}
 
@@ -727,16 +713,40 @@ class Space {
 
 	// update:
 
-	update() {
+	/**
+	 * setDirty is lazy, parent recursive:
+	 * parent recursive: when a space is set dirty, all his parent will become dirty too
+	 * lazy: if the parent is already dirty, the parent recursive call is skipped
+	 */
+	setDirty() {
 
-		this.hasBeenUpdated = false;
+		this.isDirty = true;
+
+		if (!this.updateApart && this.parent && !this.parent.isDirty)
+			this.parent.setDirty();
+
+		return this
+
+	}
+
+	get hasBeenUpdated() {
+
+		return this.updatedAt === this.root.rootUpdateCount
+
+	}
+
+	rootUpdate() {
+
+		// this.hasBeenUpdated = false
+
+		this.rootUpdateCount++;
 
 		if (this.isDirty) {
 
 			this.updateWidth();
 			this.updatePosition();
 
-			this.hasBeenUpdated = true;
+			// this.hasBeenUpdated = true
 
 		}
 
@@ -834,6 +844,7 @@ class Space {
 		}
 
 		this.isDirty = false;
+		this.updatedAt = this.root.rootUpdateCount;
 
 		for (let callback of this.onUpdate)
 			callback();
@@ -1035,6 +1046,7 @@ class Head extends Mobile {
 		this.positionRounding = 1 / 4;
 
 		this.space = new Space({ positionMode: 'FREE', width: '100%' });
+		this.space.updateApart = true; // important! head move should not trigger division update cycle
 		this.timeline.rootDivision.space.addChild(this.space);
 
 	}
@@ -1076,6 +1088,7 @@ class Head extends Mobile {
 			this.hasBeenUpdated = true;
 
 			this.space.position.set(this.roundPosition, 0);
+			this.space.rootUpdate();
 
 		}
 
@@ -1352,7 +1365,7 @@ class Division extends EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-head${index}`, eventData);
 
-		if (overlap || isInside || pass)
+		if (isInside || pass)
 			this.dispatchEvent(`progress-head${index}`, eventData);
 
 		if (pass)
@@ -1521,7 +1534,7 @@ class Timeline extends EventDispatcher {
 		for (let head of this.heads)
 			head.update();
 
-		this.rootDivision.space.update();
+		this.rootDivision.space.rootUpdate();
 
 		for (let head of this.heads)
 			head.updateDivision();
@@ -1530,7 +1543,9 @@ class Timeline extends EventDispatcher {
 
 		this.updateCost.add(dt);
 
-		let divisionsHaveBeenUpdated = this.rootDivision.children.some(division => division.hasBeenUpdated);
+		// console.log(this.rootDivision.children.map(division => division.space.hasBeenUpdated))
+
+		let divisionsHaveBeenUpdated = this.rootDivision.children.some(division => division.space.hasBeenUpdated);
 		let headsHaveBeenUpdated = this.heads.some(head => head.hasBeenUpdated);
 
 		if (divisionsHaveBeenUpdated)
