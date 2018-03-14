@@ -1530,15 +1530,16 @@ class Timeline extends EventDispatcher {
 
 		this.updateCost.add(dt);
 
+		let divisionsHaveBeenUpdated = this.rootDivision.children.some(division => division.hasBeenUpdated);
 		let headsHaveBeenUpdated = this.heads.some(head => head.hasBeenUpdated);
 
-		if (this.rootDivision.space.hasBeenUpdated)
+		if (divisionsHaveBeenUpdated)
 			this.dispatchEvent('division-update');
 
 		if (headsHaveBeenUpdated)
 			this.dispatchEvent('head-update');
 
-		if (this.rootDivision.space.hasBeenUpdated || headsHaveBeenUpdated)
+		if (divisionsHaveBeenUpdated || headsHaveBeenUpdated)
 			this.dispatchEvent('update');
 
 	}
