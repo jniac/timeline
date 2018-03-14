@@ -79,12 +79,17 @@ export class Space {
 
 	}
 
+	/**
+	 * setDirty is lazy, parent recursive:
+	 * parent recursive: when a space is set dirty, all his parent will become dirty too
+	 * lazy: if the parent is already dirty, the parent recursive call is skipped
+	 */
 	setDirty() {
 
 		this.isDirty = true
 
-		if (this.root)
-			this.root.isDirty = true
+		if (this.parent && !this.parent.isDirty)
+			this.parent.setDirty()
 
 		return this
 

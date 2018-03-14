@@ -13,12 +13,12 @@
  *            return "
  *       is a good patch, but the bug is not fixed
  *
- * • When removing a listener, if the listener has been added with a "thisArg" 
+ * • When removing a listener, if the listener has been added with a "thisArg"
  *       it could currently be removed without specifying a value for "thisArg" (since off/removeEventListener() could be used with nothing more than a type parameters)
- *       this is dangerous since differents listeners could match the same criteria (two instance of a same class / prototype have striclty equal members 
+ *       this is dangerous since differents listeners could match the same criteria (two instance of a same class / prototype have striclty equal members
  *       (because actually belonging to that class / prototype)).
  *       When specifying a callback to removeEventListener AND NOT a thisArg, should be considered as not matching listeners that HAVE a thisArg ?
- * 
+ *
  */
 
 const isIterable = obj => obj ? (typeof obj[Symbol.iterator] === 'function') : false
@@ -160,6 +160,8 @@ export function clearEventListener(target) {
 
 }
 
+// OPTIMIZE: dispatchEvent is recursively invoked, all the first precautions could be repeated two, three and even more times.
+// if dispatchEvent should remain convenient, dispatchEvent may call an inner sub-optimized-methods
 export function dispatchEvent(target, event, eventOptions = null) {
 
 	if (!target || !event)
@@ -238,13 +240,13 @@ class Event {
 
 		options = Object.assign({}, EventOptions, options)
 
-		Object.defineProperty(this, 'target', { 
+		Object.defineProperty(this, 'target', {
 
 			value: target,
 
 		})
 
-		Object.defineProperty(this, 'currentTarget', { 
+		Object.defineProperty(this, 'currentTarget', {
 
 			writable: true,
 			value: target,
@@ -260,8 +262,8 @@ class Event {
 
 		for (let k in options) {
 
-			Object.defineProperty(this, k, { 
-				
+			Object.defineProperty(this, k, {
+
 				enumerable: k in EventOptions,
 				value: options[k],
 
@@ -313,8 +315,8 @@ class Listener {
 		// options
 		Object.assign(this, ListenerDefaultOptions, options)
 
-		let index = this.array.findIndex(listener => this.insertFirst ? 
-			listener.priority <= this.priority : 
+		let index = this.array.findIndex(listener => this.insertFirst ?
+			listener.priority <= this.priority :
 			listener.priority < this.priority)
 
 		if (index === -1)
@@ -405,40 +407,40 @@ let EventDispatcherPrototype = {
 		return clearEventListener(this)
 
 	},
-	
-	addEventListener(type, callback, options = undefined) { 
 
-		return addEventListener(this, type, callback, options) 
+	addEventListener(type, callback, options = undefined) {
 
-	},
-
-	on(type, callback, options = undefined) { 
-
-		return addEventListener(this, type, callback, options) 
+		return addEventListener(this, type, callback, options)
 
 	},
 
-	once(type, callback, options = { }) { 
+	on(type, callback, options = undefined) {
 
-		return once(this, type, callback, options) 
-
-	},
-
-	removeEventListener(type, callback = undefined, options = undefined) { 
-
-		return removeEventListener(this, type, callback, options) 
+		return addEventListener(this, type, callback, options)
 
 	},
 
-	off(type, callback = undefined, options = undefined) { 
+	once(type, callback, options = { }) {
 
-		return removeEventListener(this, type, callback, options) 
+		return once(this, type, callback, options)
 
 	},
 
-	dispatchEvent(event, eventOptions = null) { 
+	removeEventListener(type, callback = undefined, options = undefined) {
 
-		return dispatchEvent(this, event, eventOptions) 
+		return removeEventListener(this, type, callback, options)
+
+	},
+
+	off(type, callback = undefined, options = undefined) {
+
+		return removeEventListener(this, type, callback, options)
+
+	},
+
+	dispatchEvent(event, eventOptions = null) {
+
+		return dispatchEvent(this, event, eventOptions)
 
 	},
 
@@ -475,8 +477,3 @@ export function implementEventDispatcher(target, { remap = null } = {}) {
 	return target
 
 }
-
-
-
-
-

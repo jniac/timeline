@@ -1,3 +1,4 @@
+import { Space } from './timeline.space.js'
 
 class Variable {
 
@@ -51,13 +52,13 @@ class Mobile {
 			hasMoved: false,
 			positionOld: 0,
 			velocityOld: 0,
-			
+
 			// target
 			forcedPosition: NaN,
 			// target: NaN,
 			// computedFriction: .1,
 
-			velocityVar: new Variable({ length: 5 }), 
+			velocityVar: new Variable({ length: 5 }),
 
 		})
 
@@ -162,7 +163,10 @@ export class Head extends Mobile {
 		this.timeline = timeline
 
 		this.roundPosition = this.position
-		this.positionRounding = .1
+		this.positionRounding = 1 / 4
+
+		this.space = new Space({ positionMode: 'FREE', width: '100%' })
+		this.timeline.rootDivision.space.addChild(this.space)
 
 	}
 
@@ -178,7 +182,7 @@ export class Head extends Mobile {
 
 	// value interface for easier handling
 	get value() { return this.position }
-	set value(value) { 
+	set value(value) {
 
 		this.forcedPosition = value
 		this.forceUpdate = true
@@ -202,10 +206,19 @@ export class Head extends Mobile {
 
 			this.hasBeenUpdated = true
 
+			this.space.position.set(this.roundPosition, 0)
+
+		}
+
+	}
+
+	updateDivision() {
+
+		if (this.hasBeenUpdated) {
+
 			let index = this.getIndex()
-			
-			// this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
-			this.timeline.rootDivision.walk(division => division.updateHead(index, this.roundPosition))
+
+			this.timeline.rootDivision.walk(division => division.updateHead(this, index, this.roundPosition))
 
 		}
 

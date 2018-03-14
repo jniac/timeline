@@ -1,4 +1,31 @@
 
+# Thu Mar 14 2018
+
+*Major changes:*  
+The new paradigm is quite cool, seems very powerful, but we have to be careful with side effects.  
+The *spacialized head* paradigm can solve the old problem of margin (for proximity detection),  
+
+### Head is spacialized!
+consequence: Division.get[children]() now need to filter children between Division and other (Head), may need an optimization there (see Reminder below)  
+
+**New Event:** *overlap*  
+Let's enter the overlap event! Fired when the head range intersects the current space range (`head.space.range.intersects(division.space.range)`).
+The overlap flag is also used to trigger the progress event.
+
+- **[Reminder] Head**  
+Space has currently 2 update flags:  
+**isDirty** and **hasBeenUpdated** (the first to internal use, the second for external use in a loop)  
+but for external use not in a loop, we miss an option / flag, for kind of lazy methods, eg:  
+Division.get[children]() may need that kind of flag, if the space instance has changed since the last call, then compute the new array, otherwise skip computation and use the current array.  
+**WARN** that flag / option should be a number: the time of the last update, given in frames, so a frame number should be propagated from timeline to divisions/heads to spaces
+**WARN** if the option seems to make sense (flag for lazy updates), be aware that implementation will result in a more complex design, is it worth it?
+
+### isDirty
+setDirty is lazy, parent recursive:  
+- parent recursive: when a space is set dirty, all his parent will become dirty too
+- lazy: if the parent is already dirty, the parent recursive call is skipped
+
+
 # Thu Mar 08 2018
 ### flexibility
 
@@ -31,7 +58,7 @@ timelineCanvas.highlight(divisionOrSelector, options)
 ```
 ```javascript
 options = {
-    activeColor: 'red',     // the highlight color 
+    activeColor: 'red',     // the highlight color
     greyedColor: '#ddd',    // the greyed color
     branch: true,  // should the whole branch holding the highlighted be highlighted w activeColor?
 }
@@ -40,12 +67,12 @@ options = {
 ### Working Proof of concept
 The result is ambiguous, the tool is powerful, but the syntax is still quite complicated:
 ```javascript
-timeline.division({ 
-    circle, 
-    positionMode: 'FREE', 
+timeline.division({
+    circle,
+    positionMode: 'FREE',
     position: (100 * index / (n - 1)) + '%',    // 0%, 33.3%, 66.6%, 100%
     width: [-10, (100 / (n - 1)) + '%'],        // 33.3% - 10, hard to decipher right?
-    align: '0%', 
+    align: '0%',
     page: true,
 })
     .addTo('svgWrapper')
@@ -152,7 +179,7 @@ section.on(/progress/, event => myDiv.style.opacity = event.progress)
 'leave' introduces the idea of being inside before leaving, 'pass' is more generic  
 The leave/pass event is fired when leaving a section as well as passing over the section. Usage: before that section that variable should be in that state, after in that other state, example:
 ```javascript
-section.on(/pass/, event => myState.myVar = event.direction === 1 ? 'beyond' : 'below') 
+section.on(/pass/, event => myState.myVar = event.direction === 1 ? 'beyond' : 'below')
 ```
 
 ---
@@ -191,5 +218,4 @@ It should be very easy to watch local progression, resizing, etc.
 section.on(/exit/, event => { ...do something }
 ```
 - **Multiple heads:**  <br/>
-*Not currently* seeing usages of such a feature, but in order to be future proof as much as possible, current position will not be unique (as can be seen actual web scroll position). A position in the timeline will be named **Head**, and `Timeline` instances will accept any arbitrary number of heads. 
-
+*Not currently* seeing usages of such a feature, but in order to be future proof as much as possible, current position will not be unique (as can be seen actual web scroll position). A position in the timeline will be named **Head**, and `Timeline` instances will accept any arbitrary number of heads.

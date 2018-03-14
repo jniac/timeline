@@ -49,7 +49,7 @@ export class Division extends eventjs.EventDispatcher {
 			space: new Space(spaceProps),
 			// props: Object.assign({}, props),
 			props: new DivisionProps(this, props),
-			heads: [],
+			localHeads: [],
 
 		})
 
@@ -191,7 +191,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	// }
 
-	updateHead(index, headValue) {
+	updateHead(head, index, headValue) {
 
 		let relative = this.space.range.ratio(headValue)
 
@@ -203,10 +203,10 @@ export class Division extends eventjs.EventDispatcher {
 		let globalClamp = this.space.range.clamp(headValue)
 		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative
 
-		let newValues = { index, contained, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp }
-		let oldValues = this.heads[index] || { index: -1, contained: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN }
+		let newValues = { head, index, contained, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp }
+		let oldValues = this.localHeads[index] || { head: null, index: -1, contained: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN }
 
-		this.heads[index] = newValues
+		this.localHeads[index] = newValues
 
 		let old_r = 		oldValues.relative
 		let new_r = 		newValues.relative
@@ -224,6 +224,8 @@ export class Division extends eventjs.EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0
 
+		let overlap = head.space.range.intersects(this.space.range)
+
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline }
 
 		if (isNaN(oldValues.global))
@@ -235,25 +237,48 @@ export class Division extends eventjs.EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-head${index}`, eventData)
 
-		if (isInside || pass)
+		if (overlap || isInside || pass)
 			this.dispatchEvent(`progress-head${index}`, eventData)
 
 		if (pass)
 			this.dispatchEvent(`pass-head${index}`, eventData)
 
+		if (overlap)
+			this.dispatchEvent(`overlap-head${index}`, eventData)
+
 	}
 
 	// traps:
-	
+
 	get root() { return this.space.root && divisionMap.get(this.space.root) }
 	get isRoot() { return this.space.isRoot }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
-	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
+
+	get children() {
+
+		// OPTIMIZE : the result could be cached, since the children array does not change frequently,
+		// kind of a mess: it's quite complicated to use the dirty flag outside Space
+
+		let array = []
+
+		for (let child of this.space.children) {
+
+			let division = divisionMap.get(child)
+
+			if (division)
+				array.push(division)
+
+		}
+
+		return array
+
+	}
+
 	isParentOf(division) { return this.space.isParentOf(division.space) }
 	isChildOf(division) { return this.space.isChildOf(division.space) }
 
 	contains(value) { return this.space.contains(value) }
-	
+
 	get min() { return this.space.range.min }
 	get max() { return this.space.range.max }
 	get width() { return this.space.range.width }
@@ -268,7 +293,14 @@ export class Division extends eventjs.EventDispatcher {
 
 	walk(callback) {
 
-		this.space.walk(space => callback(divisionMap.get(space)))
+		this.space.walk(space => {
+
+			let division = divisionMap.get(space)
+
+			if (division)
+				callback(division)
+
+		})
 
 		return this
 

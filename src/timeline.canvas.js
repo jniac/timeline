@@ -18,7 +18,7 @@ function lineV(x, y, height, { color, off = .5, thickness = 1 } = {}) {
 
 	if (color)
 		ctx.strokeStyle = color
-	
+
 	ctx.moveTo(x, y - height * off)
 	ctx.lineTo(x, y + height * (1 - off))
 	ctx.lineWidth = thickness
@@ -27,11 +27,22 @@ function lineV(x, y, height, { color, off = .5, thickness = 1 } = {}) {
 
 }
 
+function segment(x, y, length, thickness, { color, off = .5 } = {}) {
+
+	if (color)
+		ctx.fillStyle = color
+
+	ctx.rect(x, y - thickness * off, length, thickness)
+	ctx.fill()
+	ctx.beginPath()
+
+}
+
 function arrowUp(x, y, { color, size = 10, thickness = 1 } = {}) {
 
 	if (color)
 		ctx.strokeStyle = color
-	
+
 	ctx.moveTo(x - size, y + size / 2)
 	ctx.lineTo(x, y - size / 2)
 	ctx.lineTo(x + size, y + size / 2)
@@ -98,7 +109,7 @@ export class TimelineCanvas {
 
 		Object.assign(this, {
 
-			timeline, 
+			timeline,
 			ratio,
 			canvas,
 			ctx: canvas.getContext('2d')
@@ -160,17 +171,20 @@ export class TimelineCanvas {
 		let scale = (width / ratio - 2 * margin) / space.bounds.width
 		let x = margin + -space.bounds.min * scale
 
+		// HEAD
 		timeline.rootDivision.walk(division => {
 
 			let y = 20 + 20 * division.space.depth
 
-			for (let head of division.heads) {
-				lineV(x + head.global * scale, y, 30, { color: '#D9CEEE', thickness: 11 })
-				lineV(x + head.global * scale, y, 30, { color: '#D0A8EE', thickness: 1 })
+			for (let localHead of division.localHeads) {
+				let range = localHead.head.space.range
+				segment(x + range.min * scale, y, range.width * scale, 30, { color: '#D9CEEE' })
+				lineV(x + localHead.global * scale, y, 30, { color: '#D0A8EE', thickness: 1 })
 			}
 
 		})
 
+		// DIVISION
 		timeline.rootDivision.walk(division => {
 
 			let y = 20 + 20 * division.space.depth

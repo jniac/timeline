@@ -1,4 +1,4 @@
-/* 2018-03-13 */
+/* 2018-03-14 */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -327,245 +327,6 @@ class Range {
 
 }
 
-class Variable {
-
-	constructor({ length, value = 0 }) {
-
-		this.length = length;
-		this.sum = value * length;
-
-		this.array = [];
-
-		for (let i = 0; i < length; i++)
-			this.array[i] = value;
-
-		this.value = value;
-
-	}
-
-	setNewValue(value) {
-
-		this.value = value;
-
-		this.sum += -this.array.shift() + value;
-
-		this.array.push(value);
-
-	}
-
-	get average() { return this.sum / this.length }
-
-}
-
-/**
- * Class to simulate the movement of a Mobile from 2 variables:
- * • velocity
- * • friction
- *
- * key function: destination = position - velocity / log(friction)
- */
-class Mobile {
-
-	constructor() {
-
-		Object.assign(this, {
-
-			// classic physic properties
-			position: 0,
-			velocity: 0,	// px / s
-			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
-
-			deltaPosition: 0,
-			hasMoved: false,
-			positionOld: 0,
-			velocityOld: 0,
-			
-			// target
-			forcedPosition: NaN,
-			// target: NaN,
-			// computedFriction: .1,
-
-			velocityVar: new Variable({ length: 5 }), 
-
-		});
-
-	}
-
-	update(dt = 1 / 60) {
-
-		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this;
-
-		if (!isNaN(this.forcedPosition)) {
-
-			this.setPosition(this.forcedPosition);
-			this.forcedPosition = NaN;
-
-			position = this.position;
-			velocity = this.velocity;
-
-		} else {
-
-			// integral
-			position += velocity * (friction ** dt - 1) / Math.log(friction);
-			velocity *= friction ** dt;
-
-		}
-
-		let deltaPosition = position - positionOld;
-		let hasMoved = deltaPosition !== 0;
-
-		Object.assign(this, { position, positionOld, velocity, velocityOld, deltaPosition, hasMoved });
-
-		this.velocityVar.setNewValue(velocity);
-
-	}
-
-	setFriction(value, dt = 1) {
-
-		this.friction = value ** (1 / dt);
-
-	}
-
-	setPosition(value, { computeVelocity = true, dt = 1 / 60 } = {}) {
-
-		let d = value - this.positionOld;
-		this.position = value;
-		this.velocity = d / dt;
-
-	}
-
-	/**
-	 * F*** powerful, i can't remind how it works, but it works!
-	 */
-	getDestination({ position = this.position, velocity = this.velocity, friction = this.friction } = {}) {
-
-		return position + -velocity / Math.log(friction)
-
-	}
-
-	getVelocityForDestination(destination, { position, friction } = this) {
-
-		return (position - destination) * Math.log(friction)
-
-	}
-
-	getFrictionForDestination(destination, { position, velocity } = this) {
-
-		return Math.exp(velocity / (position - destination))
-
-	}
-
-	get destination() { return this.getDestination() }
-
-	shoot(destination) {
-
-		this.velocity = this.getVelocityForDestination(destination);
-
-		return this
-
-	}
-
-}
-
-
-
-
-
-
-
-
-const round = (x, precision) => Math.round(x / precision) * precision;
-
-/**
- * Extends Mobile to add Timeline integration.
- */
-
-class Head extends Mobile {
-
-	constructor(timeline) {
-
-		super();
-
-		this.color = 'red';
-		this.timeline = timeline;
-
-		this.roundPosition = this.position;
-		this.positionRounding = .1;
-
-	}
-
-	getIndex() {
-
-		return this.timeline
-			? this.timeline.heads.indexOf(this)
-			: -1
-
-	}
-
-	get index() { return this.getIndex() }
-
-	// value interface for easier handling
-	get value() { return this.position }
-	set value(value) { 
-
-		this.forcedPosition = value;
-		this.forceUpdate = true;
-		// this.setPosition(value)
-
-	}
-
-	update(force = false) {
-
-		super.update();
-
-		this.hasBeenUpdated = false;
-
-		let newRoundPosition = round(this.position, this.positionRounding);
-		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
-		this.roundPosition = newRoundPosition;
-
-		if (roundPositionHasChanged || force || this.forceUpdate) {
-
-			this.forceUpdate = false;
-
-			this.hasBeenUpdated = true;
-
-			let index = this.getIndex();
-			
-			// this.timeline.rootDivision.walk(division => division.updateHead(index, this.position))
-			this.timeline.rootDivision.walk(division => division.updateHead(index, this.roundPosition));
-
-		}
-
-	}
-
-	velocityCorrectionForNearest(selector) {
-
-		this.forcedPosition = NaN;
-
-		let velocityBefore = this.velocity;
-
-		let destination = this.getDestination({ velocity: this.velocityVar.average });
-
-		let nearest = this.timeline.nearest(destination, selector);
-
-		if (nearest)
-			this.shoot(nearest.space.globalPosition);
-
-		this.velocityCorrection = this.velocity / velocityBefore;
-
-		// console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
-
-	}
-
-	toString() {
-
-		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
-
-	}
-
-}
-
 let now = typeof performance !== 'undefined' // web
 	? performance.now.bind(performance)
 	: typeof nativePerformanceNow !== 'undefined' // React
@@ -663,9 +424,9 @@ function parsePercent(value) {
 /**
  *
  * SpaceProperty
- * 
+ *
  * Most of the lines are about parsing input values:
- * 
+ *
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
  * '100%' 		> new Double(0, 1)
@@ -673,7 +434,7 @@ function parsePercent(value) {
  * '50 50%' 	> new Double(50, .5)
  * '50% 50%' 	> new Double(.5, .5)
  * [x, y] 		> new Double(x, y)
- * 
+ *
  */
 class SpaceProperty {
 
@@ -692,7 +453,7 @@ class SpaceProperty {
 
 	}
 
-	set(absolute, relative, mode = null) {
+	set(absolute, relative = 0, mode = null) {
 
 		if (this.space)
 			this.space.setDirty();
@@ -721,7 +482,7 @@ class SpaceProperty {
 	 */
 	solveAlign(relativeReference) {
 
-		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute
 
 	}
 
@@ -751,7 +512,7 @@ class SpaceProperty {
 
 				if (reMode.test(value))
 					return this.set(0, 0, value)
-				
+
 				if (reSpaces.test(value))
 					return this.set(...value.split(reSpaces).map(parsePercent))
 
@@ -854,12 +615,17 @@ class Space {
 
 	}
 
+	/**
+	 * setDirty is lazy, parent recursive:
+	 * parent recursive: when a space is set dirty, all his parent will become dirty too
+	 * lazy: if the parent is already dirty, the parent recursive call is skipped
+	 */
 	setDirty() {
 
 		this.isDirty = true;
 
-		if (this.root)
-			this.root.isDirty = true;
+		if (this.parent && !this.parent.isDirty)
+			this.parent.setDirty();
 
 		return this
 
@@ -1103,6 +869,257 @@ class Space {
 
 }
 
+class Variable {
+
+	constructor({ length, value = 0 }) {
+
+		this.length = length;
+		this.sum = value * length;
+
+		this.array = [];
+
+		for (let i = 0; i < length; i++)
+			this.array[i] = value;
+
+		this.value = value;
+
+	}
+
+	setNewValue(value) {
+
+		this.value = value;
+
+		this.sum += -this.array.shift() + value;
+
+		this.array.push(value);
+
+	}
+
+	get average() { return this.sum / this.length }
+
+}
+
+/**
+ * Class to simulate the movement of a Mobile from 2 variables:
+ * • velocity
+ * • friction
+ *
+ * key function: destination = position - velocity / log(friction)
+ */
+class Mobile {
+
+	constructor() {
+
+		Object.assign(this, {
+
+			// classic physic properties
+			position: 0,
+			velocity: 0,	// px / s
+			friction: .01, 	// ratio / s^2 WARN: inversed expression, friction represent the remaining part of velocity after 1 second
+
+			deltaPosition: 0,
+			hasMoved: false,
+			positionOld: 0,
+			velocityOld: 0,
+
+			// target
+			forcedPosition: NaN,
+			// target: NaN,
+			// computedFriction: .1,
+
+			velocityVar: new Variable({ length: 5 }),
+
+		});
+
+	}
+
+	update(dt = 1 / 60) {
+
+		let { position, position:positionOld, velocity, velocity:velocityOld, friction } = this;
+
+		if (!isNaN(this.forcedPosition)) {
+
+			this.setPosition(this.forcedPosition);
+			this.forcedPosition = NaN;
+
+			position = this.position;
+			velocity = this.velocity;
+
+		} else {
+
+			// integral
+			position += velocity * (friction ** dt - 1) / Math.log(friction);
+			velocity *= friction ** dt;
+
+		}
+
+		let deltaPosition = position - positionOld;
+		let hasMoved = deltaPosition !== 0;
+
+		Object.assign(this, { position, positionOld, velocity, velocityOld, deltaPosition, hasMoved });
+
+		this.velocityVar.setNewValue(velocity);
+
+	}
+
+	setFriction(value, dt = 1) {
+
+		this.friction = value ** (1 / dt);
+
+	}
+
+	setPosition(value, { computeVelocity = true, dt = 1 / 60 } = {}) {
+
+		let d = value - this.positionOld;
+		this.position = value;
+		this.velocity = d / dt;
+
+	}
+
+	/**
+	 * F*** powerful, i can't remind how it works, but it works!
+	 */
+	getDestination({ position = this.position, velocity = this.velocity, friction = this.friction } = {}) {
+
+		return position + -velocity / Math.log(friction)
+
+	}
+
+	getVelocityForDestination(destination, { position, friction } = this) {
+
+		return (position - destination) * Math.log(friction)
+
+	}
+
+	getFrictionForDestination(destination, { position, velocity } = this) {
+
+		return Math.exp(velocity / (position - destination))
+
+	}
+
+	get destination() { return this.getDestination() }
+
+	shoot(destination) {
+
+		this.velocity = this.getVelocityForDestination(destination);
+
+		return this
+
+	}
+
+}
+
+
+
+
+
+
+
+
+const round = (x, precision) => Math.round(x / precision) * precision;
+
+/**
+ * Extends Mobile to add Timeline integration.
+ */
+
+class Head extends Mobile {
+
+	constructor(timeline) {
+
+		super();
+
+		this.color = 'red';
+		this.timeline = timeline;
+
+		this.roundPosition = this.position;
+		this.positionRounding = 1 / 4;
+
+		this.space = new Space({ positionMode: 'FREE', width: '100%' });
+		this.timeline.rootDivision.space.addChild(this.space);
+
+	}
+
+	getIndex() {
+
+		return this.timeline
+			? this.timeline.heads.indexOf(this)
+			: -1
+
+	}
+
+	get index() { return this.getIndex() }
+
+	// value interface for easier handling
+	get value() { return this.position }
+	set value(value) {
+
+		this.forcedPosition = value;
+		this.forceUpdate = true;
+		// this.setPosition(value)
+
+	}
+
+	update(force = false) {
+
+		super.update();
+
+		this.hasBeenUpdated = false;
+
+		let newRoundPosition = round(this.position, this.positionRounding);
+		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
+		this.roundPosition = newRoundPosition;
+
+		if (roundPositionHasChanged || force || this.forceUpdate) {
+
+			this.forceUpdate = false;
+
+			this.hasBeenUpdated = true;
+
+			this.space.position.set(this.roundPosition, 0);
+
+		}
+
+	}
+
+	updateDivision() {
+
+		if (this.hasBeenUpdated) {
+
+			let index = this.getIndex();
+
+			this.timeline.rootDivision.walk(division => division.updateHead(this, index, this.roundPosition));
+
+		}
+
+	}
+
+	velocityCorrectionForNearest(selector) {
+
+		this.forcedPosition = NaN;
+
+		let velocityBefore = this.velocity;
+
+		let destination = this.getDestination({ velocity: this.velocityVar.average });
+
+		let nearest = this.timeline.nearest(destination, selector);
+
+		if (nearest)
+			this.shoot(nearest.space.globalPosition);
+
+		this.velocityCorrection = this.velocity / velocityBefore;
+
+		// console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
+
+	}
+
+	toString() {
+
+		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
+
+	}
+
+}
+
 let divisionMap = new WeakMap();
 let divisionUID = 0;
 
@@ -1148,7 +1165,7 @@ class Division extends EventDispatcher {
 			space: new Space(spaceProps),
 			// props: Object.assign({}, props),
 			props: new DivisionProps(this, props),
-			heads: [],
+			localHeads: [],
 
 		});
 
@@ -1290,7 +1307,7 @@ class Division extends EventDispatcher {
 
 	// }
 
-	updateHead(index, headValue) {
+	updateHead(head, index, headValue) {
 
 		let relative = this.space.range.ratio(headValue);
 
@@ -1302,10 +1319,10 @@ class Division extends EventDispatcher {
 		let globalClamp = this.space.range.clamp(headValue);
 		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative;
 
-		let newValues = { index, contained, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp };
-		let oldValues = this.heads[index] || { index: -1, contained: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN };
+		let newValues = { head, index, contained, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp };
+		let oldValues = this.localHeads[index] || { head: null, index: -1, contained: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN };
 
-		this.heads[index] = newValues;
+		this.localHeads[index] = newValues;
 
 		let old_r = 		oldValues.relative;
 		let new_r = 		newValues.relative;
@@ -1322,6 +1339,8 @@ class Division extends EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0;
 
+		let overlap = head.space.range.intersects(this.space.range);
+
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline };
 
 		if (isNaN(oldValues.global))
@@ -1333,25 +1352,48 @@ class Division extends EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-head${index}`, eventData);
 
-		if (isInside || pass)
+		if (overlap || isInside || pass)
 			this.dispatchEvent(`progress-head${index}`, eventData);
 
 		if (pass)
 			this.dispatchEvent(`pass-head${index}`, eventData);
 
+		if (overlap)
+			this.dispatchEvent(`overlap-head${index}`, eventData);
+
 	}
 
 	// traps:
-	
+
 	get root() { return this.space.root && divisionMap.get(this.space.root) }
 	get isRoot() { return this.space.isRoot }
 	get parent() { return this.space.parent && divisionMap.get(this.space.parent) }
-	get children() { return this.space.children && this.space.children.map(v => divisionMap.get(v)) }
+
+	get children() {
+
+		// OPTIMIZE : the result could be cached, since the children array does not change frequently,
+		// kind of a mess: it's quite complicated to use the dirty flag outside Space
+
+		let array = [];
+
+		for (let child of this.space.children) {
+
+			let division = divisionMap.get(child);
+
+			if (division)
+				array.push(division);
+
+		}
+
+		return array
+
+	}
+
 	isParentOf(division) { return this.space.isParentOf(division.space) }
 	isChildOf(division) { return this.space.isChildOf(division.space) }
 
 	contains(value) { return this.space.contains(value) }
-	
+
 	get min() { return this.space.range.min }
 	get max() { return this.space.range.max }
 	get width() { return this.space.range.width }
@@ -1366,7 +1408,14 @@ class Division extends EventDispatcher {
 
 	walk(callback) {
 
-		this.space.walk(space => callback(divisionMap.get(space)));
+		this.space.walk(space => {
+
+			let division = divisionMap.get(space);
+
+			if (division)
+				callback(division);
+
+		});
 
 		return this
 
@@ -1469,20 +1518,27 @@ class Timeline extends EventDispatcher {
 
 		let t = now();
 
-		this.rootDivision.space.update();
-		// this.rootDivision.updateSpace()
-
 		for (let head of this.heads)
 			head.update();
+
+		this.rootDivision.space.update();
+
+		for (let head of this.heads)
+			head.updateDivision();
 
 		let dt = now() - t;
 
 		this.updateCost.add(dt);
 
+		let headsHaveBeenUpdated = this.heads.some(head => head.hasBeenUpdated);
+
 		if (this.rootDivision.space.hasBeenUpdated)
 			this.dispatchEvent('division-update');
 
-		if (this.rootDivision.space.hasBeenUpdated || this.heads.some(head => head.hasBeenUpdated))
+		if (headsHaveBeenUpdated)
+			this.dispatchEvent('head-update');
+
+		if (this.rootDivision.space.hasBeenUpdated || headsHaveBeenUpdated)
 			this.dispatchEvent('update');
 
 	}

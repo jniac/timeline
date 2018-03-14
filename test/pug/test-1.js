@@ -1,7 +1,7 @@
 import { Timeline } from '../../src/timeline.js'
 export { Timeline }
 import { query, copy } from '../../src/query.js'
-export { query, copy } 
+export { query, copy }
 import { UIEventHandler } from '../../src/UIEventHandler.js'
 
 import { TimelineCanvas } from '../../src/timeline.canvas.js'
@@ -12,6 +12,9 @@ import { Mth } from '../../src/Mth.js'
 export { Mth }
 
 export let timeline = new Timeline(800)
+
+timeline.head.space.align.set(0, 0)
+timeline.head.space.width.set(200, 0)
 
 timeline.on('update', event => console.line('timeline', 'update: ' + timeline.updateCost.average.toFixed(2) + 'ms'))
 
@@ -45,19 +48,19 @@ timeline.division({ width: '80%', svgWrapper: true })
 
 		for (let [index, circle] of document.querySelectorAll('svg circle.step').entries())
 			circle.r.baseVal.value = index === circleIndex ? 16 : 8
-		
+
 	})
 
 ;[...document.querySelectorAll('svg circle.step')].forEach((circle, index, array) => {
 
 	let n = array.length
 
-	timeline.division({ 
-		circle, 
-		positionMode: 'FREE', 
-		position: (100 * index / (n - 1)) + '%', 
-		width: [-10, (100 / (n - 1)) + '%'], 
-		align: '0%', 
+	timeline.division({
+		circle,
+		positionMode: 'FREE',
+		position: (100 * index / (n - 1)) + '%',
+		width: [-10, (100 / (n - 1)) + '%'],
+		align: '0%',
 		page: true,
 	})
 		.addTo('svgWrapper')
@@ -76,7 +79,7 @@ timeline.division({ width: '80%', svgWrapper: true })
 
 
 
-timeline.division({ name:'switch', position: '50%', width: 0, align: 0, })
+timeline.division({ name:'switch', position: '50%', width: 0, align: 0, color: 'olivedrab' })
 	.addTo('content sectionIndex=2')
 	.on(/pass/, event => {
 
@@ -183,5 +186,3 @@ document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
 timeline.update()
 
 console.log('test-1 ::: init')
-
-

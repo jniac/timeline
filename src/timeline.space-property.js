@@ -11,9 +11,9 @@ function parsePercent(value) {
 /**
  *
  * SpaceProperty
- * 
+ *
  * Most of the lines are about parsing input values:
- * 
+ *
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
  * '100%' 		> new Double(0, 1)
@@ -21,7 +21,7 @@ function parsePercent(value) {
  * '50 50%' 	> new Double(50, .5)
  * '50% 50%' 	> new Double(.5, .5)
  * [x, y] 		> new Double(x, y)
- * 
+ *
  */
 export class SpaceProperty {
 
@@ -40,7 +40,7 @@ export class SpaceProperty {
 
 	}
 
-	set(absolute, relative, mode = null) {
+	set(absolute, relative = 0, mode = null) {
 
 		if (this.space)
 			this.space.setDirty()
@@ -69,7 +69,7 @@ export class SpaceProperty {
 	 */
 	solveAlign(relativeReference) {
 
-		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute
 
 	}
 
@@ -99,7 +99,7 @@ export class SpaceProperty {
 
 				if (reMode.test(value))
 					return this.set(0, 0, value)
-				
+
 				if (reSpaces.test(value))
 					return this.set(...value.split(reSpaces).map(parsePercent))
 
