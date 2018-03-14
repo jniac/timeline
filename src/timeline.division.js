@@ -200,11 +200,13 @@ export class Division extends eventjs.EventDispatcher {
 			relative = 1
 
 		let contained = this.space.range.contains(headValue)
+		let overlap = head.space.range.intersects(this.space.range)
+
 		let globalClamp = this.space.range.clamp(headValue)
 		let relativeClamp = relative < 0 ? 0 : relative > 1 ? 1 : relative
 
-		let newValues = { head, index, contained, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp }
-		let oldValues = this.localHeads[index] || { head: null, index: -1, contained: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN }
+		let newValues = { head, index, contained, overlap, global: headValue, globalClamp, absolute: headValue - this.space.range.min, absoluteClamp: globalClamp - this.space.range.min, relative, relativeClamp }
+		let oldValues = this.localHeads[index] || { head: null, index: -1, contained: false, overlap: false, global: NaN, globalClamp: NaN, absolute: NaN, absoluteClamp: NaN, relative: NaN, relativeClamp: NaN }
 
 		this.localHeads[index] = newValues
 
@@ -223,8 +225,6 @@ export class Division extends eventjs.EventDispatcher {
 
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0
-
-		let overlap = head.space.range.intersects(this.space.range)
 
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, propagateTo: target => target instanceof Division && this.timeline }
 
