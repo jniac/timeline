@@ -66,7 +66,7 @@ function onWheel(handler, event) {
 			handler.dispatchEvent('wheel-increase-speed-x')
 
 		} else {
-			
+
 			swipeX.reset(0)
 
 		}
@@ -74,7 +74,7 @@ function onWheel(handler, event) {
 		if (wheelSpeedSmoothY.growth.value > 1) {
 
 			swipeY.newValueIncrement(dy)
-			
+
 			if (swipeY.through(-handler.options.swipeThreshold))
 				handler.dispatchEvent('swipe-up')
 
@@ -132,7 +132,7 @@ function mouseRoutine(handler) {
 	handler.vars.mouseX.newValue(x)
 	handler.vars.mouseY.newValue(y)
 
-	if (handler.mouseIsDown) {
+	if (handler.mouseIsDown && handler.dragStartDispatched) {
 
 		let dx = handler.vars.mouseX.derivative.value
 		let dy = handler.vars.mouseY.derivative.value
@@ -250,7 +250,7 @@ export class UIEventHandler extends eventjs.EventDispatcher {
 
 
 		Object.assign(this, {
-			
+
 			mouseX: 0,
 			mouseY: 0,
 
@@ -264,4 +264,3 @@ export class UIEventHandler extends eventjs.EventDispatcher {
 	}
 
 }
-

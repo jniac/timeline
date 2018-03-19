@@ -1,4 +1,4 @@
-/* 2018-03-19 23:46 GMT(+1) */
+/* 2018-03-19 23:51 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 

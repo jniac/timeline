@@ -46,12 +46,14 @@ handler.on('drag-start', event => {
 
 	headValue = timeline.head.value
 	headIsDragged = true
+	// console.log('drag-start', headValue)
 
 })
 
 handler.on('drag-end', event => {
 
 	headIsDragged = false
+	// console.log('drag-end', headValue)
 
 })
 
@@ -60,6 +62,7 @@ handler.on('drag', event => {
 	headValue += -event.dx
 
 	timeline.head.value = timeline.rootDivision.getLimitedValue(headValue, 300)
+	// console.log('drag', headValue)
 
 })
 
@@ -68,10 +71,10 @@ timeline.on('frame', event => {
 	if (!headIsDragged && !timeline.rootDivision.space.range.contains(timeline.head.value)) {
 
 		if (timeline.head.value < timeline.rootDivision.space.range.min)
-			timeline.head.value += (timeline.rootDivision.space.range.min - timeline.head.value) * .2
+			timeline.head.value += (timeline.rootDivision.space.range.min - timeline.head.value) * .1
 
 		if (timeline.head.value > timeline.rootDivision.space.range.max)
-			timeline.head.value += (timeline.rootDivision.space.range.max - timeline.head.value) * .2
+			timeline.head.value += (timeline.rootDivision.space.range.max - timeline.head.value) * .1
 
 	}
 
