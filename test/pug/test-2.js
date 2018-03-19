@@ -1,7 +1,7 @@
 import { Timeline } from '../../src/timeline.js'
 export { Timeline }
 import { query, copy } from '../../src/query.js'
-export { query, copy } 
+export { query, copy }
 import { UIEventHandler } from '../../src/UIEventHandler.js'
 
 import { TimelineCanvas } from '../../src/timeline.canvas.js'
@@ -34,12 +34,12 @@ timeline.division({ widthMode: 'CONTENT', name: 'foo' })
 		timeline.division({ width: '25', parent: 'name=bar',  })
 		timeline.division({ width: '25%', parent: 'name=bar',  })
 
-	timeline.division({ 
-		width: '0%', 
-		name: 'tiny', 
-		parent: 'name=foo', 
-		position: '50%', 
-		positionMode: 'FREE', 
+	timeline.division({
+		width: '0%',
+		name: 'tiny',
+		parent: 'name=foo',
+		position: '50%',
+		positionMode: 'FREE',
 		align: '0 0',
 	}).space.color = '#93C2FF'
 
@@ -49,13 +49,10 @@ timeline.division({ widthMode: 'CONTENT', name: 'foo' })
 timeline.division({ positionMode: 'FREE', width: '50%', align:'-75%', parent: 'f:root > *', name:'zorro' })
 timeline.division({ positionMode: 'FREE', position: '50%', width: '50', align:'-0%', parent: 'name=zorro' })
 
-timeline.rootDivision.space.update()
+	TweenMax.fromTo(timeline.query('f:isRoot > *').space.width, 1, { relative: .5 }, { relative: 1.5, yoyo: true, repeat: -1 })
 
-TweenMax.fromTo(timeline.query('f:root > *').space.width, 1, { relative: .5 }, { relative: 1.5, yoyo: true, repeat: -1 })
-
-
+timeline.on('update', event => timeline.rootDivision.space.setDirty())
 
 export let timelineCanvas = new TimelineCanvas(timeline)
 
 document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
-

@@ -94,7 +94,7 @@ export class Timeline extends eventjs.EventDispatcher {
 		for (let head of this.heads)
 			head.update()
 
-		this.rootDivision.space.rootUpdate()
+		this.rootDivision.space.rootUpdate(force)
 
 		for (let head of this.heads)
 			head.updateDivision(force || this.rootDivision.space.hasBeenUpdated)
@@ -116,6 +116,8 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		if (divisionsHaveBeenUpdated || headsHaveBeenUpdated)
 			this.dispatchEvent('update')
+
+		this.dispatchEvent('frame')
 
 	}
 

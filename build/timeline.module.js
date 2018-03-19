@@ -1,4 +1,4 @@
-/* 2018-03-19 22:53 GMT(+1) */
+/* 2018-03-19 23:46 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -751,13 +751,13 @@ class Space {
 
 	}
 
-	rootUpdate() {
+	rootUpdate(force = false) {
 
 		this.rootUpdateCount++;
 
-		if (this.isDirty) {
+		if (force || this.isDirty) {
 
-			// OPTIMIZE only dirty divisions should be updated 
+			// OPTIMIZE only dirty divisions should be updated
 			this.updateWidth();
 			this.updatePosition();
 
@@ -1487,6 +1487,20 @@ class Division extends EventDispatcher {
 
 	}
 
+	// utils
+
+	getLimitedValue(value, limit) {
+
+		if (value < this.space.range.min)
+			return this.space.range.min - Mth.limit(this.space.range.min - value, limit)
+
+		if (value > this.space.range.max)
+			return this.space.range.max + Mth.limit(value - this.space.range.max, limit)
+
+		return value
+
+	}
+
 
 
 
@@ -1587,7 +1601,7 @@ class Timeline extends EventDispatcher {
 		for (let head of this.heads)
 			head.update();
 
-		this.rootDivision.space.rootUpdate();
+		this.rootDivision.space.rootUpdate(force);
 
 		for (let head of this.heads)
 			head.updateDivision(force || this.rootDivision.space.hasBeenUpdated);
@@ -1609,6 +1623,8 @@ class Timeline extends EventDispatcher {
 
 		if (divisionsHaveBeenUpdated || headsHaveBeenUpdated)
 			this.dispatchEvent('update');
+
+		this.dispatchEvent('frame');
 
 	}
 

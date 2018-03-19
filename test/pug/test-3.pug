@@ -1,0 +1,27 @@
+extends base/test
+
+block append vars
+	- var title = 			'test #3'
+	- var scriptModule = 	'test-3.js'
+	- var consoleMode = 	'bottom'
+
+block style
+	script(src='TweenMax.min.js')
+	style
+		include:sass test-1.sass
+	style
+		:sass
+			h1
+				font-size: 140px
+			
+
+block stage
+
+	.wrapper
+		section(style='background-color:#A5D5FF')
+			h1 hello
+		section(style='background-color:#FFE5B6')
+			h1 how are
+		section(style='background-color:#FEB0B4')
+			h1 you ?
+		.border

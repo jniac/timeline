@@ -333,6 +333,20 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
+	// utils
+
+	getLimitedValue(value, limit) {
+
+		if (value < this.space.range.min)
+			return this.space.range.min - Mth.limit(this.space.range.min - value, limit)
+
+		if (value > this.space.range.max)
+			return this.space.range.max + Mth.limit(value - this.space.range.max, limit)
+
+		return value
+
+	}
+
 
 
 
