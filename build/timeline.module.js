@@ -1,4 +1,4 @@
-/* 2018-03-19 15:59 GMT(+1) */
+/* 2018-03-19 22:12 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -752,16 +752,13 @@ class Space {
 
 	rootUpdate() {
 
-		// this.hasBeenUpdated = false
-
 		this.rootUpdateCount++;
 
 		if (this.isDirty) {
 
+			// OPTIMIZE only dirty divisions should be updated 
 			this.updateWidth();
 			this.updatePosition();
-
-			// this.hasBeenUpdated = true
 
 		}
 
@@ -1100,6 +1097,7 @@ class Head extends Mobile {
 
 		let newRoundPosition = round(this.position, this.positionRounding);
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
+		this.roundPositionOld = this.roundPosition;
 		this.roundPosition = newRoundPosition;
 
 		if (roundPositionHasChanged || force || this.forceUpdate) {
@@ -1115,13 +1113,19 @@ class Head extends Mobile {
 
 	}
 
-	updateDivision() {
+	updateDivision(force = false) {
 
-		if (this.hasBeenUpdated) {
+		if (force || this.hasBeenUpdated) {
 
 			let index = this.getIndex();
 
-			this.timeline.rootDivision.walk(division => division.updateHead(this, index, this.roundPosition));
+			this.timeline.rootDivision.walk(division => {
+
+				// NOTE optimization: only division whose bounds contain head position should be updated
+				if (force || division.space.bounds.contains(this.roundPosition) || division.space.bounds.contains(this.roundPositionOld))
+					division.updateHead(this, index, this.roundPosition);
+
+			});
 
 		}
 
@@ -1575,7 +1579,7 @@ class Timeline extends EventDispatcher {
 
 	get head() { return this.heads[0] }
 
-	update() {
+	update(force = false) {
 
 		let t = now();
 
@@ -1585,7 +1589,7 @@ class Timeline extends EventDispatcher {
 		this.rootDivision.space.rootUpdate();
 
 		for (let head of this.heads)
-			head.updateDivision();
+			head.updateDivision(force || this.rootDivision.space.hasBeenUpdated);
 
 		let dt = now() - t;
 

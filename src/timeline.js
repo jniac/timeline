@@ -87,7 +87,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	get head() { return this.heads[0] }
 
-	update() {
+	update(force = false) {
 
 		let t = now()
 
@@ -97,7 +97,7 @@ export class Timeline extends eventjs.EventDispatcher {
 		this.rootDivision.space.rootUpdate()
 
 		for (let head of this.heads)
-			head.updateDivision()
+			head.updateDivision(force || this.rootDivision.space.hasBeenUpdated)
 
 		let dt = now() - t
 

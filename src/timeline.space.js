@@ -202,16 +202,13 @@ export class Space {
 
 	rootUpdate() {
 
-		// this.hasBeenUpdated = false
-
 		this.rootUpdateCount++
 
 		if (this.isDirty) {
 
+			// OPTIMIZE only dirty divisions should be updated 
 			this.updateWidth()
 			this.updatePosition()
-
-			// this.hasBeenUpdated = true
 
 		}
 
