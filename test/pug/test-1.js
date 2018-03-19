@@ -31,8 +31,6 @@ for (let [index, section] of document.querySelectorAll('.wrapper section').entri
 		.addTo(wrapperDivision)
 		.on(/init|progress/, event => {
 
-			console.log(event.progress)
-
 			event.target.props.section.style.transform = `translateX(${((1 - event.progress) * 100).toFixed(1)}%)`
 
 		})

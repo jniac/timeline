@@ -177,9 +177,18 @@ export class TimelineCanvas {
 			let y = 20 + 30 * division.space.depth + (division.space.positionMode.is.FREE ? 10 : 0)
 
 			for (let localHead of division.localHeads) {
-				let range = localHead.head.space.range
-				segment(x + range.min * scale, y, range.width * scale, 30, { color: '#D9CEEE' })
-				lineV(x + localHead.global * scale, y, 30, { color: '#D0A8EE', thickness: 1 })
+
+				if (localHead.overlap || division.isRoot) {
+
+					ctx.globalCompositeOperation = 'destination-over'
+					let range = localHead.head.space.range
+					segment(x + range.min * scale, y, range.width * scale, 30, { color: '#D9CEEE' })
+
+					ctx.globalCompositeOperation = 'source-over'
+					lineV(x + localHead.global * scale, y, 30, { color: '#CAA5EE', thickness: 1 })
+
+				}
+
 			}
 
 		})

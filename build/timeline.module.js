@@ -1,4 +1,4 @@
-/* 2018-03-19 22:12 GMT(+1) */
+/* 2018-03-19 22:53 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -174,9 +174,9 @@ function query(object, selector, { firstOnly = false, propsDelegate = 'props', c
 /**
  *
  * Double
- * 
+ *
  * Most of the lines are about parsing input values:
- * 
+ *
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
  * '100%' 		> new Double(0, 1)
@@ -184,7 +184,7 @@ function query(object, selector, { firstOnly = false, propsDelegate = 'props', c
  * '50 50%' 	> new Double(50, .5)
  * '50% 50%' 	> new Double(.5, .5)
  * [x, y] 		> new Double(x, y)
- * 
+ *
  */
 
 
@@ -238,10 +238,11 @@ class Range {
 
 	}
 
-	intersects(other) {
+	intersects(other, epsilon = 0) {
 
-		return !(other.max < this.min || other.min > this.max)
-		
+		// return !(other.max < this.min || other.min > this.max)
+		return other.max - this.min >= -epsilon && other.min - this.max <= epsilon
+
 	}
 
 	intersection(other, clone = false) {
@@ -1097,7 +1098,6 @@ class Head extends Mobile {
 
 		let newRoundPosition = round(this.position, this.positionRounding);
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
-		this.roundPositionOld = this.roundPosition;
 		this.roundPosition = newRoundPosition;
 
 		if (roundPositionHasChanged || force || this.forceUpdate) {
@@ -1106,6 +1106,7 @@ class Head extends Mobile {
 
 			this.hasBeenUpdated = true;
 
+			this.spaceBoundsOld = this.space.bounds.clone();
 			this.space.position.set(this.roundPosition, 0);
 			this.space.rootUpdate();
 
@@ -1122,7 +1123,7 @@ class Head extends Mobile {
 			this.timeline.rootDivision.walk(division => {
 
 				// NOTE optimization: only division whose bounds contain head position should be updated
-				if (force || division.space.bounds.contains(this.roundPosition) || division.space.bounds.contains(this.roundPositionOld))
+				if (force || division.space.bounds.intersects(this.space.bounds) || division.space.bounds.intersects(this.spaceBoundsOld))
 					division.updateHead(this, index, this.roundPosition);
 
 			});

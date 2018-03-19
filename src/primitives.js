@@ -5,9 +5,9 @@ const spaces = /\s/
 /**
  *
  * Double
- * 
+ *
  * Most of the lines are about parsing input values:
- * 
+ *
  * x 			> new Double(x, 1)
  * '100' 		> new Double(100, 0)
  * '100%' 		> new Double(0, 1)
@@ -15,7 +15,7 @@ const spaces = /\s/
  * '50 50%' 	> new Double(50, .5)
  * '50% 50%' 	> new Double(.5, .5)
  * [x, y] 		> new Double(x, y)
- * 
+ *
  */
 
 export class Double {
@@ -63,7 +63,7 @@ export class Double {
 				return this.set(value, 0)
 
 			case 'string':
-				
+
 				if (spaces.test(value))
 					return Double.parse(value.split(spaces))
 
@@ -110,7 +110,7 @@ export class Double {
 	 */
 	solveAlign(relativeReference) {
 
-		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute 
+		return (relativeReference || 0) * (this.relative - 1) / 2 + this.absolute
 
 	}
 
@@ -177,10 +177,11 @@ export class Range {
 
 	}
 
-	intersects(other) {
+	intersects(other, epsilon = 0) {
 
-		return !(other.max < this.min || other.min > this.max)
-		
+		// return !(other.max < this.min || other.min > this.max)
+		return other.max - this.min >= -epsilon && other.min - this.max <= epsilon
+
 	}
 
 	intersection(other, clone = false) {
@@ -265,6 +266,3 @@ export class Range {
 	}
 
 }
-
-
-

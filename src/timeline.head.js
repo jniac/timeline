@@ -199,7 +199,6 @@ export class Head extends Mobile {
 
 		let newRoundPosition = round(this.position, this.positionRounding)
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition
-		this.roundPositionOld = this.roundPosition
 		this.roundPosition = newRoundPosition
 
 		if (roundPositionHasChanged || force || this.forceUpdate) {
@@ -208,6 +207,7 @@ export class Head extends Mobile {
 
 			this.hasBeenUpdated = true
 
+			this.spaceBoundsOld = this.space.bounds.clone()
 			this.space.position.set(this.roundPosition, 0)
 			this.space.rootUpdate()
 
@@ -224,7 +224,7 @@ export class Head extends Mobile {
 			this.timeline.rootDivision.walk(division => {
 
 				// NOTE optimization: only division whose bounds contain head position should be updated
-				if (force || division.space.bounds.contains(this.roundPosition) || division.space.bounds.contains(this.roundPositionOld))
+				if (force || division.space.bounds.intersects(this.space.bounds) || division.space.bounds.intersects(this.spaceBoundsOld))
 					division.updateHead(this, index, this.roundPosition)
 
 			})
