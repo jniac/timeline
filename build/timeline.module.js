@@ -1,4 +1,4 @@
-/* 2018-03-14 15:58 GMT(+1) */
+/* 2018-03-19 15:59 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -449,7 +449,14 @@ class SpaceProperty {
 
 	constructor(space) {
 
-		this.space = space;
+		Object.assign(this, {
+
+			space,
+			absolute: 0,
+			relative: 0,
+			mode: null,
+			
+		});
 
 	}
 
@@ -490,6 +497,13 @@ class SpaceProperty {
 
 		if (args.length === 0)
 			return this.set(0, 1, null)
+
+		if (args.length === 1 && typeof args[0] === 'function') {
+
+			this.computeDelegate = args[0];
+			return this
+
+		}
 
 		if (args.length === 2)
 			return this.set(parsePercent(args[0]), parsePercent(args[1]))
@@ -629,6 +643,7 @@ class Space {
 		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++;
 		this.children.push(child);
 
+		// NOTE should we avoid sorting? and prefer splice() to push() && sort()
 		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier);
 
 		this.setDirty();
@@ -783,10 +798,16 @@ class Space {
 
 			}
 
+			if (this.width.computeDelegate)
+				this.globalWidth = this.width.computeDelegate(this, this.globalWidth);
+
 		} else {
 
 			// globalWidth is computed from parent
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth());
+
+			if (this.width.computeDelegate)
+				this.globalWidth = this.width.computeDelegate(this, this.globalWidth);
 
 			for (let child of this.children)
 				child.updateWidth();

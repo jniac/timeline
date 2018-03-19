@@ -64,8 +64,8 @@ function drawSpace(space, dx, dy, scale, color) {
 	x = dx + scale * space.range.min
 	w = scale * space.range.width
 	lineH(x, dy, w, { thickness: 3, color })
-	lineV(x, dy, 10)
-	lineV(x + w, dy, 10)
+	lineV(x, dy, 6)
+	lineV(x + w, dy, 6)
 
 	ctx.lineWidth = 1
 	ctx.moveTo(dx + scale * space.bounds.min, dy)
@@ -74,13 +74,13 @@ function drawSpace(space, dx, dy, scale, color) {
 	ctx.beginPath()
 
 	ctx.fillStyle = color
-	ctx.arc(dx + scale * space.globalPosition, dy + 9, 2, 0, 2 * Math.PI)
+	ctx.arc(dx + scale * space.globalPosition, dy + 5, 2, 0, 2 * Math.PI)
 	ctx.fill()
 	ctx.beginPath()
 
 	if (space.widthMode.is.CONTENT) {
-		arrowUp(dx + scale * space.range.interpolate(.5), dy + 10, { size: 7 })
-		lineV(dx + scale * space.range.interpolate(.5), dy + 10, 16)
+		arrowUp(dx + scale * space.range.interpolate(.5), dy + 17, { size: 5 })
+		lineV(dx + scale * space.range.interpolate(.5), dy + 15, 26)
 		// arrowUp(dx + scale * space.range.interpolate(.5) - 17, dy + 10, { size: 7 })
 		// arrowUp(dx + scale * space.range.interpolate(.5) + 17, dy + 10, { size: 7 })
 	}
@@ -174,7 +174,7 @@ export class TimelineCanvas {
 		// HEAD
 		timeline.rootDivision.walk(division => {
 
-			let y = 20 + 20 * division.space.depth
+			let y = 20 + 30 * division.space.depth + (division.space.positionMode.is.FREE ? 10 : 0)
 
 			for (let localHead of division.localHeads) {
 				let range = localHead.head.space.range
@@ -187,7 +187,7 @@ export class TimelineCanvas {
 		// DIVISION
 		timeline.rootDivision.walk(division => {
 
-			let y = 20 + 20 * division.space.depth
+			let y = 20 + 30 * division.space.depth + (division.space.positionMode.is.FREE ? 10 : 0)
 			let color
 
 			if (this.highlighted)

@@ -1,4 +1,18 @@
 
+# Mon Mar 19 2018
+
+### SpaceProperty has delegate!
+`SpaceProperty` can now define a function to compute the value.
+```javascript
+let margin = 100
+timeline.division({ positionMode: 'FREE', position: margin, width: space => space.parent.globalWidth - 2 * margin })
+```
+So `SpaceProperty`instance are no more restricted to a combination of absolute and relative parts.  
+This is a lot more permissive. And it will fix the problem of width computation of none-stacked divisions (should the relative part refer to the direct parent (the one that is dependent from stacked chilren, or to parent, the 2 options are meaningfull, instead of choose right now a suffix for relative part referring to direct parent or fixed parent, it's more wise to allow delegate for calculations, if an usage seems to ermerge it will be time then to find a suffix (eg: `em, rem, %, vw, vh etc.`))).
+
+NOTE: positionMode && widthMode seem superfluous, the mode (a enum key, a string once serialized) should probably hold by SpaceProperty.  
+It will allow a more concise definition of property: `timeline.division({ position: 'FREE 100%' })` or, using a delegate, `timeline.division({ width: ['CONTENT', space })`
+
 # Thu Mar 14 2018
 
 *Major changes:*  

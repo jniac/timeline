@@ -36,7 +36,14 @@ export class SpaceProperty {
 
 	constructor(space) {
 
-		this.space = space
+		Object.assign(this, {
+
+			space,
+			absolute: 0,
+			relative: 0,
+			mode: null,
+			
+		})
 
 	}
 
@@ -77,6 +84,13 @@ export class SpaceProperty {
 
 		if (args.length === 0)
 			return this.set(0, 1, null)
+
+		if (args.length === 1 && typeof args[0] === 'function') {
+
+			this.computeDelegate = args[0]
+			return this
+
+		}
 
 		if (args.length === 2)
 			return this.set(parsePercent(args[0]), parsePercent(args[1]))

@@ -93,6 +93,7 @@ export class Space {
 		child.childUniqueIdentifier = this.childrenUniqueIdentifierCount++
 		this.children.push(child)
 
+		// NOTE should we avoid sorting? and prefer splice() to push() && sort()
 		this.children.sort((a, b) => a.order - b.order || a.childUniqueIdentifier - b.childUniqueIdentifier)
 
 		this.setDirty()
@@ -247,10 +248,16 @@ export class Space {
 
 			}
 
+			if (this.width.computeDelegate)
+				this.globalWidth = this.width.computeDelegate(this, this.globalWidth)
+
 		} else {
 
 			// globalWidth is computed from parent
 			this.globalWidth = this.width.solve(this.getParentGlobalWidth())
+
+			if (this.width.computeDelegate)
+				this.globalWidth = this.width.computeDelegate(this, this.globalWidth)
 
 			for (let child of this.children)
 				child.updateWidth()
