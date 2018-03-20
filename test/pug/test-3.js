@@ -16,8 +16,8 @@ export let timeline = new Timeline(800)
 export let timelineCanvas = new TimelineCanvas(timeline)
 
 timeline.rootDivision.space.width.computeDelegate = (space, width) => width - space.width.absolute
-timeline.division({ bound:true, name:'min', width: '300%', positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'#FC4193' })
-timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'#FC4193' })
+timeline.division({ bound:true, name:'min', width: 300, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'#FC4193' })
+timeline.division({ bound:true, name:'max', width: 300, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'#FC4193' })
 
 for (let section of document.querySelectorAll('section')) {
 
@@ -40,7 +40,9 @@ export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
 
 
-let headValue, headIsDragged = false
+timeline.head.friction = .1
+
+let headValue, headIsDragged = false, headLimit = 300
 
 handler.on('drag-start', event => {
 
@@ -61,7 +63,7 @@ handler.on('drag', event => {
 
 	headValue += -event.dx
 
-	timeline.head.value = timeline.rootDivision.getLimitedValue(headValue, 300)
+	timeline.head.value = timeline.rootDivision.getLimitedValue(headValue, headLimit)
 	// console.log('drag', headValue)
 
 })
@@ -71,11 +73,32 @@ timeline.on('frame', event => {
 	if (!headIsDragged && !timeline.rootDivision.space.range.contains(timeline.head.value)) {
 
 		if (timeline.head.value < timeline.rootDivision.space.range.min)
-			timeline.head.value += (timeline.rootDivision.space.range.min - timeline.head.value) * .1
+			timeline.head.value += (timeline.rootDivision.space.range.min - timeline.head.value) * .15
 
 		if (timeline.head.value > timeline.rootDivision.space.range.max)
-			timeline.head.value += (timeline.rootDivision.space.range.max - timeline.head.value) * .1
+			timeline.head.value += (timeline.rootDivision.space.range.max - timeline.head.value) * .15
 
 	}
 
+	console.line('head', `head.value: ${timeline.head.value.toFixed(3)}`)
+
 })
+
+
+
+
+
+
+
+
+
+
+document.querySelector('input[type=range]').oninput = event => {
+
+	headLimit = parseFloat(event.target.value)
+
+	timeline.division('bound').forEach(division => division.width = headLimit)
+	document.querySelector('input[type=range] + label').innerHTML = `outside limit (${headLimit})`
+
+
+}

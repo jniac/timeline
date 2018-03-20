@@ -11,8 +11,15 @@ block style
 		include:sass test-1.sass
 	style
 		:sass
+			section
+				user-select: none
 			h1
 				font-size: 140px
+				
+			.setting
+				padding: 16px
+				input
+					width: 400px
 			
 
 block stage
@@ -25,3 +32,7 @@ block stage
 		section(style='background-color:#FEB0B4')
 			h1 you ?
 		.border
+		
+	.setting
+		input(type='range' min=0 max=1000 value=300)
+		label outside limit (300)

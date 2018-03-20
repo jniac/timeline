@@ -16,6 +16,7 @@
 
 	section
 		padding: 32px
+		// pointer-events: none
 
 		&.big
 			font-size: 5em
@@ -35,9 +36,12 @@
 
 	div.border
 		--border: 500px
+		// pointer-events: none
 		border: rgba(255,255,255,.85) var(--border) solid
 		width: calc(100% + 2 * var(--border))
 		height: calc(100% + 2 * var(--border))
 		top: calc(var(--border) * -1)
 		left: calc(var(--border) * -1)
 
+canvas
+	// z-index: 2
