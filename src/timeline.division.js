@@ -185,14 +185,10 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	// updateSpace(force = false) {
+	updateHead(head) {
 
-	// 	this.space.update()
-
-	// }
-
-	updateHead(head, index, headValue) {
-
+		let headValue = head.roundPosition
+		let headIndex = head.getIndex()
 		let relative = this.space.range.ratio(headValue)
 
 		// handle the 0 / 0 case (0 / range.width)
@@ -208,7 +204,7 @@ export class Division extends eventjs.EventDispatcher {
 		let newValues = {
 
 			head,
-			index,
+			headIndex,
 			contained,
 			overlap,
 			global: headValue,
@@ -220,10 +216,10 @@ export class Division extends eventjs.EventDispatcher {
 
 		}
 
-		let oldValues = this.localHeads[index] || {
+		let oldValues = this.localHeads[headIndex] || {
 
 			head: null,
-			index: -1,
+			headIndex: -1,
 			contained: false,
 			overlap: false,
 			global: NaN,
@@ -235,7 +231,7 @@ export class Division extends eventjs.EventDispatcher {
 
 		}
 
-		this.localHeads[index] = newValues
+		this.localHeads[headIndex] = newValues
 
 		let old_r = 		oldValues.relative
 		let new_r = 		newValues.relative
@@ -256,22 +252,22 @@ export class Division extends eventjs.EventDispatcher {
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range }
 
 		if (isNaN(oldValues.global))
-			this.dispatchEvent(`init-head${index}`, eventData)
+			this.dispatchEvent(`init-${head.name}`, eventData)
 
 		if (enter)
-			this.dispatchEvent(`enter-head${index}`, eventData)
+			this.dispatchEvent(`enter-${head.name}`, eventData)
 
 		if (exit)
-			this.dispatchEvent(`exit-head${index}`, eventData)
+			this.dispatchEvent(`exit-${head.name}`, eventData)
 
 		if (isInside || pass)
-			this.dispatchEvent(`progress-head${index}`, eventData)
+			this.dispatchEvent(`progress-${head.name}`, eventData)
 
 		if (pass)
-			this.dispatchEvent(`pass-head${index}`, eventData)
+			this.dispatchEvent(`pass-${head.name}`, eventData)
 
 		if (overlap || oldValues.overlap)
-			this.dispatchEvent(`overlap-head${index}`, eventData)
+			this.dispatchEvent(`overlap-${head.name}`, eventData)
 
 	}
 

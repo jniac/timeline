@@ -1,4 +1,4 @@
-/* 2018-03-21 12:11 GMT(+1) */
+/* 2018-03-21 12:48 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1052,17 +1052,25 @@ const round = (x, precision) => Math.round(x / precision) * precision;
  * Extends Mobile to add Timeline integration.
  */
 
+let HeadUID = 0;
+
 class Head extends Mobile {
 
 	constructor(timeline) {
 
 		super();
 
-		this.color = 'red';
-		this.timeline = timeline;
+		Object.assign(this, {
 
-		this.roundPosition = this.position;
-		this.positionRounding = 1 / 4;
+			uid: HeadUID++,
+			name: `head-${HeadUID}`,
+			color: 'red',
+			timeline,
+			position: 0,
+			roundPosition: 0,
+			positionRounding: 1 / 4,
+
+		});
 
 		this.space = new Space({ positionMode: 'FREE', width: '100%' });
 		this.space.updateApart = true; // important! head move should not trigger division update cycle
@@ -1118,13 +1126,11 @@ class Head extends Mobile {
 
 		if (force || this.hasBeenUpdated) {
 
-			let index = this.getIndex();
-
 			this.timeline.rootDivision.walk(division => {
 
-				// NOTE optimization: only division whose bounds contain head position should be updated
+				// NOTE optimization (done): only division whose bounds contain head position are updated
 				if (force || division.space.bounds.intersects(this.space.bounds) || division.space.bounds.intersects(this.spaceBoundsOld))
-					division.updateHead(this, index, this.roundPosition);
+					division.updateHead(this);
 
 			});
 
@@ -1340,14 +1346,10 @@ class Division extends EventDispatcher {
 
 	}
 
-	// updateSpace(force = false) {
+	updateHead(head) {
 
-	// 	this.space.update()
-
-	// }
-
-	updateHead(head, index, headValue) {
-
+		let headValue = head.roundPosition;
+		let headIndex = head.getIndex();
 		let relative = this.space.range.ratio(headValue);
 
 		// handle the 0 / 0 case (0 / range.width)
@@ -1363,7 +1365,7 @@ class Division extends EventDispatcher {
 		let newValues = {
 
 			head,
-			index,
+			headIndex,
 			contained,
 			overlap,
 			global: headValue,
@@ -1375,10 +1377,10 @@ class Division extends EventDispatcher {
 
 		};
 
-		let oldValues = this.localHeads[index] || {
+		let oldValues = this.localHeads[headIndex] || {
 
 			head: null,
-			index: -1,
+			headIndex: -1,
 			contained: false,
 			overlap: false,
 			global: NaN,
@@ -1390,7 +1392,7 @@ class Division extends EventDispatcher {
 
 		};
 
-		this.localHeads[index] = newValues;
+		this.localHeads[headIndex] = newValues;
 
 		let old_r = 		oldValues.relative;
 		let new_r = 		newValues.relative;
@@ -1410,22 +1412,22 @@ class Division extends EventDispatcher {
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range };
 
 		if (isNaN(oldValues.global))
-			this.dispatchEvent(`init-head${index}`, eventData);
+			this.dispatchEvent(`init-${head.name}`, eventData);
 
 		if (enter)
-			this.dispatchEvent(`enter-head${index}`, eventData);
+			this.dispatchEvent(`enter-${head.name}`, eventData);
 
 		if (exit)
-			this.dispatchEvent(`exit-head${index}`, eventData);
+			this.dispatchEvent(`exit-${head.name}`, eventData);
 
 		if (isInside || pass)
-			this.dispatchEvent(`progress-head${index}`, eventData);
+			this.dispatchEvent(`progress-${head.name}`, eventData);
 
 		if (pass)
-			this.dispatchEvent(`pass-head${index}`, eventData);
+			this.dispatchEvent(`pass-${head.name}`, eventData);
 
 		if (overlap || oldValues.overlap)
-			this.dispatchEvent(`overlap-head${index}`, eventData);
+			this.dispatchEvent(`overlap-${head.name}`, eventData);
 
 	}
 

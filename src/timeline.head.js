@@ -153,17 +153,25 @@ const round = (x, precision) => Math.round(x / precision) * precision
  * Extends Mobile to add Timeline integration.
  */
 
+let HeadUID = 0
+
 export class Head extends Mobile {
 
 	constructor(timeline) {
 
 		super()
 
-		this.color = 'red'
-		this.timeline = timeline
+		Object.assign(this, {
 
-		this.roundPosition = this.position
-		this.positionRounding = 1 / 4
+			uid: HeadUID++,
+			name: `head-${HeadUID}`,
+			color: 'red',
+			timeline,
+			position: 0,
+			roundPosition: 0,
+			positionRounding: 1 / 4,
+
+		})
 
 		this.space = new Space({ positionMode: 'FREE', width: '100%' })
 		this.space.updateApart = true // important! head move should not trigger division update cycle
@@ -219,13 +227,11 @@ export class Head extends Mobile {
 
 		if (force || this.hasBeenUpdated) {
 
-			let index = this.getIndex()
-
 			this.timeline.rootDivision.walk(division => {
 
-				// NOTE optimization: only division whose bounds contain head position should be updated
+				// NOTE optimization (done): only division whose bounds contain head position are updated
 				if (force || division.space.bounds.intersects(this.space.bounds) || division.space.bounds.intersects(this.spaceBoundsOld))
-					division.updateHead(this, index, this.roundPosition)
+					division.updateHead(this)
 
 			})
 
