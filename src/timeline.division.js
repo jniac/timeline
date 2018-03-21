@@ -269,6 +269,8 @@ export class Division extends eventjs.EventDispatcher {
 		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-${head.name}`, eventData)
 
+		return this
+
 	}
 
 	// traps:
