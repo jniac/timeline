@@ -1,4 +1,4 @@
-import { Double, Range } from './primitives.js'
+import { Range } from './primitives.js'
 import { now, readonlyProperties, clamp, Enum } from './timeline.utils.js'
 
 import { SpaceProperty } from './timeline.space-property.js'

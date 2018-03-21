@@ -1,4 +1,4 @@
-/* 2018-03-21 23:29 GMT(+1) */
+/* 2018-03-21 23:47 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -171,27 +171,6 @@ function query(object, selector, { firstOnly = false, propsDelegate = 'props', c
 
 }
 
-/**
- *
- * Double
- *
- * Most of the lines are about parsing input values:
- *
- * x 			> new Double(x, 1)
- * '100' 		> new Double(100, 0)
- * '100%' 		> new Double(0, 1)
- * '0 1' 		> new Double(0, 1)
- * '50 50%' 	> new Double(50, .5)
- * '50% 50%' 	> new Double(.5, .5)
- * [x, y] 		> new Double(x, y)
- *
- */
-
-
-
-
-
-
 /** Class representing an interval [min, max] */
 
 class Range {
@@ -273,9 +252,9 @@ class Range {
 
 	}
 
-	clamp(x) {
+	clamp(x, tolerance = 0) {
 
-		return x < this.min ? this.min : x > this.max ? this.max : x
+		return x < this.min - tolerance ? this.min - tolerance : x > this.max + tolerance ? this.max + tolerance : x
 
 	}
 
@@ -428,13 +407,13 @@ function parsePercent(value) {
  *
  * Most of the lines are about parsing input values:
  *
- * x 			> new Double(x, 1)
- * '100' 		> new Double(100, 0)
- * '100%' 		> new Double(0, 1)
- * '0 1' 		> new Double(0, 1)
- * '50 50%' 	> new Double(50, .5)
- * '50% 50%' 	> new Double(.5, .5)
- * [x, y] 		> new Double(x, y)
+ * x 			> new SpaceProperty().set(x, 1)
+ * '100' 		> new SpaceProperty().set(100, 0)
+ * '100%' 		> new SpaceProperty().set(0, 1)
+ * '0 1' 		> new SpaceProperty().set(0, 1)
+ * '50 50%' 	> new SpaceProperty().set(50, .5)
+ * '50% 50%' 	> new SpaceProperty().set(.5, .5)
+ * [x, y] 		> new SpaceProperty().set(x, y)
  *
  */
 class SpaceProperty {
@@ -456,7 +435,7 @@ class SpaceProperty {
 			absolute: 0,
 			relative: 0,
 			mode: null,
-			
+
 		});
 
 	}
@@ -1047,6 +1026,7 @@ class Mobile {
 }
 
 const round = (x, precision) => Math.round(x / precision) * precision;
+const clamp$1 = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x;
 
 let HeadUID = 0;
 
@@ -1150,16 +1130,18 @@ class Head {
 
 	clampVelocity(division, maxOverflow) {
 
-		let destination = this.getDestinationApproximation();
-
 		let min = division.space.range.min - maxOverflow;
 		let max = division.space.range.max + maxOverflow;
 
+		this.mobile.position = clamp$1(this.mobile.position, min, max);
+
+		let destination = this.getDestinationApproximation();
+
 		if (destination < min)
-			this.mobile.shoot(min, { log: false });
+			this.mobile.shoot(min, { log: true });
 
 		if (destination > max)
-			this.mobile.shoot(max, { log: false });
+			this.mobile.shoot(max, { log: true });
 
 	}
 
