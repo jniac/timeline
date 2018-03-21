@@ -15,7 +15,9 @@ export let timeline = new Timeline(800)
 
 export let timelineCanvas = new TimelineCanvas(timeline)
 
+// this line is important !
 timeline.rootDivision.space.width.computeDelegate = (space, width) => width - space.width.absolute
+
 timeline.division({ bound:true, name:'min', width: 300, positionMode: 'FREE', position:'0%', align: '-100%', order: -Infinity, color:'#FC4193' })
 timeline.division({ bound:true, name:'max', width: 300, positionMode: 'FREE', position:'100%', align: '100%', order: Infinity, color:'#FC4193' })
 
@@ -39,6 +41,17 @@ export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
 
 
+
+
+
+
+
+
+// > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > //
+//                                                                             //
+//                            BOUNDS - BEGIN                                   //
+//                                                                             //
+// < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < //
 
 timeline.head.friction = .1
 
@@ -70,19 +83,20 @@ handler.on('drag', event => {
 
 timeline.on('frame', event => {
 
-	if (!headIsDragged && !timeline.rootDivision.space.range.contains(timeline.head.value)) {
-
-		if (timeline.head.value < timeline.rootDivision.space.range.min)
-			timeline.head.value += (timeline.rootDivision.space.range.min - timeline.head.value) * .15
-
-		if (timeline.head.value > timeline.rootDivision.space.range.max)
-			timeline.head.value += (timeline.rootDivision.space.range.max - timeline.head.value) * .15
-
-	}
+	if (!headIsDragged)
+		timeline.rootDivision.bringBackHeadInside({ head: timeline.head })
 
 	console.line('head', `head.value: ${timeline.head.value.toFixed(3)}`)
 
 })
+
+// > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > //
+//                                                                             //
+//                             BOUNDS - END                                    //
+//                                                                             //
+// < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < //
+
+
 
 
 

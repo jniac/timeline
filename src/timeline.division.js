@@ -335,15 +335,38 @@ export class Division extends eventjs.EventDispatcher {
 
 	// utils
 
-	getLimitedValue(value, limit) {
+	/**
+	 * Very useful function to smoothly clamp head inside a division (allowing some controlled overflow).
+	 */
+	getLimitedValue(value, maxOverflow = 300) {
 
 		if (value < this.space.range.min)
-			return this.space.range.min - Mth.limit(this.space.range.min - value, limit)
+			return this.space.range.min - Mth.limit(this.space.range.min - value, maxOverflow)
 
 		if (value > this.space.range.max)
-			return this.space.range.max + Mth.limit(value - this.space.range.max, limit)
+			return this.space.range.max + Mth.limit(value - this.space.range.max, maxOverflow)
 
 		return value
+
+	}
+
+	/**
+	 * Very useful function to smoothly bring back head instance into the division bounds.
+	 * This function should be called in runtime loop.
+	 */
+	bringBackHeadInside({ head = this.timeline.head, ease = .15 } = {}) {
+
+		let { range } = this.space
+
+		if (!range.contains(head.value)) {
+
+			if (head.value < range.min)
+				head.value += (range.min - head.value) * ease
+
+			if (head.value > range.max)
+				head.value += (range.max - head.value) * ease
+
+		}
 
 	}
 
