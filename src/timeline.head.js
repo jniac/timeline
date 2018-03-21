@@ -194,7 +194,7 @@ export class Head extends Mobile {
 	set value(value) {
 
 		this.forcedPosition = value
-		this.forceUpdate = true
+		// this.forceUpdate = true
 		// this.setPosition(value)
 
 	}

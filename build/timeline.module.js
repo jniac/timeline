@@ -1,4 +1,4 @@
-/* 2018-03-21 12:51 GMT(+1) */
+/* 2018-03-21 16:14 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1093,7 +1093,7 @@ class Head extends Mobile {
 	set value(value) {
 
 		this.forcedPosition = value;
-		this.forceUpdate = true;
+		// this.forceUpdate = true
 		// this.setPosition(value)
 
 	}

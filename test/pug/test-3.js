@@ -86,7 +86,7 @@ timeline.on('frame', event => {
 	if (!headIsDragged)
 		timeline.rootDivision.bringBackHeadInside({ head: timeline.head })
 
-	console.line('head', `head.value: ${timeline.head.value.toFixed(3)}`)
+	console.line('head', `head.value: ${timeline.head.value.toFixed(3)} time: ${performance.now().toFixed(2)}ms`)
 
 })
 
@@ -112,7 +112,7 @@ document.querySelector('input[type=range]').oninput = event => {
 	headLimit = parseFloat(event.target.value)
 
 	timeline.division('bound').forEach(division => division.width = headLimit)
-	document.querySelector('input[type=range] + label').innerHTML = `outside limit (${headLimit})`
+	document.querySelector('input[type=range] + label').innerHTML = `overflow limit (${headLimit})`
 
 
 }
