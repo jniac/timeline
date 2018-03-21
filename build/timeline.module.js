@@ -1,4 +1,4 @@
-/* 2018-03-21 16:14 GMT(+1) */
+/* 2018-03-21 22:15 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1031,6 +1031,8 @@ class Mobile {
 
 	shoot(destination) {
 
+		this.forcedPosition = NaN;
+
 		this.velocity = this.getVelocityForDestination(destination);
 
 		return this
@@ -1038,13 +1040,6 @@ class Mobile {
 	}
 
 }
-
-
-
-
-
-
-
 
 const round = (x, precision) => Math.round(x / precision) * precision;
 
@@ -1054,11 +1049,11 @@ const round = (x, precision) => Math.round(x / precision) * precision;
 
 let HeadUID = 0;
 
-class Head extends Mobile {
+class Head {
 
 	constructor(timeline) {
 
-		super();
+		// super()
 
 		Object.assign(this, {
 
@@ -1069,6 +1064,7 @@ class Head extends Mobile {
 			position: 0,
 			roundPosition: 0,
 			positionRounding: 1 / 4,
+			mobile: new Mobile(),
 
 		});
 
@@ -1089,10 +1085,11 @@ class Head extends Mobile {
 	get index() { return this.getIndex() }
 
 	// value interface for easier handling
-	get value() { return this.position }
+	get value() { return this.mobile.position }
 	set value(value) {
 
-		this.forcedPosition = value;
+		// this.forcedPosition = value
+		this.mobile.forcedPosition = value;
 		// this.forceUpdate = true
 		// this.setPosition(value)
 
@@ -1100,17 +1097,18 @@ class Head extends Mobile {
 
 	update(force = false) {
 
-		super.update();
+		// super.update()
+		this.mobile.update();
 
 		this.hasBeenUpdated = false;
 
-		let newRoundPosition = round(this.position, this.positionRounding);
+		let newRoundPosition = round(this.mobile.position, this.positionRounding);
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
 		this.roundPosition = newRoundPosition;
 
-		if (roundPositionHasChanged || force || this.forceUpdate) {
+		if (force || roundPositionHasChanged /*|| this.forceUpdate*/) {
 
-			this.forceUpdate = false;
+			// this.forceUpdate = false
 
 			this.hasBeenUpdated = true;
 
@@ -1140,20 +1138,18 @@ class Head extends Mobile {
 
 	velocityCorrectionForNearest(selector) {
 
-		this.forcedPosition = NaN;
+		let mobileVelocityBefore = this.mobile.velocity;
 
-		let velocityBefore = this.velocity;
-
-		let destination = this.getDestination({ velocity: this.velocityVar.average });
+		let destination = this.mobile.getDestination({ velocity: this.mobile.velocityVar.average });
 
 		let nearest = this.timeline.nearest(destination, selector);
 
 		if (nearest)
-			this.shoot(nearest.space.globalPosition);
+			this.mobile.shoot(nearest.space.globalPosition);
 
-		this.velocityCorrection = this.velocity / velocityBefore;
+		this.velocityCorrection = this.mobile.velocity / mobileVelocityBefore;
 
-		// console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
+		console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%');
 
 	}
 
