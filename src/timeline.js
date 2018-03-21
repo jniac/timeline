@@ -1,6 +1,6 @@
 import * as eventjs from './event.js'
 import query, { copy, propsToString } from './query.js'
-import { Double, Range } from './primitives.js'
+import { Range } from './primitives.js'
 
 import { Head } from './timeline.head.js'
 import { Division } from './timeline.division.js'
@@ -70,18 +70,19 @@ export class Timeline extends eventjs.EventDispatcher {
 		Object.assign(this, {
 
 			enabled: true,
+			updateDuration: 2000,
 
 		})
 
-		this.newHead()
+		this.newHead('main')
 
 		timelines.push(this)
 
 	}
 
-	newHead() {
+	newHead(name = null) {
 
-		this.heads.push(new Head(this))
+		this.heads.push(new Head(this, { name }))
 
 	}
 
@@ -103,8 +104,6 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		this.updateCost.add(dt)
 
-		// console.log(this.rootDivision.children.map(division => division.space.hasBeenUpdated))
-
 		let divisionsHaveBeenUpdated = this.rootDivision.children.some(division => division.space.hasBeenUpdated)
 		let headsHaveBeenUpdated = this.heads.some(head => head.hasBeenUpdated)
 
@@ -115,6 +114,9 @@ export class Timeline extends eventjs.EventDispatcher {
 			this.dispatchEvent('head-update')
 
 		if (divisionsHaveBeenUpdated || headsHaveBeenUpdated)
+			this.lastUpdateTime = t
+
+		if (t - this.lastUpdateTime < this.updateDuration)
 			this.dispatchEvent('update')
 
 		this.dispatchEvent('frame')

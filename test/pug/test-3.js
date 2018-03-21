@@ -55,38 +55,47 @@ export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
 timeline.head.friction = .1
 
-let headValue, headIsDragged = false, headLimit = 300
+let headPosition, headIsDragged = false, headLimit = 300
+
+timeline.rootDivision.on('pass-main', event => {
+
+	 timeline.head.clampVelocity(timeline.rootDivision, headLimit)
+
+})
 
 handler.on('drag-start', event => {
 
-	headValue = timeline.head.value
+	headPosition = timeline.head.position
 	headIsDragged = true
-	// console.log('drag-start', headValue)
+	// console.log('drag-start', headPosition)
 
 })
 
 handler.on('drag-end', event => {
 
+	// timeline.head.clampVelocity(timeline.rootDivision, headLimit * 3)
 	headIsDragged = false
-	// console.log('drag-end', headValue)
+	// console.log('drag-end', headPosition)
 
 })
 
 handler.on('drag', event => {
 
-	headValue += -event.dx
+	headPosition += -event.dx
 
-	timeline.head.value = timeline.rootDivision.getLimitedValue(headValue, headLimit)
-	// console.log('drag', headValue)
+	timeline.head.forcedPosition = timeline.rootDivision.getLimitedValue(headPosition, headLimit)
+	// console.log('drag', headPosition)
 
 })
 
-timeline.on('frame', event => {
+timeline.on('update', event => {
 
 	if (!headIsDragged)
 		timeline.rootDivision.bringBackHeadInside({ head: timeline.head })
 
-	console.line('head', `head.value: ${timeline.head.value.toFixed(3)} time: ${performance.now().toFixed(2)}ms`)
+	timeline.head.position = timeline.rootDivision.range.clamp(timeline.head.position, headLimit)
+
+	console.line('head', `head.roundPosition: ${timeline.head.roundPosition.toFixed(3)} time: ${performance.now().toFixed(2)}ms`)
 
 })
 

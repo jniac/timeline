@@ -128,11 +128,16 @@ export class Mobile {
 
 	get destination() { return this.getDestination() }
 
-	shoot(destination) {
+	shoot(destination, { log = false } = {}) {
 
 		this.forcedPosition = NaN
 
+		let velocityBefore = this.velocity
+
 		this.velocity = this.getVelocityForDestination(destination)
+
+		if (log)
+			console.log(`Mobile.shoot: destination: ${destination.toFixed(1)}, velocity shift: ${(100 * this.velocity / velocityBefore).toFixed(1)}%`)
 
 		return this
 

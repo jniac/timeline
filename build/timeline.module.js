@@ -1,4 +1,4 @@
-/* 2018-03-21 22:15 GMT(+1) */
+/* 2018-03-21 23:29 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1029,11 +1029,16 @@ class Mobile {
 
 	get destination() { return this.getDestination() }
 
-	shoot(destination) {
+	shoot(destination, { log = false } = {}) {
 
 		this.forcedPosition = NaN;
 
+		let velocityBefore = this.velocity;
+
 		this.velocity = this.getVelocityForDestination(destination);
+
+		if (log)
+			console.log(`Mobile.shoot: destination: ${destination.toFixed(1)}, velocity shift: ${(100 * this.velocity / velocityBefore).toFixed(1)}%`);
 
 		return this
 
@@ -1043,25 +1048,18 @@ class Mobile {
 
 const round = (x, precision) => Math.round(x / precision) * precision;
 
-/**
- * Extends Mobile to add Timeline integration.
- */
-
 let HeadUID = 0;
 
 class Head {
 
-	constructor(timeline) {
-
-		// super()
+	constructor(timeline, { name = null } = {}) {
 
 		Object.assign(this, {
 
 			uid: HeadUID++,
-			name: `head-${HeadUID}`,
+			name: name || `head-${HeadUID}`,
 			color: 'red',
 			timeline,
-			position: 0,
 			roundPosition: 0,
 			positionRounding: 1 / 4,
 			mobile: new Mobile(),
@@ -1084,16 +1082,11 @@ class Head {
 
 	get index() { return this.getIndex() }
 
-	// value interface for easier handling
-	get value() { return this.mobile.position }
-	set value(value) {
+	get position() { return this.mobile.position }
+	set position(value) { this.mobile.position = value; }
 
-		// this.forcedPosition = value
-		this.mobile.forcedPosition = value;
-		// this.forceUpdate = true
-		// this.setPosition(value)
-
-	}
+	get forcedPosition() { return this.mobile.position }
+	set forcedPosition(value) { this.mobile.forcedPosition = value; }
 
 	update(force = false) {
 
@@ -1106,9 +1099,7 @@ class Head {
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition;
 		this.roundPosition = newRoundPosition;
 
-		if (force || roundPositionHasChanged /*|| this.forceUpdate*/) {
-
-			// this.forceUpdate = false
+		if (force || roundPositionHasChanged) {
 
 			this.hasBeenUpdated = true;
 
@@ -1136,20 +1127,39 @@ class Head {
 
 	}
 
+	getDestinationApproximation() {
+
+		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average })
+
+	}
+
 	velocityCorrectionForNearest(selector) {
 
 		let mobileVelocityBefore = this.mobile.velocity;
 
-		let destination = this.mobile.getDestination({ velocity: this.mobile.velocityVar.average });
+		let destination = this.getDestinationApproximation();
 
 		let nearest = this.timeline.nearest(destination, selector);
 
 		if (nearest)
-			this.mobile.shoot(nearest.space.globalPosition);
+			this.mobile.shoot(nearest.space.globalPosition, { log: false });
 
 		this.velocityCorrection = this.mobile.velocity / mobileVelocityBefore;
 
-		console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%');
+	}
+
+	clampVelocity(division, maxOverflow) {
+
+		let destination = this.getDestinationApproximation();
+
+		let min = division.space.range.min - maxOverflow;
+		let max = division.space.range.max + maxOverflow;
+
+		if (destination < min)
+			this.mobile.shoot(min, { log: false });
+
+		if (destination > max)
+			this.mobile.shoot(max, { log: false });
 
 	}
 
@@ -1508,17 +1518,17 @@ class Division extends EventDispatcher {
 	 * Very useful function to smoothly bring back head instance into the division bounds.
 	 * This function should be called in runtime loop.
 	 */
-	bringBackHeadInside({ head = this.timeline.head, ease = .15 } = {}) {
+	bringBackHeadInside({ head = this.timeline.head, ease = .25 } = {}) {
 
 		let { range } = this.space;
 
-		if (!range.contains(head.value)) {
+		if (!range.contains(head.position)) {
 
-			if (head.value < range.min)
-				head.value += (range.min - head.value) * ease;
+			if (head.position < range.min)
+				head.position += (range.min - head.position) * ease;
 
-			if (head.value > range.max)
-				head.value += (range.max - head.value) * ease;
+			if (head.position > range.max)
+				head.position += (range.max - head.position) * ease;
 
 		}
 
@@ -1600,18 +1610,19 @@ class Timeline extends EventDispatcher {
 		Object.assign(this, {
 
 			enabled: true,
+			updateDuration: 2000,
 
 		});
 
-		this.newHead();
+		this.newHead('main');
 
 		timelines.push(this);
 
 	}
 
-	newHead() {
+	newHead(name = null) {
 
-		this.heads.push(new Head(this));
+		this.heads.push(new Head(this, { name }));
 
 	}
 
@@ -1633,8 +1644,6 @@ class Timeline extends EventDispatcher {
 
 		this.updateCost.add(dt);
 
-		// console.log(this.rootDivision.children.map(division => division.space.hasBeenUpdated))
-
 		let divisionsHaveBeenUpdated = this.rootDivision.children.some(division => division.space.hasBeenUpdated);
 		let headsHaveBeenUpdated = this.heads.some(head => head.hasBeenUpdated);
 
@@ -1645,6 +1654,9 @@ class Timeline extends EventDispatcher {
 			this.dispatchEvent('head-update');
 
 		if (divisionsHaveBeenUpdated || headsHaveBeenUpdated)
+			this.lastUpdateTime = t;
+
+		if (t - this.lastUpdateTime < this.updateDuration)
 			this.dispatchEvent('update');
 
 		this.dispatchEvent('frame');

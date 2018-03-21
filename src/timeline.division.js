@@ -352,17 +352,17 @@ export class Division extends eventjs.EventDispatcher {
 	 * Very useful function to smoothly bring back head instance into the division bounds.
 	 * This function should be called in runtime loop.
 	 */
-	bringBackHeadInside({ head = this.timeline.head, ease = .15 } = {}) {
+	bringBackHeadInside({ head = this.timeline.head, ease = .25 } = {}) {
 
 		let { range } = this.space
 
-		if (!range.contains(head.value)) {
+		if (!range.contains(head.position)) {
 
-			if (head.value < range.min)
-				head.value += (range.min - head.value) * ease
+			if (head.position < range.min)
+				head.position += (range.min - head.position) * ease
 
-			if (head.value > range.max)
-				head.value += (range.max - head.value) * ease
+			if (head.position > range.max)
+				head.position += (range.max - head.position) * ease
 
 		}
 

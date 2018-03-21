@@ -138,7 +138,7 @@ timeline.query('f:name=max')
 
 
 // timeline.rootDivision.space.update()
-// timeline.head.value = 0
+// timeline.head.position = 0
 
 export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
@@ -148,7 +148,7 @@ export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 handler.on('wheel', event => {
 
 	// console.log(event.type, event.dx)
-	timeline.head.value += event.dx
+	timeline.head.position += event.dx
 
 	// timelineCanvas.draw()
 
@@ -164,7 +164,7 @@ handler.on('drag-start', event => {
 
 handler.on('drag', event => {
 
-	timeline.head.value += -event.dx
+	timeline.head.forcedPosition += -event.dx
 
 })
 

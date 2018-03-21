@@ -14,13 +14,13 @@ function parsePercent(value) {
  *
  * Most of the lines are about parsing input values:
  *
- * x 			> new Double(x, 1)
- * '100' 		> new Double(100, 0)
- * '100%' 		> new Double(0, 1)
- * '0 1' 		> new Double(0, 1)
- * '50 50%' 	> new Double(50, .5)
- * '50% 50%' 	> new Double(.5, .5)
- * [x, y] 		> new Double(x, y)
+ * x 			> new SpaceProperty().set(x, 1)
+ * '100' 		> new SpaceProperty().set(100, 0)
+ * '100%' 		> new SpaceProperty().set(0, 1)
+ * '0 1' 		> new SpaceProperty().set(0, 1)
+ * '50 50%' 	> new SpaceProperty().set(50, .5)
+ * '50% 50%' 	> new SpaceProperty().set(.5, .5)
+ * [x, y] 		> new SpaceProperty().set(x, y)
  *
  */
 export class SpaceProperty {
@@ -42,7 +42,7 @@ export class SpaceProperty {
 			absolute: 0,
 			relative: 0,
 			mode: null,
-			
+
 		})
 
 	}

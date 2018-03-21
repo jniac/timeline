@@ -212,9 +212,9 @@ export class Range {
 
 	}
 
-	clamp(x) {
+	clamp(x, tolerance = 0) {
 
-		return x < this.min ? this.min : x > this.max ? this.max : x
+		return x < this.min - tolerance ? this.min - tolerance : x > this.max + tolerance ? this.max + tolerance : x
 
 	}
 

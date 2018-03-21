@@ -8,26 +8,20 @@ import { Mobile } from './timeline.mobile.js'
 
 
 const round = (x, precision) => Math.round(x / precision) * precision
-
-/**
- * Extends Mobile to add Timeline integration.
- */
+const clamp = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x
 
 let HeadUID = 0
 
 export class Head {
 
-	constructor(timeline) {
-
-		// super()
+	constructor(timeline, { name = null } = {}) {
 
 		Object.assign(this, {
 
 			uid: HeadUID++,
-			name: `head-${HeadUID}`,
+			name: name || `head-${HeadUID}`,
 			color: 'red',
 			timeline,
-			position: 0,
 			roundPosition: 0,
 			positionRounding: 1 / 4,
 			mobile: new Mobile(),
@@ -50,16 +44,11 @@ export class Head {
 
 	get index() { return this.getIndex() }
 
-	// value interface for easier handling
-	get value() { return this.mobile.position }
-	set value(value) {
+	get position() { return this.mobile.position }
+	set position(value) { this.mobile.position = value }
 
-		// this.forcedPosition = value
-		this.mobile.forcedPosition = value
-		// this.forceUpdate = true
-		// this.setPosition(value)
-
-	}
+	get forcedPosition() { return this.mobile.position }
+	set forcedPosition(value) { this.mobile.forcedPosition = value }
 
 	update(force = false) {
 
@@ -72,9 +61,7 @@ export class Head {
 		let roundPositionHasChanged = this.roundPosition !== newRoundPosition
 		this.roundPosition = newRoundPosition
 
-		if (force || roundPositionHasChanged /*|| this.forceUpdate*/) {
-
-			// this.forceUpdate = false
+		if (force || roundPositionHasChanged) {
 
 			this.hasBeenUpdated = true
 
@@ -102,20 +89,41 @@ export class Head {
 
 	}
 
+	getDestinationApproximation() {
+
+		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average })
+
+	}
+
 	velocityCorrectionForNearest(selector) {
 
 		let mobileVelocityBefore = this.mobile.velocity
 
-		let destination = this.mobile.getDestination({ velocity: this.mobile.velocityVar.average })
+		let destination = this.getDestinationApproximation()
 
 		let nearest = this.timeline.nearest(destination, selector)
 
 		if (nearest)
-			this.mobile.shoot(nearest.space.globalPosition)
+			this.mobile.shoot(nearest.space.globalPosition, { log: false })
 
 		this.velocityCorrection = this.mobile.velocity / mobileVelocityBefore
 
-		console.log('velocity shift:', (100 * this.velocityCorrection).toFixed(1) + '%')
+	}
+
+	clampVelocity(division, maxOverflow) {
+
+		let min = division.space.range.min - maxOverflow
+		let max = division.space.range.max + maxOverflow
+
+		this.mobile.position = clamp(this.mobile.position, min, max)
+
+		let destination = this.getDestinationApproximation()
+
+		if (destination < min)
+			this.mobile.shoot(min, { log: true })
+
+		if (destination > max)
+			this.mobile.shoot(max, { log: true })
 
 	}
 
