@@ -1,4 +1,4 @@
-/* 2018-03-22 21:18 GMT(+1) */
+/* 2018-03-22 21:35 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -54,10 +54,11 @@ function propsToString(props) {
 /*
 
 query(object, 'page enabled')
-query(object, 'page enabled > stop')
-query(object, 'page enabled pagination.number>0 > stop')
-query(object, 'page enabled pagination[number>0] > stop')
-query(object, 'stop name=bob')
+query(object, 'page !enabled')
+query(object, 'page enabled > section')
+query(object, 'page enabled pagination.number>0 > section')
+query(object, 'page enabled pagination[number>0] > section')
+query(object, 'section name=bob')
 
 */
 
@@ -74,14 +75,16 @@ const SelectorOp = {
 
 function makeTest(str) {
 
-	let [, key, op, rhs] = str.match(/([\w-]+|\*)(=|!=|>|>=|<|<=)?([\w-]+)?/);
+	let [, not, key, op, rhs] = str.match(/(!)?([\w-]+|\*)(=|!=|>|>=|<|<=)?([\w-]+)?/);
 
 	if (key === '*')
 		return object => true
 
-	return op
+	return not
+	 	? object => object.hasOwnProperty(key) && !object[key]
+		: op
 		? object => SelectorOp[op](object[key], rhs)
-		: object => object.hasOwnProperty(key)
+		: object => object.hasOwnProperty(key) && !!object[key]
 
 }
 
@@ -104,10 +107,10 @@ function getChildren(object, childrenDelegate, includeSelf) {
  * selector rules:
  *
  *    • Match only the first result (the result will not be necessarily iterable)
- *    'first:[str]' 
+ *    'first:[str]'
  *
  *    • Match children
- *    '[str] > [str]' 
+ *    '[str] > [str]'
  *
  */
 function query(object, selector, { firstOnly = false, propsDelegate = 'props', childrenDelegate = 'children' } = {}) {
@@ -116,7 +119,7 @@ function query(object, selector, { firstOnly = false, propsDelegate = 'props', c
 
 		let key = propsDelegate;
 		propsDelegate = object => object[key];
-		
+
 	}
 
 	if (typeof childrenDelegate === 'string') {
