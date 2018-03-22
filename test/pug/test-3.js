@@ -53,7 +53,7 @@ export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 //                                                                             //
 // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < //
 
-timeline.head.friction = .1
+timeline.head.friction = .2
 
 let headPosition, headIsDragged = false, headLimit = 300
 
@@ -73,7 +73,6 @@ handler.on('drag-start', event => {
 
 handler.on('drag-end', event => {
 
-	// timeline.head.clampVelocity(timeline.rootDivision, headLimit * 3)
 	headIsDragged = false
 	// console.log('drag-end', headPosition)
 
@@ -93,9 +92,10 @@ timeline.on('update', event => {
 	if (!headIsDragged)
 		timeline.rootDivision.bringBackHeadInside({ head: timeline.head })
 
-	timeline.head.position = timeline.rootDivision.range.clamp(timeline.head.position, headLimit)
+	timeline.head.position = timeline.rootDivision.space.range.clamp(timeline.head.position, headLimit)
 
-	console.line('head', `head.roundPosition: ${timeline.head.roundPosition.toFixed(3)} time: ${performance.now().toFixed(2)}ms`)
+	console.line('position', timeline.head.mobile.position.toFixed(3))
+	console.line('velocity', timeline.head.mobile.velocity.toFixed(3))
 
 })
 
