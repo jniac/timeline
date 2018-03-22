@@ -127,13 +127,15 @@ export class Mobile {
 	}
 
 	get destination() { return this.getDestination() }
+	set destination(value) { this.velocity = this.getVelocityForDestination(value) }
 
-	shoot(destination, { log = false } = {}) {
+	shoot(destination, { friction = this.friction, log = false } = {}) {
 
 		this.forcedPosition = NaN
 
 		let velocityBefore = this.velocity
 
+		this.friction = friction
 		this.velocity = this.getVelocityForDestination(destination)
 
 		if (log)

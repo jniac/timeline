@@ -1,4 +1,4 @@
-/* 2018-03-22 21:35 GMT(+1) */
+/* 2018-03-22 22:12 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1010,13 +1010,15 @@ class Mobile {
 	}
 
 	get destination() { return this.getDestination() }
+	set destination(value) { this.velocity = this.getVelocityForDestination(value); }
 
-	shoot(destination, { log = false } = {}) {
+	shoot(destination, { friction = this.friction, log = false } = {}) {
 
 		this.forcedPosition = NaN;
 
 		let velocityBefore = this.velocity;
 
+		this.friction = friction;
 		this.velocity = this.getVelocityForDestination(destination);
 
 		if (log)
@@ -1067,6 +1069,9 @@ class Head {
 
 	get position() { return this.mobile.position }
 	set position(value) { this.mobile.position = value; }
+
+	get destination() { return this.mobile.destination }
+	set destination(value) { this.mobile.destination = value; }
 
 	get forcedPosition() { return this.mobile.position }
 	set forcedPosition(value) { this.mobile.forcedPosition = value; }
@@ -1314,7 +1319,7 @@ class Division extends EventDispatcher {
 
 	}
 
-	nearest({ position, selector = '*' }) {
+	nearest({ position, selector = '*', distanceMax = Infinity } = {}) {
 
 		let array = this.query(selector);
 
@@ -1332,6 +1337,9 @@ class Division extends EventDispatcher {
 				best = { division, distance };
 
 		}
+
+		if (best.distance > distanceMax)
+			return null
 
 		return best.division
 
@@ -1690,12 +1698,12 @@ class Timeline extends EventDispatcher {
 
 	query(selector) { return this.rootDivision.query(selector) }
 
-	nearest({ position, selector = '*' }) {
+	nearest({ position, selector = '*', distanceMax = Infinity } = {}) {
 
 		if (position === undefined)
 			position = this.head.position;
 
-		return this.rootDivision.nearest({ position, selector })
+		return this.rootDivision.nearest({ position, selector, distanceMax })
 
 	}
 

@@ -162,7 +162,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	nearest({ position, selector = '*' }) {
+	nearest({ position, selector = '*', distanceMax = Infinity } = {}) {
 
 		let array = this.query(selector)
 
@@ -180,6 +180,9 @@ export class Division extends eventjs.EventDispatcher {
 				best = { division, distance }
 
 		}
+
+		if (best.distance > distanceMax)
+			return null
 
 		return best.division
 

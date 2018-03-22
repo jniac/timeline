@@ -47,6 +47,9 @@ export class Head {
 	get position() { return this.mobile.position }
 	set position(value) { this.mobile.position = value }
 
+	get destination() { return this.mobile.destination }
+	set destination(value) { this.mobile.destination = value }
+
 	get forcedPosition() { return this.mobile.position }
 	set forcedPosition(value) { this.mobile.forcedPosition = value }
 
