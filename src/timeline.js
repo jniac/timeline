@@ -73,7 +73,7 @@ export class Timeline extends eventjs.EventDispatcher {
 			updateDuration: 2000,
 
 		})
-		
+
 		this.newHead('main')
 
 		timelines.push(this)
@@ -120,6 +120,19 @@ export class Timeline extends eventjs.EventDispatcher {
 			this.dispatchEvent('update')
 
 		this.dispatchEvent('frame')
+
+	}
+
+	fireHeadEvent(event) {
+
+		this.rootDivision.walk(division => {
+
+			for (let head of this.heads)
+				division.updateHead(head, event)
+
+		})
+
+		return this
 
 	}
 
