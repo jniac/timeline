@@ -1,4 +1,4 @@
-/* 2018-03-22 22:12 GMT(+1) */
+/* 2018-03-22 22:40 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1326,20 +1326,18 @@ class Division extends EventDispatcher {
 		if (!array.length)
 			return null
 
-		let distance = Math.abs(array[0].space.globalPosition - position);
-		let best = { division: array[0], distance };
+		let division = null;
+		let distance = distanceMax;
+		let best = { division, distance };
 
-		for (let i = 1, division; division = array[i]; i++) {
+		for (let i = 1; division = array[i]; i++) {
 
 			distance = Math.abs(division.space.globalPosition - position);
 
-			if (distance < best.distance)
+			if (distance <= best.distance)
 				best = { division, distance };
 
 		}
-
-		if (best.distance > distanceMax)
-			return null
 
 		return best.division
 
