@@ -185,7 +185,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	updateHead(head) {
+	updateHead(head, fireEvent = null) {
 
 		let headValue = head.roundPosition
 		let headIndex = head.getIndex()
@@ -268,6 +268,9 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-${head.name}`, eventData)
+
+		if (fireEvent)
+			this.dispatchEvent(`${fireEvent}-${head.name}`, eventData)
 
 		return this
 

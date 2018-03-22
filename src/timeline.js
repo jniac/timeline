@@ -73,7 +73,7 @@ export class Timeline extends eventjs.EventDispatcher {
 			updateDuration: 2000,
 
 		})
-
+		
 		this.newHead('main')
 
 		timelines.push(this)

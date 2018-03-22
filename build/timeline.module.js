@@ -1,4 +1,4 @@
-/* 2018-03-22 03:04 GMT(+1) */
+/* 2018-03-22 13:45 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1334,7 +1334,7 @@ class Division extends EventDispatcher {
 
 	}
 
-	updateHead(head) {
+	updateHead(head, fireEvent = null) {
 
 		let headValue = head.roundPosition;
 		let headIndex = head.getIndex();
@@ -1416,6 +1416,9 @@ class Division extends EventDispatcher {
 
 		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-${head.name}`, eventData);
+
+		if (fireEvent)
+			this.dispatchEvent(`${fireEvent}-${head.name}`, eventData);
 
 		return this
 
@@ -1598,7 +1601,7 @@ class Timeline extends EventDispatcher {
 			updateDuration: 2000,
 
 		});
-
+		
 		this.newHead('main');
 
 		timelines.push(this);
