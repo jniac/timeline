@@ -1,4 +1,4 @@
-/* 2018-03-22 13:56 GMT(+1) */
+/* 2018-03-22 21:18 GMT(+1) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1117,9 +1117,9 @@ class Head {
 
 		let mobileVelocityBefore = this.mobile.velocity;
 
-		let destination = this.getDestinationApproximation();
+		let position = this.getDestinationApproximation();
 
-		let nearest = this.timeline.nearest(destination, selector);
+		let nearest = this.timeline.nearest({ position, selector });
 
 		if (nearest)
 			this.mobile.shoot(nearest.space.globalPosition, { log: false });
@@ -1311,7 +1311,7 @@ class Division extends EventDispatcher {
 
 	}
 
-	nearest(position, selector = '*') {
+	nearest({ position, selector = '*' }) {
 
 		let array = this.query(selector);
 
@@ -1455,6 +1455,7 @@ class Division extends EventDispatcher {
 
 	contains(value) { return this.space.contains(value) }
 
+	get position() { return this.space.globalPosition }
 	get min() { return this.space.range.min }
 	get max() { return this.space.range.max }
 	get width() { return this.space.range.width }
@@ -1686,7 +1687,14 @@ class Timeline extends EventDispatcher {
 
 	query(selector) { return this.rootDivision.query(selector) }
 
-	nearest(...args) { return this.rootDivision.nearest(...args)}
+	nearest({ position, selector = '*' }) {
+
+		if (position === undefined)
+			position = this.head.position;
+
+		return this.rootDivision.nearest({ position, selector })
+
+	}
 
 	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
 

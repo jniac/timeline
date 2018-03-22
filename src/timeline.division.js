@@ -162,7 +162,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	nearest(position, selector = '*') {
+	nearest({ position, selector = '*' }) {
 
 		let array = this.query(selector)
 
@@ -307,6 +307,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	contains(value) { return this.space.contains(value) }
 
+	get position() { return this.space.globalPosition }
 	get min() { return this.space.range.min }
 	get max() { return this.space.range.max }
 	get width() { return this.space.range.width }

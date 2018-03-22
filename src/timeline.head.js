@@ -99,9 +99,9 @@ export class Head {
 
 		let mobileVelocityBefore = this.mobile.velocity
 
-		let destination = this.getDestinationApproximation()
+		let position = this.getDestinationApproximation()
 
-		let nearest = this.timeline.nearest(destination, selector)
+		let nearest = this.timeline.nearest({ position, selector })
 
 		if (nearest)
 			this.mobile.shoot(nearest.space.globalPosition, { log: false })

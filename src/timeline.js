@@ -158,7 +158,14 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	query(selector) { return this.rootDivision.query(selector) }
 
-	nearest(...args) { return this.rootDivision.nearest(...args)}
+	nearest({ position, selector = '*' }) {
+
+		if (position === undefined)
+			position = this.head.position
+
+		return this.rootDivision.nearest({ position, selector })
+
+	}
 
 	division({ parent = null, position = 0, width = '100%', align = '100%', order = 0, widthMode, positionMode }) {
 
