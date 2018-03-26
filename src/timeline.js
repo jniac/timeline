@@ -1,5 +1,5 @@
 import * as eventjs from './event.js'
-import query, { copy, propsToString } from './query.js'
+import query, { copy } from './query.js'
 import { Range } from './primitives.js'
 
 import { Head } from './timeline.head.js'
@@ -171,6 +171,9 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		if (typeof arguments[0] === 'string') // it's a query!
 			return this.query(arguments[0])
+
+		if (Array.isArray(arguments[0])) // it's multiple
+			return [...arguments[0]].map(props => this.division(props))
 
 		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' })
 

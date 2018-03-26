@@ -104,7 +104,10 @@ function getChildren(object, childrenDelegate, includeSelf) {
  * selector rules:
  *
  *    • Match only the first result (the result will not be necessarily iterable)
- *    'first:[str]'
+ *    'first:{selector}' or 'f:{selector}'
+ *
+ *    • Match multiple:
+ *    'type=page !isRoot width>100'
  *
  *    • Match children
  *    '[str] > [str]'

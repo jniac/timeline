@@ -90,8 +90,14 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (Array.isArray(child)) {
 
-			for (let child2 of child)
+			for (let child2 of child) {
+
+				if (!(child2 instanceof Division))
+					child2 = this.timeline.division(child2)
+
 				this.space.addChild(child2.space)
+
+			}
 
 		} else {
 

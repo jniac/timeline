@@ -1,7 +1,7 @@
 import { Timeline } from '../../src/timeline.js'
 export { Timeline }
-import { query, copy } from '../../src/query.js'
-export { query, copy }
+import { query } from '../../src/query.js'
+export { query }
 import { UIEventHandler } from '../../src/UIEventHandler.js'
 
 import { TimelineCanvas } from '../../src/timeline.canvas.js'
@@ -129,6 +129,11 @@ timeline.query('f:name=max')
 			timeline.head.position += (timeline.rootDivision.max - timeline.head.position) / 2
 
 	})
+
+// array test
+timeline.division('f:bound name=min').add([...Mth.range(3)].map(v => ({ width: 200, color: 'blue' })))
+timeline.division([...Mth.range(6)].map(index => ({ parent: 'bound name=min', width: 200, color: index % 2 ? 'red' : 'purple' })))
+
 
 // timeline.division({ name: 'exp', widthMode: 'CONTENT' })
 // timeline.division({ parent: 'first:name=exp' })

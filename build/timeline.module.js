@@ -1,4 +1,4 @@
-/* 2018-03-22 22:40 GMT(+1) */
+/* 2018-03-27 00:16 GMT(+2) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -107,7 +107,10 @@ function getChildren(object, childrenDelegate, includeSelf) {
  * selector rules:
  *
  *    • Match only the first result (the result will not be necessarily iterable)
- *    'first:[str]'
+ *    'first:{selector}' or 'f:{selector}'
+ *
+ *    • Match multiple:
+ *    'type=page !isRoot width>100'
  *
  *    • Match children
  *    '[str] > [str]'
@@ -1247,8 +1250,14 @@ class Division extends EventDispatcher {
 
 		if (Array.isArray(child)) {
 
-			for (let child2 of child)
+			for (let child2 of child) {
+
+				if (!(child2 instanceof Division))
+					child2 = this.timeline.division(child2);
+
 				this.space.addChild(child2.space);
+
+			}
 
 		} else {
 
@@ -1330,7 +1339,7 @@ class Division extends EventDispatcher {
 		let distance = distanceMax;
 		let best = { division, distance };
 
-		for (let i = 1; division = array[i]; i++) {
+		for (let i = 0; division = array[i]; i++) {
 
 			distance = Math.abs(division.space.globalPosition - position);
 
@@ -1709,6 +1718,9 @@ class Timeline extends EventDispatcher {
 
 		if (typeof arguments[0] === 'string') // it's a query!
 			return this.query(arguments[0])
+
+		if (Array.isArray(arguments[0])) // it's multiple
+			return [...arguments[0]].map(props => this.division(props))
 
 		let props = copy(arguments[0], { recursive: false, exclude: 'parent, position, width, align, order, positionMode, widthMode' });
 
