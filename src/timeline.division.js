@@ -173,7 +173,7 @@ export class Division extends eventjs.EventDispatcher {
 		let distance = distanceMax
 		let best = { division, distance }
 
-		for (let i = 1; division = array[i]; i++) {
+		for (let i = 0; division = array[i]; i++) {
 
 			distance = Math.abs(division.space.globalPosition - position)
 
