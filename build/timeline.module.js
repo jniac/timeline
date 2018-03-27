@@ -1,4 +1,4 @@
-/* 2018-03-27 00:16 GMT(+2) */
+/* 2018-03-27 15:42 GMT(+2) */
 /* exprimental stuff from https://github.com/jniac/timeline */
 import { EventDispatcher } from './event.js';
 
@@ -1118,13 +1118,13 @@ class Head {
 
 	}
 
-	getDestinationApproximation() {
+	getDestinationApproximation(velocityBoostRatio = 1) {
 
-		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average })
+		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average * velocityBoostRatio })
 
 	}
 
-	velocityCorrectionForNearest(selector) {
+	velocityCorrectionForNearest(selector = '*') {
 
 		let mobileVelocityBefore = this.mobile.velocity;
 
@@ -1670,12 +1670,12 @@ class Timeline extends EventDispatcher {
 
 	}
 
-	fireHeadEvent(event) {
+	fireHeadEvent({ extraEvent = null } = {}) {
 
 		this.rootDivision.walk(division => {
 
 			for (let head of this.heads)
-				division.updateHead(head, event);
+				division.updateHead(head, extraEvent);
 
 		});
 

@@ -92,13 +92,13 @@ export class Head {
 
 	}
 
-	getDestinationApproximation() {
+	getDestinationApproximation(velocityBoostRatio = 1) {
 
-		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average })
+		return this.mobile.getDestination({ velocity: this.mobile.velocityVar.average * velocityBoostRatio })
 
 	}
 
-	velocityCorrectionForNearest(selector) {
+	velocityCorrectionForNearest(selector = '*') {
 
 		let mobileVelocityBefore = this.mobile.velocity
 
