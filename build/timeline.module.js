@@ -1,5 +1,11 @@
-/* 2018-03-27 15:42 GMT(+2) */
-/* exprimental stuff from https://github.com/jniac/timeline */
+/*
+
+	timeline.js
+	2018-03-27 15:49 GMT(+2)
+ 	exprimental stuff from https://github.com/jniac/timeline
+
+*/
+
 import { EventDispatcher } from './event.js';
 
 // utils

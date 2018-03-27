@@ -17,10 +17,15 @@ function banner() {
 
 	return `
 
-/* ${date()} */
-/* exprimental stuff from https://github.com/jniac/timeline */\n
+/*
 
-`.trim()
+	timeline.js
+	${date()}
+ 	exprimental stuff from https://github.com/jniac/timeline
+
+*/
+
+`.trim() + '\n'
 
 }
 
