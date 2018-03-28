@@ -132,7 +132,9 @@ timeline.query('f:name=max')
 	})
 
 // array test
-timeline.division('f:bound name=min').add([...Mth.range(3)].map(v => ({ width: 200, color: 'blue' })))
+timeline.division('f:bound name=min').add([...Mth.range(2)].map(v => ({ width: 200, color: 'blue' })))
+let a = timeline.division('f:bound name=min').division([...Mth.range(2)].map(v => ({ width: 200, color: 'orange' })))
+console.log('division.division([Array]) returns', a.constructor)
 timeline.division([...Mth.range(6)].map(index => ({ parent: 'bound name=min', width: 200, color: index % 2 ? 'red' : 'purple' })))
 
 

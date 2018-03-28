@@ -161,8 +161,8 @@ export class Division extends eventjs.EventDispatcher {
 		// propsOrQuery are props:
 
 		let division = this.timeline.division(propsOrQuery)
-
-		this.space.addChild(division.space)
+		
+		this.add(division)
 
 		return division
 

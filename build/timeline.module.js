@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-28 14:37 GMT(+2)
+	2018-03-28 15:03 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1327,8 +1327,8 @@ class Division extends EventDispatcher {
 		// propsOrQuery are props:
 
 		let division = this.timeline.division(propsOrQuery);
-
-		this.space.addChild(division.space);
+		
+		this.add(division);
 
 		return division
 
