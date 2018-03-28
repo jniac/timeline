@@ -3,7 +3,7 @@
 
 ### forcedEvent vs extraEvent
 ```javascript
-timeline.dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {})
+timeline.dispatchHeadEvent({ extraEvent, forcedEvent })
 ```
 allows to dispatch events outside internal update loop:  
 
@@ -22,9 +22,9 @@ Current events are:
 
 Forced event can be multiple:
 ```javascript
-timeline.dispatchHeadEvent({ forcedEvent = ['progress', 'init'] })
+timeline.dispatchHeadEvent({ forcedEvent: ['progress', 'init'] })
 // ===
-timeline.dispatchHeadEvent({ forcedEvent = 'progress init' })
+timeline.dispatchHeadEvent({ forcedEvent: 'progress init' })
 ```
 
 
