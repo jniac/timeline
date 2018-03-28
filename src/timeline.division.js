@@ -246,6 +246,8 @@ export class Division extends eventjs.EventDispatcher {
 
 		// flags:
 
+		let init = isNaN(oldValues.global)
+
 		let wasInside = 	old_r >= 0 && old_r <= 1
 		let isInside = 		new_r >= 0 && new_r <= 1
 
@@ -277,7 +279,7 @@ export class Division extends eventjs.EventDispatcher {
 
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range }
 
-		if (isNaN(oldValues.global))
+		if (init)
 			this.dispatchEvent(`init-${head.name}`, eventData)
 
 		if (enter)

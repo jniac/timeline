@@ -20,6 +20,13 @@ Current events are:
 - `progress`
 - `overlap`
 
+Forced event can be multiple:
+```javascript
+timeline.dispatchHeadEvent({ forcedEvent = ['progress', 'init'] })
+// ===
+timeline.dispatchHeadEvent({ forcedEvent = 'progress init' })
+```
+
 
 
 # Mon Mar 19 2018
