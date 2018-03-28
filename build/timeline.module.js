@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-28 11:59 GMT(+2)
+	2018-03-28 14:37 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1763,6 +1763,16 @@ class Timeline extends EventDispatcher {
 		return this.createDivision(parent, { position, width, align, order, positionMode, widthMode }, props)
 
 		return null
+
+	}
+
+	add(params = {}) {
+
+		params.parent = this.rootDivision;
+
+		this.division(params);
+
+		return this
 
 	}
 

@@ -192,6 +192,16 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	}
 
+	add(params = {}) {
+
+		params.parent = this.rootDivision
+
+		this.division(params)
+
+		return this
+
+	}
+
 }
 
 function udpateTimelines() {

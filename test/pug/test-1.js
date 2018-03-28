@@ -103,8 +103,9 @@ timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE',
 	.division({ positionMode: 'FREE', position: [0, .5], widthMode: 'CONTENT', color: 'coral', align: '0%' })
 	.add({ width: 800 })
 
-// width as a callback:
-timeline.division({ name: 'flexible', positionMode: 'FREE', position: 100, width: space => space.parent.globalWidth - 200, color: '#39f' })
+// NOTE: timeline.add
+// NOTE: width as a callback:
+timeline.add({ name: 'flexible', positionMode: 'FREE', position: 100, width: space => space.parent.globalWidth - 200, color: '#39f' })
 
 timeline.query('f:name=min')
 	.on(/progress/, event => {
