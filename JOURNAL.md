@@ -1,6 +1,14 @@
 
 # Wed Mar 28 2018
 
+### timeline.add(divisionParams)
+like `division.add()` (returning itself), `timeline.add(divisionParams)` return timeline, this allows concise declaration, eg:
+```javascript
+timeline
+    .add({ name:'first', width: '50%' })
+    .add({ name:'second', width: '50%' })
+```
+
 ### forcedEvent vs extraEvent
 ```javascript
 timeline.dispatchHeadEvent({ extraEvent, forcedEvent })
