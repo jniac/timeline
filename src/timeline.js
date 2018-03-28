@@ -123,12 +123,12 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	}
 
-	fireHeadEvent({ extraEvent = null } = {}) {
+	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
 
 		this.rootDivision.walk(division => {
 
 			for (let head of this.heads)
-				division.updateHead(head, extraEvent)
+				division.updateHead(head, extraEvent, forcedEvent)
 
 		})
 

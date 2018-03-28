@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-27 15:49 GMT(+2)
+	2018-03-28 11:51 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1170,9 +1170,6 @@ class Head {
 
 }
 
-let divisionMap = new WeakMap();
-let divisionUID = 0;
-
 class DivisionProps {
 
 	constructor(division, props) {
@@ -1199,6 +1196,9 @@ class DivisionProps {
 	}
 
 }
+
+let divisionMap = new WeakMap();
+let divisionUID = 0;
 
 class Division extends EventDispatcher {
 
@@ -1358,7 +1358,7 @@ class Division extends EventDispatcher {
 
 	}
 
-	updateHead(head, extraEvent = null) {
+	updateHead(head, extraEvent = null, forcedEvent = null) {
 
 		let headValue = head.roundPosition;
 		let headIndex = head.getIndex();
@@ -1421,6 +1421,25 @@ class Division extends EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0;
 
+		let progress = 		isInside || pass;
+
+		if (forcedEvent) {
+
+			forcedEvent = Array.isArray(forcedEvent) ? forcedEvent : forcedEvent.split(/\s/);
+
+			for (let event of forcedEvent) {
+
+				init = init || event === 'init';
+				enter = enter || event === 'enter';
+				exit = exit || event === 'exit';
+				pass = pass || event === 'pass';
+				progress = progress || event === 'progress';
+				overlap = overlap || event === 'overlap';
+
+			}
+
+		}
+
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range };
 
 		if (isNaN(oldValues.global))
@@ -1432,7 +1451,7 @@ class Division extends EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-${head.name}`, eventData);
 
-		if (isInside || pass)
+		if (progress)
 			this.dispatchEvent(`progress-${head.name}`, eventData);
 
 		if (pass)
@@ -1553,11 +1572,11 @@ class Division extends EventDispatcher {
 
 	toString() {
 
-		let r = `[${this.space.range.min}, ${this.space.range.min + this.space.range.width}]`;
-		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`;
+		let r = `[${this.space.range.min.toFixed(1)}, ${this.space.range.max.toFixed(1)}]`;
+		let b = `[${this.space.bounds.min.toFixed(1)}, ${this.space.bounds.max.toFixed(1)}]`;
 		let props = propsToString(copy(this.props, { exclude: 'uid' }));
 
-		return `Division#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
+		return `Division#${this.uid} { props: ${props}, r: ${r}, b: ${b} }`
 
 	}
 
@@ -1676,12 +1695,12 @@ class Timeline extends EventDispatcher {
 
 	}
 
-	fireHeadEvent({ extraEvent = null } = {}) {
+	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
 
 		this.rootDivision.walk(division => {
 
 			for (let head of this.heads)
-				division.updateHead(head, extraEvent);
+				division.updateHead(head, extraEvent, forcedEvent);
 
 		});
 

@@ -4,9 +4,6 @@ import query, { copy, propsToString } from './query.js'
 import { now, readonlyProperties, clamp } from './timeline.utils.js'
 import { Space } from './timeline.space.js'
 
-let divisionMap = new WeakMap()
-let divisionUID = 0
-
 export class DivisionProps {
 
 	constructor(division, props) {
@@ -33,6 +30,9 @@ export class DivisionProps {
 	}
 
 }
+
+let divisionMap = new WeakMap()
+let divisionUID = 0
 
 export class Division extends eventjs.EventDispatcher {
 
@@ -192,7 +192,7 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	updateHead(head, extraEvent = null) {
+	updateHead(head, extraEvent = null, forcedEvent = null) {
 
 		let headValue = head.roundPosition
 		let headIndex = head.getIndex()
@@ -256,6 +256,25 @@ export class Division extends eventjs.EventDispatcher {
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0
 
+		let progress = 		isInside || pass
+
+		if (forcedEvent) {
+
+			forcedEvent = Array.isArray(forcedEvent) ? forcedEvent : forcedEvent.split(/\s/)
+
+			for (let event of forcedEvent) {
+
+				init = init || event === 'init'
+				enter = enter || event === 'enter'
+				exit = exit || event === 'exit'
+				pass = pass || event === 'pass'
+				progress = progress || event === 'progress'
+				overlap = overlap || event === 'overlap'
+
+			}
+
+		}
+
 		let eventData = { progress:relativeClamp, direction, values:newValues, oldValues, range:this.space.range }
 
 		if (isNaN(oldValues.global))
@@ -267,7 +286,7 @@ export class Division extends eventjs.EventDispatcher {
 		if (exit)
 			this.dispatchEvent(`exit-${head.name}`, eventData)
 
-		if (isInside || pass)
+		if (progress)
 			this.dispatchEvent(`progress-${head.name}`, eventData)
 
 		if (pass)
@@ -388,11 +407,11 @@ export class Division extends eventjs.EventDispatcher {
 
 	toString() {
 
-		let r = `[${this.space.range.min}, ${this.space.range.min + this.space.range.width}]`
-		let b = `[${this.space.bounds.min}, ${this.space.bounds.max}]`
+		let r = `[${this.space.range.min.toFixed(1)}, ${this.space.range.max.toFixed(1)}]`
+		let b = `[${this.space.bounds.min.toFixed(1)}, ${this.space.bounds.max.toFixed(1)}]`
 		let props = propsToString(copy(this.props, { exclude: 'uid' }))
 
-		return `Division#${this.uid} {props: ${props}, r: ${r}, b: ${b}}`
+		return `Division#${this.uid} { props: ${props}, r: ${r}, b: ${b} }`
 
 	}
 
