@@ -2,7 +2,11 @@
 # Wed Mar 28 2018
 
 ### forcedEvent vs extraEvent
-`timeline.dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {})` allows to dispatch events outside internal update loop:  
+```javascript
+timeline.dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {})
+```
+allows to dispatch events outside internal update loop:  
+
 2 ways:  
 - `timeline.dispatchHeadEvent({ extraEvent: 'foo' })` to dispatch an extra 'foo' event (that could never be fired internally, if the event already exists (eg: `progress`), it may be fired twice (first in the internal process, second as an extra event))
 - `timeline.dispatchHeadEvent({ forcedEvent: 'progress' })` to dispatch a 'progress' event (if that event is normally triggered, it won't be fired twice)
