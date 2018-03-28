@@ -1,4 +1,23 @@
 
+# Wed Mar 28 2018
+
+### forcedEvent vs extraEvent
+`timeline.dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {})` allows to dispatch events outside internal update loop:  
+2 ways:  
+- `timeline.dispatchHeadEvent({ extraEvent: 'foo' })` to dispatch an extra 'foo' event (that could never be fired internally, if the event already exists (eg: `progress`), it may be fired twice (first in the internal process, second as an extra event))
+- `timeline.dispatchHeadEvent({ forcedEvent: 'progress' })` to dispatch a 'progress' event (if that event is normally triggered, it won't be fired twice)
+
+**Reminder**  
+Current events are:
+- `init`
+- `enter`
+- `exit`
+- `pass`
+- `progress`
+- `overlap`
+
+
+
 # Mon Mar 19 2018
 
 ### SpaceProperty has delegate!
@@ -45,6 +64,7 @@ setDirty is lazy, parent recursive:
 - lazy: if the parent is already dirty, the parent recursive call is skipped
 
 
+
 # Thu Mar 08 2018
 ### flexibility
 
@@ -58,6 +78,8 @@ setDirty is lazy, parent recursive:
 
 &#35;1 `[Division].add({ ...props })` Division.add() can now accept props for a brand new division (no longer need to start from the timeline instance)
 
+
+
 # Mon Mar 05 2018
 ### isDirty implementation
 `Space` implements now isDirty design.
@@ -68,6 +90,8 @@ setDirty is lazy, parent recursive:
 Now timeline will dispatch `update` events only if:
 - The tree has changed (some spaces props, width/position/align or hierarchy parent/children has changed)
 - One head has moved (at least one).
+
+
 
 # Tue Feb 20 2018
 ### Added highlight() to TimelineCanvas (Debug)
