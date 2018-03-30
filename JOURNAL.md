@@ -2,15 +2,36 @@
 # Fri Mar 30 2018
 
 ### Stack! (to fix a major bug, cf below)
-Major feature: added light Stack class, 2 stacks instances:
-- `onUpdate` every callback added to the stack will be execute every frame (until the callback returns false)
-- `onNextUpdate` the callback will be executed once (at the beginning of the next frame)
+Major feature: added light Stack class,  
+~~2 stacks instances:~~
+4 stacks instances (`Late` suffix is coming from Unity):
+- `onUpdate` every callback added to the stack will be execute every frame **before** the timeline updates (until the callback returns false)
+- `onNextUpdate` the callback will be executed once **before** the timeline updates(at the beginning of the next frame)
+- `onLateUpdate` every callback added to the stack will be execute every frame **after** the timeline updates (until the callback returns false)
+- `onNextLateUpdate` the callback will be executed once **after** the timeline updates (at the beginning of the next frame)
 ```javascript
 import { onUpdate, onNextUpdate } from './timeline.js'
 
 onNextUpdate.add(myCallback, { thisArg, args })
 ```
-`timeline.destroy()` was previously using its own array, now is using onNextUpdate
+Current internal usage:
+- timeline.destroy: `timeline.destroy()` was previously using its own array, now is using onNextUpdate
+- timeline.dispatchHeadEvent: to avoid any call before the first `Space` update
+e.g.
+```javascript
+...
+dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
+
+    if (this.updateCount === 0) {
+
+        onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
+
+        return this
+
+    }
+    ...
+```
+
 
 # WARN: SHOULD-NOT-CHANGE!!!!
 ### fix a f*** annoying bug

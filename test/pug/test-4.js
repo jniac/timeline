@@ -55,7 +55,7 @@ for (let [index, name] of images.entries()) {
 		.division({ name:'debug', width: '20%', color: 'blue', align: 0, positionMode: 'FREE' })
 		.on(/enter/, event => {
 
-			console.log('hey!!', event.type, event.target.uid, event.target.space.range)
+			console.log('hey!!', timeline.updateCount, event.type, event.target.uid, event.target.space.range)
 
 		})
 

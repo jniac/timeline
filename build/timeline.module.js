@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-30 16:24 GMT(+2)
+	2018-03-30 17:14 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1713,6 +1713,7 @@ class Timeline extends EventDispatcher {
 
 			enabled: true,
 			updateDuration: 2000,
+			updateCount: 0,
 
 		});
 
@@ -1789,10 +1790,19 @@ class Timeline extends EventDispatcher {
 		this.dispatchEvent('frame');
 
 		this.shouldNotChange = false;
+		this.updateCount++;
 
 	}
 
 	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
+
+		if (this.updateCount === 0) {
+
+			onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments });
+
+			return this
+
+		}
 
 		this.rootDivision.walk(division => {
 
@@ -1882,12 +1892,17 @@ class Stack {
 
 		this.array = [];
 		this.next = [];
+		this.count = 0;
 
 	}
 
 	add(callback, { thisArg = null, args = null  } = {}) {
 
+		if (!callback)
+			return
+
 		this.next.push({ callback, thisArg, args });
+		this.count++;
 
 	}
 
@@ -1907,6 +1922,7 @@ class Stack {
 				array.splice(i, 1);
 				i--;
 				n--;
+				this.count--;
 
 			}
 
@@ -1925,6 +1941,7 @@ class Stack {
 			callback.apply(thisArg, args);
 
 		array.length = 0;
+		this.count = 0;
 
 	}
 
@@ -1932,6 +1949,9 @@ class Stack {
 
 let onUpdate = new Stack();
 let onNextUpdate = new Stack();
+
+let onLateUpdate = new Stack();
+let onNextLateUpdate = new Stack();
 
 function update() {
 
@@ -1947,8 +1967,11 @@ function update() {
 		if (timeline.enabled)
 			timeline.update();
 
+	onLateUpdate.execute();
+	onNextLateUpdate.dump();
+
 }
 
 update();
 
-export { Timeline, onUpdate, onNextUpdate };
+export { Timeline, onUpdate, onNextUpdate, onLateUpdate, onNextLateUpdate };
