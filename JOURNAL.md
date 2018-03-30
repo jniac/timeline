@@ -1,6 +1,41 @@
 
 # Fri Mar 30 2018
 
+### timeline.destroy()!
+now Timeline can be destroyed (for performance, memory consideration)  
+as seen below, the timeline is not destroyed immediately but at the next frame (to be sure not currently being inside a nested timeline.update call)
+
+```javascript
+class Timeline {
+
+    ...
+
+    destroy() {
+
+        toBeDestroyed.push(this)
+
+        return this
+
+    }
+
+    ...
+
+}
+
+...
+
+for (let timeline of toBeDestroyed) {
+
+    timeline.rootDivision.destroy({ recursive: true })
+    timeline.enabled = false
+    timeline.destroyed = true
+
+    let index = timelines.indexOf(timeline)
+    timelines.splice(index, 1)
+
+}
+```
+
 ### `[Space].removeAll({ recursive = false } = {})`
 now `Space` instances can be cleared recursively (e.g. to destroy timeline)
 
