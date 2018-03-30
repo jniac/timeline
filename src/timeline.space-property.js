@@ -42,6 +42,7 @@ export class SpaceProperty {
 			absolute: 0,
 			relative: 0,
 			mode: null,
+			computeDelegate: null,
 
 		})
 
@@ -126,6 +127,15 @@ export class SpaceProperty {
 				return this.set(0, 0)
 
 		}
+
+	}
+
+	destroy() {
+
+		for (let k in this)
+			delete this[k]
+
+		return this
 
 	}
 

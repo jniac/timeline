@@ -68,7 +68,9 @@ export class Space {
 			root: this,
 			parent: null,
 			children: [],
-			sortedChildren: [],
+
+			// TODO: remove this
+			// sortedChildren: [],
 
 			childrenUniqueIdentifierCount: 0,
 			childUniqueIdentifier: -1,
@@ -118,9 +120,12 @@ export class Space {
 
 	}
 
-	removeAll() {
+	removeAll({ recursive = false } = {}) {
 
 		for (let child of this.children) {
+
+			if (recursive)
+				child.removeAll({ recursive })
 
 			child.root = child
 			child.parent = null
@@ -142,6 +147,24 @@ export class Space {
 			this.parent.removeChild(this)
 
 		return this
+
+	}
+
+	destroy({ recursive = false } = {}) {
+
+		if (recursive)
+			for (let child of this.children)
+				child.destroy({ recursive })
+
+		this.bounds.setAsVoid()
+		this.range.setAsVoid()
+		this.position.destroy()
+		this.width.destroy()
+		this.align.destroy()
+		this.onUpdate.length = 0
+		this.children.length = 0
+		this.root = null
+		this.parent = null
 
 	}
 
@@ -333,10 +356,6 @@ export class Space {
 	contains(value) {
 
 		return this.range.contains(value)
-
-	}
-
-	getSpaces(value) {
 
 	}
 

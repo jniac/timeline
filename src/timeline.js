@@ -11,6 +11,7 @@ import { now, readonlyProperties, clamp } from './timeline.utils.js'
 
 
 let timelines = []
+let toBeDestroyed = []
 let timelineUID = 0
 
 class Variable {
@@ -77,6 +78,14 @@ export class Timeline extends eventjs.EventDispatcher {
 		this.newHead('main')
 
 		timelines.push(this)
+
+	}
+
+	destroy() {
+
+		toBeDestroyed.push(this)
+
+		return this
 
 	}
 
@@ -210,6 +219,19 @@ function udpateTimelines() {
 		throw 'requestAnimationFrame is not available, cannot run'
 
 	requestAnimationFrame(udpateTimelines)
+
+	for (let timeline of toBeDestroyed) {
+
+		timeline.rootDivision.destroy({ recursive: true })
+		timeline.enabled = false
+		timeline.destroyed = true
+
+		let index = timelines.indexOf(timeline)
+		timelines.splice(index, 1)
+
+	}
+
+	toBeDestroyed.length = 0
 
 	for (let timeline of timelines)
 		if (timeline.enabled)

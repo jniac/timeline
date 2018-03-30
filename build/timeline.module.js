@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-28 15:03 GMT(+2)
+	2018-03-30 14:31 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -211,6 +211,15 @@ class Range {
 	isVoid() {
 
 		return isNaN(this.min) || isNaN(this.max)
+
+	}
+
+	setAsVoid() {
+
+		this.min = NaN;
+		this.max = NaN;
+
+		return this
 
 	}
 
@@ -447,6 +456,7 @@ class SpaceProperty {
 			absolute: 0,
 			relative: 0,
 			mode: null,
+			computeDelegate: null,
 
 		});
 
@@ -534,6 +544,15 @@ class SpaceProperty {
 
 	}
 
+	destroy() {
+
+		for (let k in this)
+			delete this[k];
+
+		return this
+
+	}
+
 	toString() {
 
 		return this.mode
@@ -610,7 +629,9 @@ class Space {
 			root: this,
 			parent: null,
 			children: [],
-			sortedChildren: [],
+
+			// TODO: remove this
+			// sortedChildren: [],
 
 			childrenUniqueIdentifierCount: 0,
 			childUniqueIdentifier: -1,
@@ -660,9 +681,12 @@ class Space {
 
 	}
 
-	removeAll() {
+	removeAll({ recursive = false } = {}) {
 
 		for (let child of this.children) {
+
+			if (recursive)
+				child.removeAll({ recursive });
 
 			child.root = child;
 			child.parent = null;
@@ -684,6 +708,24 @@ class Space {
 			this.parent.removeChild(this);
 
 		return this
+
+	}
+
+	destroy({ recursive = false } = {}) {
+
+		if (recursive)
+			for (let child of this.children)
+				child.destroy({ recursive });
+
+		this.bounds.setAsVoid();
+		this.range.setAsVoid();
+		this.position.destroy();
+		this.width.destroy();
+		this.align.destroy();
+		this.onUpdate.length = 0;
+		this.children.length = 0;
+		this.root = null;
+		this.parent = null;
 
 	}
 
@@ -875,10 +917,6 @@ class Space {
 	contains(value) {
 
 		return this.range.contains(value)
-
-	}
-
-	getSpaces(value) {
 
 	}
 
@@ -1181,6 +1219,7 @@ class DivisionProps {
 			isRoot: {
 
 				enumerable: true,
+				configurable: true,
 				get() { return division.space.isRoot },
 
 			},
@@ -1217,7 +1256,7 @@ class Division extends EventDispatcher {
 			props: new DivisionProps(this, props),
 			localHeads: [],
 
-		});
+		}, { enumerable: true, configurable: true });
 
 		Object.assign(this, {
 
@@ -1225,14 +1264,36 @@ class Division extends EventDispatcher {
 
 		});
 
-		this.space.onUpdate.push(() => this.dispatchEvent('change'));
+		// TODO: remove this line (useless right?)
+		// this.space.onUpdate.push(() => this.dispatchEvent('change'))
 
-		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true });
+		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true, configurable: true });
 
 		divisionMap.set(this.space, this);
 
 		if (parent)
 			parent.space.addChild(this.space);
+
+	}
+
+	destroy({ recursive = false } = {}) {
+
+		if (recursive)
+			for (let child of this.children)
+				child.destroy({ recursive });
+
+		this.space.destroy({ recursive: false });
+
+		this.localHeads.length = 0;
+
+		for (let k in this.props)
+			delete this.props[k];
+
+		divisionMap.delete(this.space);
+
+		delete this.timeline;
+		delete this.space;
+
 
 	}
 
@@ -1327,7 +1388,7 @@ class Division extends EventDispatcher {
 		// propsOrQuery are props:
 
 		let division = this.timeline.division(propsOrQuery);
-		
+
 		this.add(division);
 
 		return division
@@ -1585,6 +1646,7 @@ class Division extends EventDispatcher {
 }
 
 let timelines = [];
+let toBeDestroyed = [];
 let timelineUID = 0;
 
 class Variable$1 {
@@ -1651,6 +1713,14 @@ class Timeline extends EventDispatcher {
 		this.newHead('main');
 
 		timelines.push(this);
+
+	}
+
+	destroy() {
+
+		toBeDestroyed.push(this);
+
+		return this
 
 	}
 
@@ -1784,6 +1854,19 @@ function udpateTimelines() {
 		throw 'requestAnimationFrame is not available, cannot run'
 
 	requestAnimationFrame(udpateTimelines);
+
+	for (let timeline of toBeDestroyed) {
+
+		timeline.rootDivision.destroy({ recursive: true });
+		timeline.enabled = false;
+		timeline.destroyed = true;
+
+		let index = timelines.indexOf(timeline);
+		timelines.splice(index, 1);
+
+	}
+
+	toBeDestroyed.length = 0;
 
 	for (let timeline of timelines)
 		if (timeline.enabled)

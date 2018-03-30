@@ -34,6 +34,15 @@ export class Range {
 
 	}
 
+	setAsVoid() {
+
+		this.min = NaN
+		this.max = NaN
+
+		return this
+
+	}
+
 	copy(other) {
 
 		this.min = other.min

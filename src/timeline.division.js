@@ -15,6 +15,7 @@ export class DivisionProps {
 			isRoot: {
 
 				enumerable: true,
+				configurable: true,
 				get() { return division.space.isRoot },
 
 			},
@@ -51,7 +52,7 @@ export class Division extends eventjs.EventDispatcher {
 			props: new DivisionProps(this, props),
 			localHeads: [],
 
-		})
+		}, { enumerable: true, configurable: true })
 
 		Object.assign(this, {
 
@@ -59,14 +60,36 @@ export class Division extends eventjs.EventDispatcher {
 
 		})
 
-		this.space.onUpdate.push(() => this.dispatchEvent('change'))
+		// TODO: remove this line (useless right?)
+		// this.space.onUpdate.push(() => this.dispatchEvent('change'))
 
-		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true })
+		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true, configurable: true })
 
 		divisionMap.set(this.space, this)
 
 		if (parent)
 			parent.space.addChild(this.space)
+
+	}
+
+	destroy({ recursive = false } = {}) {
+
+		if (recursive)
+			for (let child of this.children)
+				child.destroy({ recursive })
+
+		this.space.destroy({ recursive: false })
+
+		this.localHeads.length = 0
+
+		for (let k in this.props)
+			delete this.props[k]
+
+		divisionMap.delete(this.space)
+
+		delete this.timeline
+		delete this.space
+
 
 	}
 
@@ -161,7 +184,7 @@ export class Division extends eventjs.EventDispatcher {
 		// propsOrQuery are props:
 
 		let division = this.timeline.division(propsOrQuery)
-		
+
 		this.add(division)
 
 		return division

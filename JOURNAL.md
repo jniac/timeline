@@ -1,4 +1,9 @@
 
+# Fri Mar 30 2018
+
+### `[Space].removeAll({ recursive = false } = {})`
+now `Space` instances can be cleared recursively (e.g. to destroy timeline)
+
 # Wed Mar 28 2018
 
 ### timeline.add(divisionParams)
