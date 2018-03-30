@@ -83,6 +83,24 @@ export class Space {
 
 	}
 
+		destroy({ recursive = false } = {}) {
+
+			if (recursive)
+				for (let child of this.children)
+					child.destroy({ recursive })
+
+			this.bounds.setAsVoid()
+			this.range.setAsVoid()
+			this.position.destroy()
+			this.width.destroy()
+			this.align.destroy()
+			this.onUpdate.length = 0
+			this.children.length = 0
+			this.root = null
+			this.parent = null
+
+		}
+
 	get depth() { return this.parent ? this.parent.depth + 1 : 0 }
 
 	addChild(child) {
@@ -147,24 +165,6 @@ export class Space {
 			this.parent.removeChild(this)
 
 		return this
-
-	}
-
-	destroy({ recursive = false } = {}) {
-
-		if (recursive)
-			for (let child of this.children)
-				child.destroy({ recursive })
-
-		this.bounds.setAsVoid()
-		this.range.setAsVoid()
-		this.position.destroy()
-		this.width.destroy()
-		this.align.destroy()
-		this.onUpdate.length = 0
-		this.children.length = 0
-		this.root = null
-		this.parent = null
 
 	}
 

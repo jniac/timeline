@@ -27,7 +27,7 @@ for (let [index, section] of document.querySelectorAll('.wrapper section').entri
 
 	let wrapperDivision = timeline.division({ widthMode: 'CONTENT', wrapper: true, sectionIndex: index })
 
-	timeline.division({ width: '100%', section, page: true, content: true, sectionIndex: index })
+	timeline.division({ width: '100%', section, page: true, content: true, sectionIndex: index, color: ['brown', 'black'][index % 2] })
 		.addTo(wrapperDivision)
 		.on(/init|progress/, event => {
 
@@ -105,7 +105,7 @@ timeline.division({ bound:true, name:'max', width: '300%', positionMode: 'FREE',
 
 // NOTE: timeline.add
 // NOTE: width as a callback:
-timeline.add({ name: 'flexible', positionMode: 'FREE', position: 100, width: space => space.parent.globalWidth - 200, color: '#39f' })
+timeline.add({ name: 'flexible', positionMode: 'FREE', position: 200, width: space => space.parent.globalWidth - 2 * 200, color: '#39f' })
 
 timeline.query('f:name=min')
 	.on(/progress/, event => {

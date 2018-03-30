@@ -1,6 +1,7 @@
 import * as eventjs from './event.js'
 import query, { copy, propsToString } from './query.js'
 
+import { onNextUpdate } from './timeline.js'
 import { now, readonlyProperties, clamp } from './timeline.utils.js'
 import { Space } from './timeline.space.js'
 
@@ -68,7 +69,7 @@ export class Division extends eventjs.EventDispatcher {
 		divisionMap.set(this.space, this)
 
 		if (parent)
-			parent.space.addChild(this.space)
+			parent.add(this)
 
 	}
 
@@ -107,9 +108,17 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	// convenient methods:
+	// convenient (and secured) methods:
 
 	add(child) {
+
+		if (this.timeline.shouldNotChange) {
+
+			onNextUpdate.add(this.add, { thisArg: this, args: arguments })
+
+			return this
+
+		}
 
 		if (Array.isArray(child)) {
 
@@ -143,7 +152,8 @@ export class Division extends eventjs.EventDispatcher {
 		if (Array.isArray(parent))
 			parent = parent[0]
 
-		parent.space.addChild(this.space)
+		if (parent)
+			parent.add(this)
 
 		return this
 

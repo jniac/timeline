@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-30 14:31 GMT(+2)
+	2018-03-30 16:24 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -644,6 +644,24 @@ class Space {
 
 	}
 
+		destroy({ recursive = false } = {}) {
+
+			if (recursive)
+				for (let child of this.children)
+					child.destroy({ recursive });
+
+			this.bounds.setAsVoid();
+			this.range.setAsVoid();
+			this.position.destroy();
+			this.width.destroy();
+			this.align.destroy();
+			this.onUpdate.length = 0;
+			this.children.length = 0;
+			this.root = null;
+			this.parent = null;
+
+		}
+
 	get depth() { return this.parent ? this.parent.depth + 1 : 0 }
 
 	addChild(child) {
@@ -708,24 +726,6 @@ class Space {
 			this.parent.removeChild(this);
 
 		return this
-
-	}
-
-	destroy({ recursive = false } = {}) {
-
-		if (recursive)
-			for (let child of this.children)
-				child.destroy({ recursive });
-
-		this.bounds.setAsVoid();
-		this.range.setAsVoid();
-		this.position.destroy();
-		this.width.destroy();
-		this.align.destroy();
-		this.onUpdate.length = 0;
-		this.children.length = 0;
-		this.root = null;
-		this.parent = null;
 
 	}
 
@@ -1272,7 +1272,7 @@ class Division extends EventDispatcher {
 		divisionMap.set(this.space, this);
 
 		if (parent)
-			parent.space.addChild(this.space);
+			parent.add(this);
 
 	}
 
@@ -1311,9 +1311,17 @@ class Division extends EventDispatcher {
 
 	}
 
-	// convenient methods:
+	// convenient (and secured) methods:
 
 	add(child) {
+
+		if (this.timeline.shouldNotChange) {
+
+			onNextUpdate.add(this.add, { thisArg: this, args: arguments });
+
+			return this
+
+		}
 
 		if (Array.isArray(child)) {
 
@@ -1347,7 +1355,8 @@ class Division extends EventDispatcher {
 		if (Array.isArray(parent))
 			parent = parent[0];
 
-		parent.space.addChild(this.space);
+		if (parent)
+			parent.add(this);
 
 		return this
 
@@ -1646,7 +1655,6 @@ class Division extends EventDispatcher {
 }
 
 let timelines = [];
-let toBeDestroyed = [];
 let timelineUID = 0;
 
 class Variable$1 {
@@ -1701,8 +1709,6 @@ class Timeline extends EventDispatcher {
 
 		});
 
-		this.currentDivision = this.rootDivision;
-
 		Object.assign(this, {
 
 			enabled: true,
@@ -1718,7 +1724,22 @@ class Timeline extends EventDispatcher {
 
 	destroy() {
 
-		toBeDestroyed.push(this);
+		if (this.shouldNotChange) {
+
+			onNextUpdate.add(this.destroy, { thisArg: this });
+
+			return this
+
+		}
+
+		this.rootDivision.destroy({ recursive: true });
+		this.enabled = false;
+		this.destroyed = true;
+
+		let index = timelines.indexOf(this);
+		timelines.splice(index, 1);
+
+		this.dispatchEvent('destroy');
 
 		return this
 
@@ -1735,6 +1756,8 @@ class Timeline extends EventDispatcher {
 	update(force = false) {
 
 		let t = now();
+
+		this.shouldNotChange = true;
 
 		for (let head of this.heads)
 			head.update();
@@ -1765,6 +1788,8 @@ class Timeline extends EventDispatcher {
 
 		this.dispatchEvent('frame');
 
+		this.shouldNotChange = false;
+
 	}
 
 	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
@@ -1784,7 +1809,7 @@ class Timeline extends EventDispatcher {
 
 		let division = new Division(this, parent, spaceProps, props);
 
-		this.lastDivision = division;
+		// this.lastDivision = division
 
 		return division
 
@@ -1827,8 +1852,11 @@ class Timeline extends EventDispatcher {
 		if (Array.isArray(parent))
 			parent = parent[0];
 
+		// if (!parent)
+		// 	parent = this.currentDivision
+
 		if (!parent)
-			parent = this.currentDivision;
+			parent = this.rootDivision;
 
 		return this.createDivision(parent, { position, width, align, order, positionMode, widthMode }, props)
 
@@ -1848,25 +1876,72 @@ class Timeline extends EventDispatcher {
 
 }
 
-function udpateTimelines() {
+class Stack {
+
+	constructor() {
+
+		this.array = [];
+		this.next = [];
+
+	}
+
+	add(callback, { thisArg = null, args = null  } = {}) {
+
+		this.next.push({ callback, thisArg, args });
+
+	}
+
+	execute() {
+
+		let { array, next } = this;
+
+		array.push(...next);
+		next.length = 0;
+
+		for (let i = 0, n = array.length; i < n; i++) {
+
+			let { callback, thisArg, args } = array[i];
+
+			if (callback.apply(thisArg, args) === false) {
+
+				array.splice(i, 1);
+				i--;
+				n--;
+
+			}
+
+		}
+
+	}
+
+	dump() {
+
+		let { array, next } = this;
+
+		array.push(...next);
+		next.length = 0;
+
+		for (let { callback, thisArg, args } of array)
+			callback.apply(thisArg, args);
+
+		array.length = 0;
+
+	}
+
+}
+
+let onUpdate = new Stack();
+let onNextUpdate = new Stack();
+
+function update() {
 
 	if (typeof requestAnimationFrame === 'undefined')
 		throw 'requestAnimationFrame is not available, cannot run'
 
-	requestAnimationFrame(udpateTimelines);
+	requestAnimationFrame(update);
 
-	for (let timeline of toBeDestroyed) {
-
-		timeline.rootDivision.destroy({ recursive: true });
-		timeline.enabled = false;
-		timeline.destroyed = true;
-
-		let index = timelines.indexOf(timeline);
-		timelines.splice(index, 1);
-
-	}
-
-	toBeDestroyed.length = 0;
+	onUpdate.execute();
+	onNextUpdate.dump();
 
 	for (let timeline of timelines)
 		if (timeline.enabled)
@@ -1874,6 +1949,6 @@ function udpateTimelines() {
 
 }
 
-udpateTimelines();
+update();
 
-export { Timeline };
+export { Timeline, onUpdate, onNextUpdate };

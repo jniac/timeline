@@ -11,7 +11,6 @@ import { now, readonlyProperties, clamp } from './timeline.utils.js'
 
 
 let timelines = []
-let toBeDestroyed = []
 let timelineUID = 0
 
 class Variable {
@@ -66,8 +65,6 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		})
 
-		this.currentDivision = this.rootDivision
-
 		Object.assign(this, {
 
 			enabled: true,
@@ -83,7 +80,22 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	destroy() {
 
-		toBeDestroyed.push(this)
+		if (this.shouldNotChange) {
+
+			onNextUpdate.add(this.destroy, { thisArg: this })
+
+			return this
+
+		}
+
+		this.rootDivision.destroy({ recursive: true })
+		this.enabled = false
+		this.destroyed = true
+
+		let index = timelines.indexOf(this)
+		timelines.splice(index, 1)
+
+		this.dispatchEvent('destroy')
 
 		return this
 
@@ -100,6 +112,8 @@ export class Timeline extends eventjs.EventDispatcher {
 	update(force = false) {
 
 		let t = now()
+
+		this.shouldNotChange = true
 
 		for (let head of this.heads)
 			head.update()
@@ -130,6 +144,8 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		this.dispatchEvent('frame')
 
+		this.shouldNotChange = false
+
 	}
 
 	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
@@ -149,7 +165,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		let division = new Division(this, parent, spaceProps, props)
 
-		this.lastDivision = division
+		// this.lastDivision = division
 
 		return division
 
@@ -192,8 +208,11 @@ export class Timeline extends eventjs.EventDispatcher {
 		if (Array.isArray(parent))
 			parent = parent[0]
 
+		// if (!parent)
+		// 	parent = this.currentDivision
+
 		if (!parent)
-			parent = this.currentDivision
+			parent = this.rootDivision
 
 		return this.createDivision(parent, { position, width, align, order, positionMode, widthMode }, props)
 
@@ -213,25 +232,72 @@ export class Timeline extends eventjs.EventDispatcher {
 
 }
 
-function udpateTimelines() {
+class Stack {
+
+	constructor() {
+
+		this.array = []
+		this.next = []
+
+	}
+
+	add(callback, { thisArg = null, args = null  } = {}) {
+
+		this.next.push({ callback, thisArg, args })
+
+	}
+
+	execute() {
+
+		let { array, next } = this
+
+		array.push(...next)
+		next.length = 0
+
+		for (let i = 0, n = array.length; i < n; i++) {
+
+			let { callback, thisArg, args } = array[i]
+
+			if (callback.apply(thisArg, args) === false) {
+
+				array.splice(i, 1)
+				i--
+				n--
+
+			}
+
+		}
+
+	}
+
+	dump() {
+
+		let { array, next } = this
+
+		array.push(...next)
+		next.length = 0
+
+		for (let { callback, thisArg, args } of array)
+			callback.apply(thisArg, args)
+
+		array.length = 0
+
+	}
+
+}
+
+export let onUpdate = new Stack()
+export let onNextUpdate = new Stack()
+
+function update() {
 
 	if (typeof requestAnimationFrame === 'undefined')
 		throw 'requestAnimationFrame is not available, cannot run'
 
-	requestAnimationFrame(udpateTimelines)
+	requestAnimationFrame(update)
 
-	for (let timeline of toBeDestroyed) {
-
-		timeline.rootDivision.destroy({ recursive: true })
-		timeline.enabled = false
-		timeline.destroyed = true
-
-		let index = timelines.indexOf(timeline)
-		timelines.splice(index, 1)
-
-	}
-
-	toBeDestroyed.length = 0
+	onUpdate.execute()
+	onNextUpdate.dump()
 
 	for (let timeline of timelines)
 		if (timeline.enabled)
@@ -239,4 +305,4 @@ function udpateTimelines() {
 
 }
 
-udpateTimelines()
+update()

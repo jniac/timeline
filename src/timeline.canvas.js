@@ -117,6 +117,7 @@ export class TimelineCanvas {
 		})
 
 		timeline.on('update', event => this.draw())
+		timeline.on('destroy', event => this.draw())
 
 	}
 
@@ -159,6 +160,9 @@ export class TimelineCanvas {
 
 		ctx.setTransform(1, 0, 0, 1, 0, 0)
 		ctx.clearRect(0, 0, width, height)
+
+		if (timeline.destroyed)
+			return
 
 		// ctx.fillStyle = 'red'
 		// ctx.fillRect(0, 0, width, height)

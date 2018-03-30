@@ -1,7 +1,47 @@
 
 # Fri Mar 30 2018
 
-### timeline.destroy()!
+### Stack! (to fix a major bug, cf below)
+Major feature: added light Stack class, 2 stacks instances:
+- `onUpdate` every callback added to the stack will be execute every frame (until the callback returns false)
+- `onNextUpdate` the callback will be executed once (at the beginning of the next frame)
+```javascript
+import { onUpdate, onNextUpdate } from './timeline.js'
+
+onNextUpdate.add(myCallback, { thisArg, args })
+```
+`timeline.destroy()` was previously using its own array, now is using onNextUpdate
+
+# WARN: SHOULD-NOT-CHANGE!!!!
+### fix a f*** annoying bug
+I should know it.  
+Changing something inside an update loop is *DANGEROUS*! And should be avoided.  
+To do that timeline has now a flag: `shouldNotChange`  
+And according to the flag, some operations may be delayed, this is the case for `[Division].add(...)`:  
+```javascript
+export class Division extends eventjs.EventDispatcher {
+    ...
+    add(child) {
+
+        if (this.timeline.shouldNotChange) {
+
+            onNextUpdate.add(this.add, { thisArg: this, args: arguments })
+
+            return this
+
+        }
+
+        ...
+    }
+    ...
+}
+```
+**Reminder** some other operations may be concerned!
+
+
+
+
+### timeline.destroy()! [changed, cf *Stack!* above]
 now Timeline can be destroyed (for performance, memory consideration)  
 as seen below, the timeline is not destroyed immediately but at the next frame (to be sure not currently being inside a nested timeline.update call)
 
@@ -210,7 +250,7 @@ So, if 2 children have the same order, they will be ordered according to their o
 - **Head**  
 Should head avatars, currently declared in `Division`, allow to modify head position directly (from absolute/relative property)? Overkill?  
 Example:
-```javasctipt
+```javascript
 division.heads[0].position.relative += .01
 ```
 
