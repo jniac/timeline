@@ -71,6 +71,11 @@ export class Timeline extends eventjs.EventDispatcher {
 			updateDuration: 2000,
 			updateCount: 0,
 
+			onUpdate: new Stack(),
+			onNextUpdate: new Stack(),
+			onLateUpdate: new Stack(),
+			onNextLateUpdate: new Stack(),
+
 		})
 
 		this.newHead('main')
@@ -83,7 +88,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		if (this.shouldNotChange) {
 
-			onNextUpdate.add(this.destroy, { thisArg: this })
+			onNextLateUpdate.add(this.destroy, { thisArg: this })
 
 			return this
 
@@ -113,6 +118,9 @@ export class Timeline extends eventjs.EventDispatcher {
 	update(force = false) {
 
 		let t = now()
+
+		this.onUpdate.execute()
+		this.onNextUpdate.dump()
 
 		this.shouldNotChange = true
 
@@ -145,6 +153,9 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		this.dispatchEvent('frame')
 
+		this.onLateUpdate.execute()
+		this.onNextLateUpdate.dump()
+
 		this.shouldNotChange = false
 		this.updateCount++
 
@@ -154,7 +165,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		if (this.updateCount === 0) {
 
-			onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
+			this.onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
 
 			return this
 

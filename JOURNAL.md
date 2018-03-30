@@ -4,32 +4,63 @@
 ### Stack! (to fix a major bug, cf below)
 Major feature: added light Stack class,  
 ~~2 stacks instances:~~
-4 stacks instances (`Late` suffix is coming from Unity):
+4 stacks instances (`Late` suffix is coming from Unity)
 - `onUpdate` every callback added to the stack will be execute every frame **before** the timeline updates (until the callback returns false)
 - `onNextUpdate` the callback will be executed once **before** the timeline updates(at the beginning of the next frame)
 - `onLateUpdate` every callback added to the stack will be execute every frame **after** the timeline updates (until the callback returns false)
 - `onNextLateUpdate` the callback will be executed once **after** the timeline updates (at the beginning of the next frame)
+
+those 4 stacks exist globally and locally (by Timeline instance)
 ```javascript
 import { onUpdate, onNextUpdate } from './timeline.js'
 
 onNextUpdate.add(myCallback, { thisArg, args })
 ```
-Current internal usage:
-- timeline.destroy: `timeline.destroy()` was previously using its own array, now is using onNextUpdate
-- timeline.dispatchHeadEvent: to avoid any call before the first `Space` update
-e.g.
+Current internal usage (3):
+
+- `onNextLateUpdate (global)` timeline.destroy: `timeline.destroy()` was previously using its own array, now is using onNextUpdate
+```javascript
+    ...
+    dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
+
+        if (this.updateCount === 0) {
+
+            onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
+
+            return this
+
+        }
+        ...
+```
+
+- `onNextLateUpdate (local)` [Division].add(): to avoid adding child during an update loop
+```javascript
+    ...
+    add(child) {
+
+        if (this.timeline.shouldNotChange) {
+
+            this.timeline.onNextLateUpdate.add(this.add, { thisArg: this, args: arguments })
+
+            return this
+
+        }
+        ...
+```
+
+- `onNextLateUpdate (local)` timeline.dispatchHeadEvent: to avoid any call before the first `Space` update loop
 ```javascript
 ...
-dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
+    dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
 
-    if (this.updateCount === 0) {
+        if (this.updateCount === 0) {
 
-        onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
+            onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
 
-        return this
+            return this
 
-    }
-    ...
+        }
+        ...
 ```
 
 

@@ -114,7 +114,7 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (this.timeline.shouldNotChange) {
 
-			onNextUpdate.add(this.add, { thisArg: this, args: arguments })
+			this.timeline.onNextLateUpdate.add(this.add, { thisArg: this, args: arguments })
 
 			return this
 

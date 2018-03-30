@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-30 17:14 GMT(+2)
+	2018-03-30 17:30 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1317,7 +1317,7 @@ class Division extends EventDispatcher {
 
 		if (this.timeline.shouldNotChange) {
 
-			onNextUpdate.add(this.add, { thisArg: this, args: arguments });
+			this.timeline.onNextLateUpdate.add(this.add, { thisArg: this, args: arguments });
 
 			return this
 
@@ -1715,6 +1715,11 @@ class Timeline extends EventDispatcher {
 			updateDuration: 2000,
 			updateCount: 0,
 
+			onUpdate: new Stack(),
+			onNextUpdate: new Stack(),
+			onLateUpdate: new Stack(),
+			onNextLateUpdate: new Stack(),
+
 		});
 
 		this.newHead('main');
@@ -1727,7 +1732,7 @@ class Timeline extends EventDispatcher {
 
 		if (this.shouldNotChange) {
 
-			onNextUpdate.add(this.destroy, { thisArg: this });
+			onNextLateUpdate.add(this.destroy, { thisArg: this });
 
 			return this
 
@@ -1757,6 +1762,9 @@ class Timeline extends EventDispatcher {
 	update(force = false) {
 
 		let t = now();
+
+		this.onUpdate.execute();
+		this.onNextUpdate.dump();
 
 		this.shouldNotChange = true;
 
@@ -1789,6 +1797,9 @@ class Timeline extends EventDispatcher {
 
 		this.dispatchEvent('frame');
 
+		this.onLateUpdate.execute();
+		this.onNextLateUpdate.dump();
+
 		this.shouldNotChange = false;
 		this.updateCount++;
 
@@ -1798,7 +1809,7 @@ class Timeline extends EventDispatcher {
 
 		if (this.updateCount === 0) {
 
-			onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments });
+			this.onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments });
 
 			return this
 
