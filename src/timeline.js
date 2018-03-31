@@ -165,7 +165,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 		if (this.updateCount === 0) {
 
-			this.onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments })
+			this.onNextLateUpdate.add(this.dispatchHeadEvent, { thisArg: this, args: arguments })
 
 			return this
 

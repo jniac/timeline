@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-03-30 17:30 GMT(+2)
+	2018-04-01 01:18 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1807,9 +1807,9 @@ class Timeline extends EventDispatcher {
 
 	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
 
-		if (this.updateCount === 0) {
+		if (this.updateCount === 0 || !this.enabled) {
 
-			this.onNextLateUpdate.add(this.dispatchEvent, { thisArg: this, args: arguments });
+			this.onNextLateUpdate.add(this.dispatchHeadEvent, { thisArg: this, args: arguments });
 
 			return this
 

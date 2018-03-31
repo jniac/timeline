@@ -5,9 +5,9 @@
 Major feature: added light Stack class,  
 ~~2 stacks instances:~~
 4 stacks instances (`Late` suffix is coming from Unity)
-- `onUpdate` every callback added to the stack will be execute every frame **before** the timeline updates (until the callback returns false)
-- `onNextUpdate` the callback will be executed once **before** the timeline updates(at the beginning of the next frame)
-- `onLateUpdate` every callback added to the stack will be execute every frame **after** the timeline updates (until the callback returns false)
+- `onUpdate` callbacks will be executed every frame **before** the timeline updates (until the callback returns false)
+- `onNextUpdate` callbacks will be executed *once* **before** the timeline updates(at the beginning of the next frame)
+- `onLateUpdate` callbacks will be executed *every frame* **after** the timeline updates (until the callback returns false)
 - `onNextLateUpdate` the callback will be executed once **after** the timeline updates (at the beginning of the next frame)
 
 those 4 stacks exist globally and locally (by Timeline instance)
