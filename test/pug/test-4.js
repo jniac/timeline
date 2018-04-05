@@ -58,6 +58,7 @@ for (let [index, name] of images.entries()) {
 			console.log('hey!!', timeline.updateCount, event.type, event.target.uid, event.target.space.range)
 
 		})
+		.on(/foo/, event => console.log('foo!!!!!!!'))
 
 }
 

@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-04-01 01:18 GMT(+2)
+	2018-04-05 10:37 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1200,6 +1200,13 @@ class Head {
 
 	}
 
+	reset(position = 0) {
+
+		this.mobile.position = position;
+		this.mobile.velocity = 0;
+
+	}
+
 	toString() {
 
 		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
@@ -1914,6 +1921,12 @@ class Stack {
 
 		this.next.push({ callback, thisArg, args });
 		this.count++;
+
+	}
+
+	remove(callback, { thisArg = null, args = null  } = {}) {
+
+		// TODO: implement or use another Stack definition
 
 	}
 

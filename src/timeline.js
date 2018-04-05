@@ -163,7 +163,7 @@ export class Timeline extends eventjs.EventDispatcher {
 
 	dispatchHeadEvent({ extraEvent = null, forcedEvent = null } = {}) {
 
-		if (this.updateCount === 0) {
+		if (this.updateCount === 0 || !this.enabled) {
 
 			this.onNextLateUpdate.add(this.dispatchHeadEvent, { thisArg: this, args: arguments })
 
@@ -270,6 +270,12 @@ class Stack {
 
 		this.next.push({ callback, thisArg, args })
 		this.count++
+
+	}
+
+	remove(callback, { thisArg = null, args = null  } = {}) {
+
+		// TODO: implement or use another Stack definition
 
 	}
 

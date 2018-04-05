@@ -130,6 +130,13 @@ export class Head {
 
 	}
 
+	reset(position = 0) {
+
+		this.mobile.position = position
+		this.mobile.velocity = 0
+
+	}
+
 	toString() {
 
 		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
