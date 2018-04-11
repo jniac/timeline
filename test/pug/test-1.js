@@ -89,6 +89,9 @@ timeline.division({ name:'switch', position: '50%', width: 0, align: 0, color: '
 
 	})
 	.division({ width: 500, color: 'palevioletred', align: 0, positionMode: 'FREE' })
+		// overlapEnter & overlapExit test
+		.on(/overlapEnter/, event => console.log('palevioletred overlapEnter!'))
+		.on(/overlapExit/, event => console.log('palevioletred overlapExit!'))
 
 
 

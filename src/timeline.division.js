@@ -287,6 +287,8 @@ export class Division extends eventjs.EventDispatcher {
 		let stayInside = 	wasInside && isInside
 		let enter = 		!wasInside && isInside
 		let exit = 			wasInside && !isInside
+		let overlapEnter = 	overlap && !oldValues.overlap
+		let overlapExit = 	!overlap && oldValues.overlap
 
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0
@@ -305,6 +307,8 @@ export class Division extends eventjs.EventDispatcher {
 				pass = pass || event === 'pass'
 				progress = progress || event === 'progress'
 				overlap = overlap || event === 'overlap'
+				overlapEnter = overlapEnter || event === 'overlapEnter'
+				overlapExit = overlapExit || event === 'overlapExit'
 
 			}
 
@@ -329,6 +333,12 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-${head.name}`, eventData)
+
+		if (overlapEnter)
+			this.dispatchEvent(`overlapEnter-${head.name}`, eventData)
+
+		if (overlapExit)
+			this.dispatchEvent(`overlapExit-${head.name}`, eventData)
 
 		if (extraEvent)
 			this.dispatchEvent(`${extraEvent}-${head.name}`, eventData)

@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-04-05 10:37 GMT(+2)
+	2018-04-11 21:53 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1496,6 +1496,8 @@ class Division extends EventDispatcher {
 
 		let enter = 		!wasInside && isInside;
 		let exit = 			wasInside && !isInside;
+		let overlapEnter = 	overlap && !oldValues.overlap;
+		let overlapExit = 	!overlap && oldValues.overlap;
 
 		let pass = 			old_r <= 1 && new_r > 1 ||
 							old_r >= 0 && new_r < 0;
@@ -1514,6 +1516,8 @@ class Division extends EventDispatcher {
 				pass = pass || event === 'pass';
 				progress = progress || event === 'progress';
 				overlap = overlap || event === 'overlap';
+				overlapEnter = overlapEnter || event === 'overlapEnter';
+				overlapExit = overlapExit || event === 'overlapExit';
 
 			}
 
@@ -1538,6 +1542,12 @@ class Division extends EventDispatcher {
 
 		if (overlap || oldValues.overlap)
 			this.dispatchEvent(`overlap-${head.name}`, eventData);
+
+		if (overlapEnter)
+			this.dispatchEvent(`overlapEnter-${head.name}`, eventData);
+
+		if (overlapExit)
+			this.dispatchEvent(`overlapExit-${head.name}`, eventData);
 
 		if (extraEvent)
 			this.dispatchEvent(`${extraEvent}-${head.name}`, eventData);
