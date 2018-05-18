@@ -35,6 +35,7 @@ for (let index of Mth.range(100))
 			section.style.transform = `translateX(${-absolute}px)`
 
 		})
+			.division({ positionMode: 'FREE', align: 0, width: '80%' })
 
 
 

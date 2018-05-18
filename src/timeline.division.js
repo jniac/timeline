@@ -2,7 +2,7 @@ import * as eventjs from './event.js'
 import query, { copy, propsToString } from './query.js'
 
 import { onNextUpdate } from './timeline.js'
-import { now, readonlyProperties, clamp } from './timeline.utils.js'
+import { now, readonlyProperties, clamp, limit } from './timeline.utils.js'
 import { Space } from './timeline.space.js'
 
 export class DivisionProps {
@@ -414,10 +414,10 @@ export class Division extends eventjs.EventDispatcher {
 	getLimitedValue(value, maxOverflow = 300) {
 
 		if (value < this.space.range.min)
-			return this.space.range.min - Mth.limit(this.space.range.min - value, maxOverflow)
+			return this.space.range.min - limit(this.space.range.min - value, maxOverflow)
 
 		if (value > this.space.range.max)
-			return this.space.range.max + Mth.limit(value - this.space.range.max, maxOverflow)
+			return this.space.range.max + limit(value - this.space.range.max, maxOverflow)
 
 		return value
 

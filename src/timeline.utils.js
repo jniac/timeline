@@ -13,11 +13,22 @@ export const readonlyProperties = (target, properties, options = {}) => {
 
 export const clamp = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x
 
+/**
+ * returns an image of x where f(x) < limit
+ * f(0) = 0
+ * f(limit) = limit / 2
+ * f(Infinity) = limit
+ * f'(0) = 1
+ * f'(limit) = 1/4 * limit
+ * f'(Infinity) = 0
+ */
+export const limit = (x, limit = 1, ratio = 1) => x * ratio * limit / (x * ratio + limit)
+
 
 
 /**
  * key can be compared via 'is':
- * 
+ *
  * let e = new Enum('FOO', 'BAR')
  * let key = e.FOO
  * key.is.FOO // true
@@ -26,7 +37,7 @@ export const clamp = (x, min = 0, max = 1) => x < min ? min : x > max ? max : x
  */
 class EnumKey {
 
-	constructor(enumInstance, index, keys) { 
+	constructor(enumInstance, index, keys) {
 
 		Object.assign(this, {
 
@@ -43,7 +54,7 @@ class EnumKey {
 		})
 
 		Object.freeze(this)
-	
+
 	}
 
 	toString() { return this.name }

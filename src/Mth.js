@@ -56,6 +56,7 @@ export const Mth = {
 	},
 
 	/**
+	 * https://jsfiddle.net/jniac/mwf019mg/
 	 * http://www.iquilezles.org/www/articles/functions/functions.htm
 	 * @param x: the value
 	 * @param a in coefficient
@@ -80,10 +81,10 @@ export const Mth = {
 		if (clamp)
 			x = x < 0 ? 0 : x > 1 ? 1 : x
 
-		return x === i 
-			? x 
-			: x < i 
-			? 1 / Math.pow(i, p - 1) * Math.pow(x, p) 
+		return x === i
+			? x
+			: x < i
+			? 1 / Math.pow(i, p - 1) * Math.pow(x, p)
 			: 1 - 1 / Math.pow(1 - i, p - 1) * Math.pow(1 - x, p)
 
 	},
@@ -101,9 +102,9 @@ export const Mth = {
 				x = x < 0 ? 0 : x > 1 ? 1 : x
 
 			return x === i
-				? x  
-				: x < i 
-				? 1 / Math.pow(i, p - 1) * Math.pow(x, p) 
+				? x
+				: x < i
+				? 1 / Math.pow(i, p - 1) * Math.pow(x, p)
 				: 1 - 1 / Math.pow(1 - i, p - 1) * Math.pow(1 - x, p)
 
 		}
@@ -111,7 +112,6 @@ export const Mth = {
 	},
 
 	/**
-	 * https://jsfiddle.net/jniac/mwf019mg/
 	 * map [0, 1] to [0, Infinity]
 	 * infinity(0) = 0
 	 * infinity(1/2) = 1
@@ -126,7 +126,7 @@ export const Mth = {
 	infinityPrime(x) {
 
 		return -2 * x / ((x = x - 1) * x * x)
-		
+
 	},
 
 	infinityPrimeAngle(x) {
@@ -189,10 +189,10 @@ export const Mth = {
 
 	/**
 	 * Python like
-	 * 
+	 *
 	 * for (let x of Mth.range(5))
 	 *     ... // 0, 1, 2, 3, 4
-	 * 
+	 *
 	 */
 	*range(n) {
 
@@ -206,25 +206,34 @@ export const Mth = {
 	/**
 	 * Example:
 	 *
-	 * for (let x of Mth.range(100, 110))
+	 * for (let x of Mth.step(100, 110))
 	 *     ... // 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110
-	 * 
-	 * for (let x of Mth.range(100, 100, { step: 2 }))
+	 *
+	 * for (let x of Mth.step(100, 100, { step: 2 }))
 	 *     ... // 100, 102, 104, 106, 108, 110
-	 * 
-	 * for (let x of Mth.range(100, 100, { count: 3 }))
+	 *
+	 * for (let x of Mth.step(100, 100, { count: 3 }))
 	 *     ... // 100, 105, 110
-	 * 
+	 *
 	 */
-	*step(start, end, { step = 1, count } = {}) {
+	*step(start, end, { step = 1, count, includeEnd = true, returnIndex = false } = {}) {
 
 		let d = end - start
 
 		if (count === undefined)
 			count = Math.ceil(d / step)
 
-		for (let i = 0; i <= count; i++)
-			yield start + d * i / count
+		if (includeEnd) {
+
+			for (let i = 0; i <= count; i++)
+				yield returnIndex ? [i, start + d * i / count] : start + d * i / count
+
+		} else {
+
+			for (let i = 0; i < count; i++)
+				yield returnIndex ? [i, start + d * i / count] : start + d * i / count
+
+		}
 
 	},
 

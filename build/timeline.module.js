@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-04-11 21:53 GMT(+2)
+	2018-05-18 10:19 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -343,11 +343,22 @@ const readonlyProperties = (target, properties, options = {}) => {
 
 
 
+/**
+ * returns an image of x where f(x) < limit
+ * f(0) = 0
+ * f(limit) = limit / 2
+ * f(Infinity) = limit
+ * f'(0) = 1
+ * f'(limit) = 1/4 * limit
+ * f'(Infinity) = 0
+ */
+const limit = (x, limit = 1, ratio = 1) => x * ratio * limit / (x * ratio + limit);
+
 
 
 /**
  * key can be compared via 'is':
- * 
+ *
  * let e = new Enum('FOO', 'BAR')
  * let key = e.FOO
  * key.is.FOO // true
@@ -356,7 +367,7 @@ const readonlyProperties = (target, properties, options = {}) => {
  */
 class EnumKey {
 
-	constructor(enumInstance, index, keys) { 
+	constructor(enumInstance, index, keys) {
 
 		Object.assign(this, {
 
@@ -373,7 +384,7 @@ class EnumKey {
 		});
 
 		Object.freeze(this);
-	
+
 	}
 
 	toString() { return this.name }
@@ -1623,10 +1634,10 @@ class Division extends EventDispatcher {
 	getLimitedValue(value, maxOverflow = 300) {
 
 		if (value < this.space.range.min)
-			return this.space.range.min - Mth.limit(this.space.range.min - value, maxOverflow)
+			return this.space.range.min - limit(this.space.range.min - value, maxOverflow)
 
 		if (value > this.space.range.max)
-			return this.space.range.max + Mth.limit(value - this.space.range.max, maxOverflow)
+			return this.space.range.max + limit(value - this.space.range.max, maxOverflow)
 
 		return value
 
