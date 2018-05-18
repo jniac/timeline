@@ -28,6 +28,24 @@ export class Range {
 
 	}
 
+	secure() {
+
+		if (this.min > this.max)
+			this.min = this.max = (this.min + this.max) / 2
+			
+	}
+
+	expand(q) {
+
+		this.min += -q
+		this.max += q
+
+		this.secure()
+
+		return this
+
+	}
+
 	isVoid() {
 
 		return isNaN(this.min) || isNaN(this.max)

@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-05-18 13:10 GMT(+2)
+	2018-05-18 15:58 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -203,6 +203,24 @@ class Range {
 
 		this.min = min;
 		this.max = max;
+
+		return this
+
+	}
+
+	secure() {
+
+		if (this.min > this.max)
+			this.min = this.max = (this.min + this.max) / 2;
+			
+	}
+
+	expand(q) {
+
+		this.min += -q;
+		this.max += q;
+
+		this.secure();
 
 		return this
 
