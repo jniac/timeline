@@ -18,7 +18,6 @@ export let timeline = new Timeline(width)
 let images = [...'abc']
 
 
-// timeline = new Timeline(width)
 
 timeline.division({ positionMode: 'FREE', width: width * images.length, color: 'red' })
 	.on(/overlap|refresh/, event => {
@@ -52,13 +51,13 @@ for (let [index, name] of images.entries()) {
 
 		})
 
-		.division({ name:'debug', width: '20%', color: 'blue', align: 0, positionMode: 'FREE' })
-		.on(/enter/, event => {
+			.division({ name:'debug', width: '20%', color: 'blue', align: 0, positionMode: 'FREE' })
+			.on(/enter/, event => {
 
-			console.log('hey!!', timeline.updateCount, event.type, event.target.uid, event.target.space.range)
+				console.log('hey!!', timeline.updateCount, event.type, event.target.uid, event.target.space.range)
 
-		})
-		.on(/foo/, event => console.log('foo!!!!!!!'))
+			})
+			.on(/foo/, event => console.log('foo!!!!!!!'))
 
 }
 

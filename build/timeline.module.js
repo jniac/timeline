@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-05-18 10:19 GMT(+2)
+	2018-05-18 13:10 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1254,6 +1254,9 @@ class DivisionProps {
 
 }
 
+// event: propagate to parent or timeline
+const propagateTo = division => division instanceof Division && (division.parent || division.timeline);
+
 let divisionMap = new WeakMap();
 let divisionUID = 0;
 
@@ -1270,7 +1273,6 @@ class Division extends EventDispatcher {
 
 			uid: divisionUID++,
 			space: new Space(spaceProps),
-			// props: Object.assign({}, props),
 			props: new DivisionProps(this, props),
 			localHeads: [],
 
@@ -1343,14 +1345,10 @@ class Division extends EventDispatcher {
 
 		if (Array.isArray(child)) {
 
-			for (let child2 of child) {
+			let children = child;
 
-				if (!(child2 instanceof Division))
-					child2 = this.timeline.division(child2);
-
-				this.space.addChild(child2.space);
-
-			}
+			for (let child of children)
+				this.add(child);
 
 		} else {
 
@@ -1358,6 +1356,9 @@ class Division extends EventDispatcher {
 				child = this.timeline.division(child);
 
 			this.space.addChild(child.space);
+
+			// EVENT:
+			child.dispatchEvent('add-child', { propagateTo });
 
 		}
 
@@ -1381,6 +1382,9 @@ class Division extends EventDispatcher {
 	}
 
 	remove() {
+
+		// EVENT:
+		this.dispatchEvent('remove-child', { propagateTo });
 
 		this.space.remove();
 
@@ -1407,18 +1411,16 @@ class Division extends EventDispatcher {
 
 	}
 
-	division(propsOrQuery) {
+	division(division) {
 
-		if (typeof propsOrQuery === 'string')
-			return this.query(propsOrQuery)
+		if (typeof division === 'string')
+			return this.query(division)
 
-		// propsOrQuery are props:
+		// division are props:
 
-		let division = this.timeline.division(propsOrQuery);
+		division.parent = this;
 
-		this.add(division);
-
-		return division
+		return this.timeline.division(division)
 
 	}
 

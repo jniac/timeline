@@ -15,6 +15,23 @@ export let timeline = new Timeline(800)
 
 export let timelineCanvas = new TimelineCanvas(timeline)
 
+
+// EVENT: add-child
+timeline.on('add-child', event => {
+
+	console.log(event.type, `#${event.target.uid} to #${event.target.parent.uid}`)
+
+})
+
+// EVENT: remove-child
+timeline.on('remove-child', event => {
+
+	console.log(event.type, `#${event.target.uid} from #${event.target.parent.uid}`)
+
+})
+
+
+
 // this line is important !
 timeline.rootDivision.space.width.computeDelegate = (space, width) => width - space.width.absolute
 
@@ -31,6 +48,7 @@ for (let section of document.querySelectorAll('section')) {
 			event.target.props.section.style.transform = `translateX(${(- x * 100).toFixed(1)}%)`
 
 		})
+			.division({ width: 100, color: 'purple' })
 }
 
 document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
@@ -40,7 +58,8 @@ document.querySelector('div.stage').appendChild(timelineCanvas.canvas)
 export let handler = new UIEventHandler(document.querySelector('.wrapper'))
 
 
-
+// EVENT: remove-child
+timeline.division('f:color=purple').remove()
 
 
 
