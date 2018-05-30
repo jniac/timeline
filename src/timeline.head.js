@@ -139,7 +139,7 @@ export class Head {
 
 	toString() {
 
-		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
+		return `Head{ index: ${this.index}, value: ${this.position.toFixed(1)} }`
 
 	}
 

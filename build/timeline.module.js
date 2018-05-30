@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-05-18 15:58 GMT(+2)
+	2018-05-30 11:33 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1238,7 +1238,7 @@ class Head {
 
 	toString() {
 
-		return `Head{ index: ${this.index}, value: ${this.value.toFixed(1)} }`
+		return `Head{ index: ${this.index}, value: ${this.position.toFixed(1)} }`
 
 	}
 
