@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-05-30 11:33 GMT(+2)
+	2018-06-08 14:00 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1036,7 +1036,7 @@ class Mobile {
 		} else {
 
 			// integral
-			position += velocity * (friction ** dt - 1) / Math.log(friction);
+			position += friction === 1 ? velocity * dt : velocity * (friction ** dt - 1) / Math.log(friction);
 			velocity *= friction ** dt;
 
 		}
@@ -1571,8 +1571,8 @@ class Division extends EventDispatcher {
 		if (pass)
 			this.dispatchEvent(`pass-${head.name}`, eventData);
 
-		if (overlap || oldValues.overlap)
-			this.dispatchEvent(`overlap-${head.name}`, eventData);
+		if (overlap)
+			this.dispatchEvent(`overlapProgress-${head.name}`, eventData);
 
 		if (overlapEnter)
 			this.dispatchEvent(`overlapEnter-${head.name}`, eventData);

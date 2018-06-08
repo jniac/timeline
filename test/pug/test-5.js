@@ -20,7 +20,7 @@ timeline.on('update', event => console.line('timeline', 'update: ' + timeline.up
 let sections = document.querySelectorAll('section')
 
 for (let index of Mth.range(100))
-	timeline.division({ index })
+	timeline.division({ index, color: index % 10 === 0 ? 'red' : 'black' })
 		.on(/overlapEnter/, ({ target }) => {
 
 			let { index } = target.props
@@ -37,8 +37,13 @@ for (let index of Mth.range(100))
 		})
 			.division({ positionMode: 'FREE', align: 0, width: '80%' })
 
+timeline.division('f:index=10)').space.color = '#09f'
+timeline.division('f:index=10)')
+	.on(/overlap/, event => {
 
+		console.log(event.type)
 
+	})
 
 
 
