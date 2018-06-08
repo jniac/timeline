@@ -77,7 +77,7 @@ export class Mobile {
 		} else {
 
 			// integral
-			position += velocity * (friction ** dt - 1) / Math.log(friction)
+			position += friction === 1 ? velocity * dt : velocity * (friction ** dt - 1) / Math.log(friction)
 			velocity *= friction ** dt
 
 		}
