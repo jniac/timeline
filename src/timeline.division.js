@@ -333,8 +333,8 @@ export class Division extends eventjs.EventDispatcher {
 		if (pass)
 			this.dispatchEvent(`pass-${head.name}`, eventData)
 
-		if (overlap || oldValues.overlap)
-			this.dispatchEvent(`overlap-${head.name}`, eventData)
+		if (overlap)
+			this.dispatchEvent(`overlapProgress-${head.name}`, eventData)
 
 		if (overlapEnter)
 			this.dispatchEvent(`overlapEnter-${head.name}`, eventData)
