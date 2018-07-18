@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-06-08 14:00 GMT(+2)
+	2018-06-19 10:55 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -39,23 +39,7 @@ function copy(object, { recursive = false, exclude = null } = {}) {
 
 }
 
-function propsToString(props) {
 
-	let entries = Object.entries(props);
-
-	if (!entries.length)
-		return '{}'
-
-	return `{ ${entries.map(([k, v]) => {
-
-		if (v === true)
-			return k
-
-		return k + ': ' + v
-
-	}).join(', ')} }`
-
-}
 
 /*
 
@@ -1248,25 +1232,69 @@ class DivisionProps {
 
 	constructor(division, props) {
 
-		Object.assign(this, props);
-
 		Object.defineProperties(this, {
 
 			isRoot: {
 
-				enumerable: true,
+				enumerable: false,
 				configurable: true,
 				get() { return division.space.isRoot },
 
 			},
 
+			uid: {
+
+				enumerable: false,
+				configurable: true,
+				get() { return division.uid },
+
+			},
+
 		});
+
+		Object.assign(this, props);
 
 	}
 
 	set(props) {
 
 		Object.assign(this, props);
+
+	}
+
+	toString() {
+
+		let array = [];
+
+		for (let [key, value] of Object.entries(this)) {
+
+			let type = typeof value;
+
+			if (value === true) {
+
+				array.push(key);
+
+			} else {
+
+				if (type === 'string') {
+
+					array.push(`${key}="${value}"`);
+
+				} else if (type === 'object') {
+
+					array.push(`${key}=${value.constructor.name}()`);
+
+				} else {
+
+					array.push(`${key}=${value}`);
+
+				}
+
+			}
+
+		}
+
+		return array.join(', ')
 
 	}
 
@@ -1305,7 +1333,7 @@ class Division extends EventDispatcher {
 		// TODO: remove this line (useless right?)
 		// this.space.onUpdate.push(() => this.dispatchEvent('change'))
 
-		readonlyProperties(this.props, { uid: this.uid }, { enumerable: true, configurable: true });
+		// readonlyProperties(this.props, { uid: this.uid }, { enumerable: true, configurable: true })
 
 		divisionMap.set(this.space, this);
 
@@ -1694,9 +1722,30 @@ class Division extends EventDispatcher {
 
 		let r = `[${this.space.range.min.toFixed(1)}, ${this.space.range.max.toFixed(1)}]`;
 		let b = `[${this.space.bounds.min.toFixed(1)}, ${this.space.bounds.max.toFixed(1)}]`;
-		let props = propsToString(copy(this.props, { exclude: 'uid' }));
 
-		return `Division#${this.uid} { props: ${props}, r: ${r}, b: ${b} }`
+		return `Division#${this.uid} { ${this.props.toString()}, r: ${r}, b: ${b} }`
+
+	}
+
+	toGraphString() {
+
+		let array = [];
+
+		array.push('root');
+
+		this.walk(division => {
+
+			let body = `division#${division.uid} [${division.props.toString()}]`;
+
+			let hier = division.children.length ? '┬' : '─';
+
+			let str = '  '.repeat(division.space.depth) + hier + ' ' + body;
+
+			array.push(str);
+
+		});
+
+		return array.join('\n')
 
 	}
 
