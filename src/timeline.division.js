@@ -281,9 +281,15 @@ export class Division extends eventjs.EventDispatcher {
 
 		if (head === null) {
 
+<<<<<<< HEAD
 			if (this.timeline) {
 
 				for (let head of this.timeline.heads) {
+=======
+			if (this.division) {
+
+				for (let head of this.division.heads) {
+>>>>>>> 37579c8f84e4c15906477c78c9e9e57cc185db5f
 
 					this.updateHead(head, { extraEvent, forcedEvent })
 

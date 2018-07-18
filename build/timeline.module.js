@@ -1,7 +1,11 @@
 /*
 
 	timeline.js
+<<<<<<< HEAD
 	2018-07-18 15:55 GMT(+2)
+=======
+	2018-07-18 15:52 GMT(+2)
+>>>>>>> 37579c8f84e4c15906477c78c9e9e57cc185db5f
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1504,9 +1508,15 @@ class Division extends EventDispatcher {
 
 		if (head === null) {
 
+<<<<<<< HEAD
 			if (this.timeline) {
 
 				for (let head of this.timeline.heads) {
+=======
+			if (this.division) {
+
+				for (let head of this.division.heads) {
+>>>>>>> 37579c8f84e4c15906477c78c9e9e57cc185db5f
 
 					this.updateHead(head, { extraEvent, forcedEvent });
 
