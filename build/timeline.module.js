@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-07-18 15:28 GMT(+2)
+	2018-07-18 15:55 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1500,7 +1500,23 @@ class Division extends EventDispatcher {
 
 	}
 
-	updateHead(head, extraEvent = null, forcedEvent = null) {
+	updateHead(head = null, { extraEvent = null, forcedEvent = null } = {}) {
+
+		if (head === null) {
+
+			if (this.timeline) {
+
+				for (let head of this.timeline.heads) {
+
+					this.updateHead(head, { extraEvent, forcedEvent });
+
+				}
+
+			}
+
+			return this
+
+		}
 
 		let headValue = head.roundPosition;
 		let headIndex = head.getIndex();
@@ -1921,7 +1937,7 @@ class Timeline extends EventDispatcher {
 		this.rootDivision.walk(division => {
 
 			for (let head of this.heads)
-				division.updateHead(head, extraEvent, forcedEvent);
+				division.updateHead(head, { extraEvent, forcedEvent });
 
 		});
 

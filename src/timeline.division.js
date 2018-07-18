@@ -277,7 +277,23 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
-	updateHead(head, extraEvent = null, forcedEvent = null) {
+	updateHead(head = null, { extraEvent = null, forcedEvent = null } = {}) {
+
+		if (head === null) {
+
+			if (this.timeline) {
+
+				for (let head of this.timeline.heads) {
+
+					this.updateHead(head, { extraEvent, forcedEvent })
+
+				}
+
+			}
+
+			return this
+
+		}
 
 		let headValue = head.roundPosition
 		let headIndex = head.getIndex()

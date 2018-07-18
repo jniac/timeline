@@ -174,7 +174,7 @@ export class Timeline extends eventjs.EventDispatcher {
 		this.rootDivision.walk(division => {
 
 			for (let head of this.heads)
-				division.updateHead(head, extraEvent, forcedEvent)
+				division.updateHead(head, { extraEvent, forcedEvent })
 
 		})
 
