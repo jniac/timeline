@@ -271,6 +271,12 @@ export class Division extends eventjs.EventDispatcher {
 
 	}
 
+	getHeadValues(headIndex = 0) {
+
+		return this.localHeads[headIndex]
+
+	}
+
 	updateHead(head, extraEvent = null, forcedEvent = null) {
 
 		let headValue = head.roundPosition

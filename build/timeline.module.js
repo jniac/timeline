@@ -1,7 +1,7 @@
 /*
 
 	timeline.js
-	2018-06-19 10:55 GMT(+2)
+	2018-07-18 15:28 GMT(+2)
  	exprimental stuff from https://github.com/jniac/timeline
 
 */
@@ -1491,6 +1491,12 @@ class Division extends EventDispatcher {
 		}
 
 		return best.division
+
+	}
+
+	getHeadValues(headIndex = 0) {
+
+		return this.localHeads[headIndex]
 
 	}
 
