@@ -1,0 +1,22 @@
+{
+  "name": "timeline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "rollup.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jniac/timeline.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jniac/timeline/issues"
+  },
+  "homepage": "https://github.com/jniac/timeline#readme"
+}
