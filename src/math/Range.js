@@ -30,6 +30,13 @@ class Range {
 
 	}
 
+	move(offset) {
+
+		this.min += offset
+		this.max += offset
+
+	}
+
 	expand(q) {
 
 		this.min += -q
@@ -146,6 +153,9 @@ class Range {
 		return (x - this.min) / (this.max - this.min)
 
 	}
+
+	get position() { return this.min }
+	set position(value) { this.move(value - this.min) }
 
 	get width() { return this.max - this.min }
 	set width(value) { this.max = this.min + value }
