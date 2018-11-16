@@ -1,10 +1,18 @@
 
-import Range from '../math/Range.js'
-import Space from './Space.js'
+import { Node } from '../lib/tree.js'
 
-class Division extends Space {
+import Range from '../math/Range.js'
+import LayoutProperty from './LayoutProperty.js'
+
+class Division extends Node {
 
     constructor(props) {
+
+        super()
+
+        this.position = new LayoutProperty()
+        this.anchorPosition = new LayoutProperty()
+        this.width = new LayoutProperty()
 
         this.range = new Range()
         this.bounds = new Range()

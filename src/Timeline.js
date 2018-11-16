@@ -3,7 +3,11 @@ import Division from './core/Division.js'
 
 class Timeline extends Division {
 
-    constructor() {
+    constructor(rootWidth = 800) {
+
+        super()
+
+        this.width.basis = rootWidth
 
         console.log('hi')
 
