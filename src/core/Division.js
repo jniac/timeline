@@ -136,6 +136,7 @@ class Division extends Node {
 
         updateWidth(this)
         updatePosition(this)
+        this.forAllChildren(child => child.fire('update'))
 
     }
 
