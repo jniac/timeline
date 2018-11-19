@@ -1,8 +1,9 @@
 
 import { Node } from '../lib/tree.js'
+import { makeDispatcher } from '../events/Dispatcher.js'
 
 import Range from '../math/Range.js'
-import { WidthProperty, PositionProperty } from './LayoutProperties.js'
+import { LayoutProperty, WidthProperty } from './LayoutProperties.js'
 
 const consumeProps = (division, props) => {
 
@@ -115,7 +116,7 @@ class Division extends Node {
         map.set(this.nodeId, this)
 
         this.layout = 'normal'
-        this.position = new PositionProperty()
+        this.position = new LayoutProperty()
         // this.anchorPosition = new LayoutProperty()
         this.width = new WidthProperty()
         this.relativeMode = 'PARENTS'
@@ -181,7 +182,11 @@ class Division extends Node {
 }
 
 Object.assign(Division, {
+
     map,
+
 })
+
+makeDispatcher(Division.prototype)
 
 export default Division

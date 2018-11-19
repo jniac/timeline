@@ -100,33 +100,9 @@ class WidthProperty extends LayoutProperty {
 
 }
 
-class PositionProperty extends LayoutProperty {
-
-    reset() {
-
-        super.reset()
-
-        this.absolute = false
-
-    }
-
-    parse(value) {
-
-        super.parse(value)
-
-        if (value === 'absolute') {
-
-            this.absolute = true
-
-        }
-
-    }
-
-}
-
 export {
 
+    LayoutProperty,
     WidthProperty,
-    PositionProperty,
 
 }

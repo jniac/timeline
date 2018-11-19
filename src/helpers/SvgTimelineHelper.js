@@ -1,7 +1,7 @@
 
-const create = (type, { parent, ...props }) => {
+const makeSvg = (elementOrType, { parent, ...props }) => {
 
-    let element = document.createElementNS('http://www.w3.org/2000/svg', type)
+    let element = elementOrType === 'object' ? elementOrType : document.createElementNS('http://www.w3.org/2000/svg', elementOrType)
 
     for (let [key, value] of Object.entries(props)) {
 
@@ -19,6 +19,29 @@ const create = (type, { parent, ...props }) => {
 
 }
 
+const drawDivision = (svg, division, offsetY = 0) => {
+
+    let transform = `translate(${division.range.position * .5}, 0)`
+    let x2 = division.range.width * .5
+    let y = 10 * division.ancestors.length + offsetY
+
+    let g = makeSvg('g', { parent:svg, stroke:division.props.color, 'stroke-width':3, transform })
+    g.classList.add(`node${division.nodeId}`)
+
+    makeSvg('line', { parent:g, x1:0, x2, y1:y, y2:y })
+    makeSvg('line', { parent:g, x1:0, x2:0, y1:y-4, y2:y+4, 'stroke-width':1 })
+    makeSvg('line', { parent:g, x1:x2, x2:x2, y1:y-4, y2:y+4, 'stroke-width':1 })
+
+    // division.on('move', () => {
+    //
+    //     let transform = `translate(${division.range.position * .5}, 0)`
+    //
+    //     makeSvg(g, { transform })
+    //
+    // })
+
+}
+
 class SvgTimelineHelper {
 
     constructor(timeline) {
@@ -27,29 +50,13 @@ class SvgTimelineHelper {
 
         for (let division of timeline.rootContainer.allChildren) {
 
-            let g = create('g', { parent:svg })
-            g.classList.add(`node${division.nodeId}`)
-
-            let y = 10 * division.ancestors.length
-            let x1 = division.range.min * .5
-            let x2 = division.range.max * .5
-            create('line', { parent:g, x1, x2, y1:y, y2:y, 'stroke':division.props.color, 'stroke-width':3 })
-            create('line', { parent:g, x1:x1, x2:x1, y1:y-4, y2:y+4, 'stroke':division.props.color, 'stroke-width':1 })
-            create('line', { parent:g, x1:x2, x2:x2, y1:y-4, y2:y+4, 'stroke':division.props.color, 'stroke-width':1 })
+            drawDivision(svg, division)
 
         }
 
         for (let division of timeline.headContainer.allChildren) {
 
-            let g = create('g', { parent:svg })
-            g.classList.add(`node${division.nodeId}`)
-
-            let y = 40 + 10 * division.ancestors.length
-            let x1 = division.range.min * .5
-            let x2 = division.range.max * .5
-            create('line', { parent:g, x1, x2, y1:y, y2:y, 'stroke':division.props.color, 'stroke-width':3 })
-            create('line', { parent:g, x1:x1, x2:x1, y1:y-4, y2:y+4, 'stroke':division.props.color, 'stroke-width':1 })
-            create('line', { parent:g, x1:x2, x2:x2, y1:y-4, y2:y+4, 'stroke':division.props.color, 'stroke-width':1 })
+            drawDivision(svg, division, 40)
 
         }
 
