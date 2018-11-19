@@ -102,8 +102,8 @@ class Range {
 		let max = Math.min(this.max, other.max)
 		let width = Math.max(max - min, 0)
 
-		if (width === 0 && this.width === 0)
-			return 1
+		if (this.width === 0)
+			return min === max ? 1 : 0
 
 		return width / this.width
 
