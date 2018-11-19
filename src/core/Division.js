@@ -46,7 +46,7 @@ const updateWidth = (division) => {
     division.forAllChildren((division) => {
 
         // NOTE: '==' is used there, because division.valueOf() is used under the hood, be careful
-        if (division.width == 'auto') {
+        if (division.width.auto) {
 
             widthAutoDivisions.unshift(division)
             return
@@ -55,7 +55,7 @@ const updateWidth = (division) => {
 
         let referenceDivision = division.parent
 
-        while (referenceDivision.width == 'auto' || referenceDivision.width == 'none') {
+        while (referenceDivision.width.auto || referenceDivision.width == 'none') {
 
             referenceDivision = referenceDivision.parent
 
@@ -76,7 +76,7 @@ const updateWidth = (division) => {
 
         })
 
-        division.range.width = width
+        division.range.width = division.width.compute(width, division)
 
     }
 

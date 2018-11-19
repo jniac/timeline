@@ -1,5 +1,7 @@
 
-const percentToFunction = str => new Function('x', `return ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
+// const percentFunction = str => new Function('x', `return ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
+const percentFunction = str => eval(`x => ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
+const autoFunction = str => eval(`x => ${str.replace(/auto/g, 'x')}`)
 
 class LayoutProperty {
 
@@ -44,7 +46,7 @@ class LayoutProperty {
 
         } else if (/%/.test(value)) {
 
-            this.relativeCallback = percentToFunction(value)
+            this.relativeCallback = percentFunction(value)
 
         }
 
@@ -54,7 +56,7 @@ class LayoutProperty {
 
         if (this.computeCallback) {
 
-            return this.computeCallback(division)
+            return this.computeCallback(referenceWidth, division)
 
         } else if (this.relativeCallback) {
 
@@ -84,9 +86,19 @@ class WidthProperty extends LayoutProperty {
 
         super.parse(value)
 
-        if (value === 'auto') {
+        if (/\bauto\b/.test(value)) {
 
             this.auto = true
+
+            if (value === 'auto') {
+
+                this.relative = 1
+
+            } else {
+
+                this.computeCallback = autoFunction(value)
+
+            }
 
         }
 
