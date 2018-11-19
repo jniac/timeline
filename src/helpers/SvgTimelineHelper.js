@@ -1,9 +1,15 @@
 
-const makeSvg = (elementOrType, { parent, ...props }) => {
+const makeSvg = (elementOrTypeOrArray, { parent, ...props }) => {
 
-    let element = typeof elementOrType === 'object'
-        ? elementOrType
-        : document.createElementNS('http://www.w3.org/2000/svg', elementOrType)
+    if (elementOrTypeOrArray instanceof Array) {
+
+        return elementOrTypeOrArray.map(item => makeSvg(item, { parent, ...props }))
+
+    }
+
+    let element = typeof elementOrTypeOrArray === 'object'
+        ? elementOrTypeOrArray
+        : document.createElementNS('http://www.w3.org/2000/svg', elementOrTypeOrArray)
 
     for (let [key, value] of Object.entries(props)) {
 
@@ -21,23 +27,29 @@ const makeSvg = (elementOrType, { parent, ...props }) => {
 
 }
 
+let defaultColors = ['#33f', '#f33', '#f3f']
+
 const drawDivision = (svg, division, offsetY = 0) => {
 
-    let position = division.range.position * .5
-    let width = division.range.width * .5
+    let scale = 1/4
+
+    let position = division.range.position * scale
+    let width = division.range.width * scale
     let y = 10 * division.ancestors.length + offsetY
 
-    let g = makeSvg('g', { parent:svg, stroke:division.props.color, 'stroke-width':3, transform:`translate(${position}, 0)` })
+    let color = division.props.color || defaultColors[division.nodeId % defaultColors.length]
+
+    let g = makeSvg('g', { parent:svg, stroke:color, transform:`translate(${position}, 0)` })
     g.classList.add(`node${division.nodeId}`)
 
     let lineMain = makeSvg('line',  { parent:g, x1:0, x2:width, y1:y, y2:y })
-    let lineStart = makeSvg('line', { parent:g, x1:0, x2:0, y1:y-4, y2:y+4, 'stroke-width':1 })
-    let lineEnd = makeSvg('line',   { parent:g, x1:width, x2:width, y1:y-4, y2:y+4, 'stroke-width':1 })
+    let lineStart = makeSvg('line', { parent:g, x1:0, x2:0, y1:y-4, y2:y+4 })
+    let lineEnd = makeSvg('line',   { parent:g, x1:width, x2:width, y1:y-4, y2:y+4 })
 
     const update = () => {
 
-        let position = division.range.position * .5
-        let width = division.range.width * .5
+        let position = division.range.position * scale
+        let width = division.range.width * scale
 
         makeSvg(g, { transform:`translate(${position}, 0)` })
         makeSvg(lineEnd, { x1:width, x2:width })
@@ -45,6 +57,9 @@ const drawDivision = (svg, division, offsetY = 0) => {
     }
 
     division.on('update', update)
+
+    division.on(/main-overlapEnter/, () => makeSvg([lineMain, lineStart, lineEnd], { 'stroke-width':3 }))
+    division.on(/main-overlapExit/, () => makeSvg([lineMain, lineStart, lineEnd], { 'stroke-width':1 }))
 
 }
 

@@ -34,11 +34,11 @@ class LayoutProperty {
 
         this.value = value
 
-        if (typeof value === 'number' || /^\.?\d+[\.\d]*$/.test(value)) {
+        if (typeof value === 'number' || /^-?\.?\d+[\.\d]*$/.test(value)) {
 
             this.basis = Number(value)
 
-        } else if (/^\.?\d+[\.\d]*%$/.test(value)) {
+        } else if (/^-?\.?\d+[\.\d]*%$/.test(value)) {
 
             this.relative = Number(value.slice(0, -1)) / 100
 
@@ -50,9 +50,21 @@ class LayoutProperty {
 
     }
 
-    compute() {
+    compute(referenceWidth, division) {
 
-        return NaN
+        if (this.computeCallback) {
+
+            return this.computeCallback(division)
+
+        } else if (this.relativeCallback) {
+
+            return this.relativeCallback(referenceWidth)
+
+        } else {
+
+            return referenceWidth * this.relative + this.basis
+
+        }
 
     }
 
@@ -75,24 +87,6 @@ class WidthProperty extends LayoutProperty {
         if (value === 'auto') {
 
             this.auto = true
-
-        }
-
-    }
-
-    compute(referenceWidth, division) {
-
-        if (this.computeCallback) {
-
-            return this.computeCallback(division)
-
-        } else if (this.relativeCallback) {
-
-            return this.relativeCallback(referenceWidth)
-
-        } else {
-
-            return referenceWidth * this.relative + this.basis
 
         }
 

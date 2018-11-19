@@ -95,7 +95,8 @@ const updatePosition = (division) => {
 
         } else {
 
-            child.range.position = division.range.interpolate(child.position.relative) + child.position.basis
+            // child.range.position = division.range.interpolate(child.position.relative) + child.position.basis
+            child.range.position = division.range.position + child.position.compute(division.range.width, child)
 
         }
 
@@ -119,16 +120,13 @@ class Division extends Node {
         this.position = new LayoutProperty()
         // this.anchorPosition = new LayoutProperty()
         this.width = new WidthProperty()
-        this.relativeMode = 'PARENTS'
 
         this.range = new Range()
         this.bounds = new Range()
 
-        this.props = {
+        this.localHeads = new WeakMap()
 
-            color: '#' + Math.floor(0xffffff * Math.random()).toString(16).padStart(6, '0'),
-            ...consumeProps(this, props),
-        }
+        this.props = consumeProps(this, props)
 
     }
 
@@ -195,6 +193,8 @@ class Division extends Node {
         }
 
     }
+
+    // head relation
 
 }
 

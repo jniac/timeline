@@ -35,6 +35,7 @@ class MouseDragHelper {
 
             timeline.head.position.basis += -mouse.dy
             timeline.head.fire('update')
+            timeline.head.updateHead()
 
         }
 

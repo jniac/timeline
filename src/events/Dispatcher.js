@@ -74,11 +74,11 @@ const off = (target, eventType, callback, props = null) => {
 
 const once = (target, eventType, callback, props = null) => {
 
-    let onceCallback = function(event) {
+    let onceCallback = function(...args) {
 
         off(target, eventType, onceCallback, props)
 
-        callback.apply(target, event)
+        callback.call(target, ...args)
 
     }
 
@@ -99,7 +99,7 @@ const makeEvent = (type, cancelable = true) => {
 
 }
 
-const fire = (target, event) => {
+const fire = (target, event, ...args) => {
 
     let listener = map.get(target)
 
@@ -128,7 +128,13 @@ const fire = (target, event) => {
 
         if (match) {
 
-            callback.call(target, event)
+            callback.call(target, event, ...args)
+
+        }
+
+        if (event.canceled) {
+
+            break
 
         }
 
@@ -166,9 +172,9 @@ const makeDispatcher = (target) => {
 
         },
 
-        fire: function(event) {
+        fire: function(event, ...args) {
 
-            fire(this, event)
+            fire(this, event, ...args)
 
             return this
 
