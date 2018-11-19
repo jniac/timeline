@@ -1,5 +1,6 @@
 
-let map = new WeakMap()
+// NOTE: map could be a WeakMap... when debugging will be done!
+let map = new Map()
 
 const ensure = (target) => {
 
@@ -113,7 +114,7 @@ const fire = (target, event) => {
 
     for (let { eventType, callback } of [...listener.array]) {
 
-        let match
+        let match = false
 
         if (typeof eventType === 'string') {
 
@@ -139,12 +140,45 @@ const makeDispatcher = (target) => {
 
     Object.assign(target, {
 
-        on: on.bind(null, target),
-        off: off.bind(null, target),
-        once: once.bind(null, target),
-        fire: fire.bind(null, target),
+        // NOTE: be carefull method signatures should match precisely global method signatures
 
-        debugGetListener: () => map.get(target),
+        on: function(target, eventType, callback, props = null) {
+
+            on(this, target, eventType, callback, props = null)
+
+            return this
+
+        },
+
+        off: function(target, eventType, callback, props = null) {
+
+            off(this, target, eventType, callback, props = null)
+
+            return this
+
+        },
+
+        once: function(target, eventType, callback, props = null) {
+
+            once(this, target, eventType, callback, props = null)
+
+            return this
+
+        },
+
+        fire: function(event) {
+
+            fire(this, event)
+
+            return this
+
+        },
+
+        debugGetListener: function() {
+
+            return map.get(target)
+
+        },
 
     })
 
