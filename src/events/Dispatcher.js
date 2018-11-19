@@ -86,12 +86,13 @@ const once = (target, eventType, callback, props = null) => {
 
 }
 
-const makeEvent = (type, cancelable = true) => {
+const makeEvent = (target, type, cancelable = true) => {
 
     let canceled = false
     let cancel = cancelable ? () => canceled = true : () => {}
 
     return {
+        target,
         type,
         cancel,
         get canceled() { return canceled },
@@ -108,7 +109,7 @@ const fire = (target, event, ...args) => {
 
     if (typeof event === 'string') {
 
-        event = makeEvent(event)
+        event = makeEvent(target, event)
 
     }
 
