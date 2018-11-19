@@ -8,6 +8,7 @@ class Node {
 		Object.defineProperty(this, 'nodeId', { enumerable: true, value: nodeIdCount++ })
 
 		this.root = this
+		this.depth = 0
 
 		Object.assign(this, props)
 
@@ -21,7 +22,10 @@ class Node {
 				child.parent.remove(child)
 
 			child.parent = this
+			child.depth = this.depth + 1
 			child.root = this.root
+
+			child.forAllChildren(node => node.depth = node.parent.depth + 1)
 
 			if (this.lastChild) {
 
@@ -172,21 +176,27 @@ class Node {
 
 	// iterators:
 
+	*iChildren() {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			yield child
+
+			child = child.next
+
+		}
+
+	}
+
 	*[Symbol.iterator]() {
 
-		let child = this.firstChild
-
-		while(child) {
-
-			yield child
-
-			child = child.next
-
-		}
+		yield* this.iChildren()
 
 	}
 
-	*allChildren() {
+	*iAllChildren() {
 
 		let child = this.firstChild
 
@@ -194,7 +204,7 @@ class Node {
 
 			yield child
 
-			yield* child.allChildren()
+			yield* child.iAllChildren()
 
 			child = child.next
 
@@ -202,7 +212,7 @@ class Node {
 
 	}
 
-	*allParents() {
+	*iAncestors() {
 
 		let node = this.parent
 
@@ -218,22 +228,78 @@ class Node {
 
 
 
+	// callback
+
+	forChildren(callback) {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			callback(child)
+
+			child = child.next
+
+		}
+
+	}
+
+	forAllChildren(callback) {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			callback(child)
+
+			child.forAllChildren(callback)
+
+			child = child.next
+
+		}
+
+	}
+
+
+
+	// useful arrays
+
+	get ancestors() {
+
+		return [...this.iAncestors()]
+
+	}
+
+	get children() {
+
+		return [...this.iChildren()]
+
+	}
+
+	get allChildren() {
+
+		return [...this.iAllChildren()]
+
+	}
+
+
+
 	// toGraphString:
 
 	toGraphStringLine() {
 
 		let intro = []
 
-		for (let parent of this.allParents())
+		for (let parent of this.iAncestors())
 			intro.unshift(parent.next ? '│ ' : '  ')
 
 		return intro.join('') + (!this.parent ? (this.next ? '┌' : '─') : (this.next ? '├' : '└')) + '─' + (this.firstChild ? '┬' : '─') + '─ Node#' + this.nodeId
 
 	}
 
-	toGraphString() {
+	toGraphString(callback) {
 
-		return [this, ...this.allChildren()].map(node => node.toGraphStringLine()).join('\n')
+		return [this, ...this.iAllChildren()].map(node => node.toGraphStringLine() + (callback ? ` ${callback(node)}` : '')).join('\n')
 
 	}
 
