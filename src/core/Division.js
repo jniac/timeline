@@ -158,6 +158,22 @@ class Division extends Node {
 
         }
 
+        if (typeof selector === 'object') {
+
+            let entries = Object.entries(selector)
+
+            for (let child of this.iAllChildren()) {
+
+                if (entries.every(([key, value]) => child.props[key] === value)) {
+
+                    return child
+
+                }
+
+            }
+
+        }
+
     }
 
     createDivision(props) {
