@@ -172,13 +172,44 @@ class Division extends Node {
 
         }
 
+        if (typeof selector === 'string') {
+
+            if (/^[\w-]+$/.test(selector)) {
+
+                for (let child of this.iAllChildren()) {
+
+                    if (child.props.name === selector) {
+
+                        return child
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
-    createDivision(props) {
+    createDivision({ parent = this, ...props }) {
 
         let division = new Division(props)
 
-        this.append(division)
+        if (!(parent instanceof Division)) {
+
+            let query = parent
+            parent = this.fetchDivision(query)
+
+            if (!parent) {
+                console.log(this)
+                console.log(this.toGraphString())
+                throw `oups, parent is ${parent}, ("${query}")`
+            }
+
+        }
+
+        parent.append(division)
 
         return division
 
