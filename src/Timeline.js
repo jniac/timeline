@@ -1,9 +1,9 @@
 
 import Division from './core/Division.js'
 import Head from './core/Head.js'
-import Mth from './utils/Mth.js'
-import Stack from './utils/Stack.js'
 import Range from './math/Range.js'
+import Mth from './math/Mth.js'
+import Stack from './utils/Stack.js'
 import * as events from './events/Dispatcher.js'
 import * as helpers from './helpers/index.js'
 
