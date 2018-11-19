@@ -96,6 +96,16 @@ class Range {
 
 	}
 
+	coverage(other) {
+
+		let min = Math.max(this.min, other.min)
+		let max = Math.min(this.max, other.max)
+		let width = Math.max(max - min, 0)
+
+		return width / this.width
+
+	}
+
 	union(other, clone = false) {
 
 		let target = clone ? this.clone() : this
