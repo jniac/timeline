@@ -1,5 +1,5 @@
 
-import { readonly } from '../utils/utils.js'
+import { safeArray, readonly } from '../utils/utils.js'
 
 // NOTE: map could be a WeakMap... when debugging will be done!
 let map = new Map()
@@ -94,25 +94,79 @@ const makeEvent = (target, type, { cancelable = true, ...eventProps } = {}) => {
     let cancel = cancelable ? () => canceled = true : () => {}
 
     return {
+
+        ...eventProps,
         target,
+        currentTarget: target,
         type,
         cancel,
-        ...eventProps,
+        get cancelable() { return cancelable },
         get canceled() { return canceled },
+
     }
 
 }
 
-const fire = (target, event, options) => {
+const cloneEvent = (event, currentTarget) => {
 
-    let listener = map.get(target)
+    let {
+        target,
+        type,
+        cancelable,
+        ...eventProps
+    } = event
 
-    if (!listener)
+    let canceled = false
+    let cancel = cancelable ? () => canceled = true : () => {}
+
+    return {
+
+        ...eventProps,
+        target,
+        currentTarget,
+        type,
+        cancel,
+        get cancelable() { return cancelable },
+        get canceled() { return canceled },
+
+    }
+
+}
+
+const propagate = (event) => {
+
+    for (let target of safeArray(event.propagate(event.currentTarget))) {
+
+        fireEvent(cloneEvent(event, target))
+
+    }
+
+}
+
+const fire = (target, eventType, eventProps) => {
+
+    if (!map.has(target) && (!eventProps || !eventProps.propagate))
         return
 
-    if (typeof event === 'string') {
+    let event = makeEvent(target, eventType, eventProps)
 
-        event = makeEvent(target, event, options)
+    fireEvent(event)
+
+}
+
+const fireEvent = (event) => {
+
+    let listener = map.get(event.currentTarget)
+
+    if (!listener) {
+
+        if (event.propagate) {
+
+            propagate(event)
+
+        }
+
+        return
 
     }
 
@@ -132,7 +186,7 @@ const fire = (target, event, options) => {
 
         if (match) {
 
-            callback.call(target, event)
+            callback.call(event.currentTarget, event)
 
         }
 
@@ -144,9 +198,9 @@ const fire = (target, event, options) => {
 
     }
 
-    if (event.bubbles) {
+    if (event.propagate) {
 
-
+        propagate(event)
 
     }
 

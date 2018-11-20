@@ -1,4 +1,21 @@
 
+const safeArray = (object) => {
+
+    if (object === null || object === undefined)
+        return []
+
+    if (typeof object !== 'object') {
+
+        return [object]
+
+    } else {
+
+        return Symbol.iterator in object ? [...object] : [object]
+
+    }
+
+}
+
 const groupEvery = (array, n) => {
 
     let result = []
@@ -51,6 +68,7 @@ const biggest = (number, ...numbers) => {
 
 export {
 
+    safeArray,
     groupEvery,
     readonly,
     biggest,
