@@ -1,7 +1,9 @@
 
 // const percentFunction = str => new Function('x', `return ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
-const percentFunction = str => eval(`x => ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
-const autoFunction = str => eval(`x => ${str.replace(/auto/g, 'x')}`)
+// const percentFunction = str => eval(`x => ${str.replace(/(\d+)%/g, (m,n) => `x * ${n} / 100`)}`)
+// const autoFunction = str => eval(`x => ${str.replace(/auto/g, 'x')}`)
+const percentFunction = str => new Function(`return x => ${str.replace(/(-?\.?\d+[\.\d]*)%/g, (m,n) => `x * ${n} / 100`)}`)()
+const autoFunction = str => new Function(`return x => ${str.replace(/auto/g, 'x')}`)()
 
 class LayoutProperty {
 
