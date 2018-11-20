@@ -39,11 +39,11 @@ class MouseWheelHelper {
                 direction === 'greaterXorY' ? greater(event.deltaX, event.deltaY) :
                 0
 
-            let value = Mth.clamp(timeline.head.position.basis + delta, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
+            let value = timeline.head.position.basis + delta
+            value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
 
             timeline.head.position.basis = value
-            timeline.headContainer.update()
-            timeline.head.updateHead()
+            timeline.updateHeads()
 
         })
 

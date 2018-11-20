@@ -72,7 +72,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
             makeSvg(arrowStart, { visibility:state === -1 ? null : 'hidden' })
             makeSvg(arrowEnd, { visibility:state === 1 ? null : 'hidden' })
         })
-        
+
     }
 
     const update = () => {
@@ -170,7 +170,7 @@ class SvgTimelineHelper {
 
     constructor(timeline) {
 
-        this.scale = 1 / 8
+        this.scale = 1 / 16
 
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         svg.classList.add('svg-timeline-helper')

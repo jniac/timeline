@@ -130,7 +130,7 @@ class Division extends Node {
 
     }
 
-    update() {
+    updateChildren() {
 
         updateWidth(this)
         updatePosition(this)

@@ -38,6 +38,7 @@ class Timeline extends Division {
 
     updateHeads() {
 
+        this.headContainer.updateChildren()
         this.headContainer.forChildren(head => head.updateHead())
 
     }
