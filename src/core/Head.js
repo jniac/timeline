@@ -66,29 +66,31 @@ class Head extends Division {
 
             division.localHeads.set(this, values)
 
+            let eventOptions = { values }
+
             if (stateChange)
-                division.fire(`${name}-stateChange`, values)
+                division.fire(`${name}-stateChange`, eventOptions)
 
             if (overlapEnter)
-                division.fire(`${name}-overlapEnter`, values)
+                division.fire(`${name}-overlapEnter`, eventOptions)
 
             if (overflowEnter)
-                division.fire(`${name}-overflowEnter`, values)
+                division.fire(`${name}-overflowEnter`, eventOptions)
 
             if (progress)
-                division.fire(`${name}-progress`, values)
+                division.fire(`${name}-progress`, eventOptions)
 
             if (overlap)
-                division.fire(`${name}-overlap`, values)
+                division.fire(`${name}-overlap`, eventOptions)
 
             if (overflow)
-                division.fire(`${name}-overflow`, values)
+                division.fire(`${name}-overflow`, eventOptions)
 
             if (overflowExit)
-                division.fire(`${name}-overflowExit`, values)
+                division.fire(`${name}-overflowExit`, eventOptions)
 
             if (overlapExit)
-                division.fire(`${name}-overlapExit`, values)
+                division.fire(`${name}-overlapExit`, eventOptions)
 
         })
 

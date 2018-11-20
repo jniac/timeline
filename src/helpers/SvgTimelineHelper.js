@@ -68,7 +68,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
         let arrowStart = makeSvg('polyline', { parent:g, fill:'none', stroke:'#333', points:makePoints(min(width,a)+th*1.2,y-th*1.2,min(width,a),y,min(width,a)+th*1.2,y+th*1.2) })
         let arrowEnd = makeSvg('polyline', { parent:g, fill:'none', stroke:'#333', points:makePoints(max(0,width-a)-th*1.2,y-th*1.2,max(0,width-a),y,max(0,width-a)-th*1.2,y+th*1.2) })
 
-        division.on('main-stateChange', (event, { state }) => {
+        division.on('main-stateChange', ({ values:{ state } }) => {
             makeSvg(arrowStart, { visibility:state === -1 ? null : 'hidden' })
             makeSvg(arrowEnd, { visibility:state === 1 ? null : 'hidden' })
         })

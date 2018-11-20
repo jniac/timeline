@@ -88,7 +88,7 @@ const once = (target, eventType, callback, props = null) => {
 
 }
 
-const makeEvent = (target, type, cancelable = true) => {
+const makeEvent = (target, type, { cancelable = true, ...eventProps } = {}) => {
 
     let canceled = false
     let cancel = cancelable ? () => canceled = true : () => {}
@@ -97,12 +97,13 @@ const makeEvent = (target, type, cancelable = true) => {
         target,
         type,
         cancel,
+        ...eventProps,
         get canceled() { return canceled },
     }
 
 }
 
-const fire = (target, event, ...args) => {
+const fire = (target, event, options) => {
 
     let listener = map.get(target)
 
@@ -111,7 +112,7 @@ const fire = (target, event, ...args) => {
 
     if (typeof event === 'string') {
 
-        event = makeEvent(target, event)
+        event = makeEvent(target, event, options)
 
     }
 
@@ -131,15 +132,21 @@ const fire = (target, event, ...args) => {
 
         if (match) {
 
-            callback.call(target, event, ...args)
+            callback.call(target, event)
 
         }
 
         if (event.canceled) {
 
-            break
+            return
 
         }
+
+    }
+
+    if (event.bubbles) {
+
+
 
     }
 
