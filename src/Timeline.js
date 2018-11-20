@@ -6,6 +6,7 @@ import Mth from './math/Mth.js'
 import Stack from './utils/Stack.js'
 import * as events from './events/Dispatcher.js'
 import * as helpers from './helpers/index.js'
+import * as utils from './utils/utils.js'
 
 let instances = []
 
@@ -75,7 +76,7 @@ update()
 
 export default Timeline
 
-Object.assign(Timeline, {
+utils.readonly(Timeline, {
 
     Mth,
 
@@ -85,6 +86,7 @@ Object.assign(Timeline, {
 
     helpers,
     events,
+    utils,
 
 })
 
@@ -98,5 +100,6 @@ export {
 
     helpers,
     events,
+    utils,
 
 }

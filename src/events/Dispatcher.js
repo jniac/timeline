@@ -1,4 +1,6 @@
 
+import { readonly } from '../utils/utils.js'
+
 // NOTE: map could be a WeakMap... when debugging will be done!
 let map = new Map()
 
@@ -145,7 +147,7 @@ const fire = (target, event, ...args) => {
 
 const makeDispatcher = (target) => {
 
-    Object.assign(target, {
+    readonly(target, {
 
         // NOTE: be carefull method signatures should match precisely global method signatures
 
@@ -187,7 +189,9 @@ const makeDispatcher = (target) => {
 
         },
 
-    })
+    }, { enumerable:false })
+
+    return target
 
 }
 

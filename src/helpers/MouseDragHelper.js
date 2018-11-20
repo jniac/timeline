@@ -1,4 +1,6 @@
 
+import Mth from '../math/Mth.js'
+
 let mouse = {
 
     x: 0,

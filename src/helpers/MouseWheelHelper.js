@@ -1,27 +1,6 @@
 
 import Mth from '../math/Mth.js'
-
-const greater = (number, ...numbers) => {
-
-    let max = Math.abs(number)
-    let maxSign = number > 0 ? 1 : -1
-
-    for (let number of numbers) {
-
-        let abs = Math.abs(number)
-
-        if (abs > max) {
-
-            max = abs
-            maxSign = number > 0 ? 1 : -1
-
-        }
-
-    }
-
-    return max * maxSign
-
-}
+import * as utils from '../utils/utils.js'
 
 class MouseWheelHelper {
 
@@ -36,7 +15,7 @@ class MouseWheelHelper {
             let delta =
                 direction === 'y' ? event.deltaY :
                 direction === 'x' ? event.deltaX :
-                direction === 'greaterXorY' ? greater(event.deltaX, event.deltaY) :
+                direction === 'biggestXorY' ? utils.biggest(event.deltaX, event.deltaY) :
                 0
 
             let value = timeline.head.position.basis + delta

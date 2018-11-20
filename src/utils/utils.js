@@ -15,8 +15,44 @@ const groupEvery = (array, n) => {
 
 }
 
+const readonly = (target, props, { enumerable = true } = {}) => {
+
+    for (let [key, value] of Object.entries(props)) {
+
+        Object.defineProperty(target, key, { value, enumerable })
+
+    }
+
+}
+
+const biggest = (number, ...numbers) => {
+
+    let max = Math.abs(number)
+    let maxSign = number > 0 ? 1 : -1
+
+    for (let number of numbers) {
+
+        let abs = Math.abs(number)
+
+        if (abs > max) {
+
+            max = abs
+            maxSign = number > 0 ? 1 : -1
+
+        }
+
+    }
+
+    return max * maxSign
+
+}
+
+
+
 export {
 
     groupEvery,
-    
+    readonly,
+    biggest,
+
 }
