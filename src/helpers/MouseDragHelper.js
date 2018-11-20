@@ -34,7 +34,7 @@ class MouseDragHelper {
         const onMouseMove = () => {
 
             timeline.head.position.basis += -mouse.dy
-            timeline.head.fire('update')
+            timeline.headContainer.update()
             timeline.head.updateHead()
 
         }

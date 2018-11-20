@@ -18,17 +18,21 @@ class Timeline extends Division {
         this.width.basis = rootWidth
         this.range.width = rootWidth
 
-        this.rootContainer = this.createDivision({ name:'rootContainer', width:'auto' })
-        this.headContainer = this.createDivision({ name:'headContainer', width:'none' })
+        this.rootContainer = this.createDivision({ parent:this, name:'rootContainer', width:'auto' })
+        this.headContainer = this.createDivision({ parent:this, name:'headContainer', width:'none', layout:'absolute' })
 
         let mainHead = new Head({ name:'main', width:'100%' })
-        let mainEndHead = new Head({ name:'main-middle', position:'50%' })
         this.headContainer.append(mainHead)
-        mainHead.append(mainEndHead)
 
         this.onUpdate = new Stack()
 
         instances.push(this)
+
+    }
+
+    createDivision({ parent = 'rootContainer', ...props }) {
+
+        return super.createDivision({ parent, ...props })
 
     }
 
@@ -46,7 +50,7 @@ class Timeline extends Division {
 
     toGraphString() {
 
-        return super.toGraphString(node => `${node.props.name ? node.props.name + ' ' : ''}${node.range.position}:${node.range.width}`)
+        return 'timeline:\n' + super.toGraphString(node => `${node.props.name ? node.props.name + ' ' : ''}${node.range.position}:${node.range.width}`)
 
     }
 

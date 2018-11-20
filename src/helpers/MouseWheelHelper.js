@@ -1,4 +1,6 @@
 
+import Mth from '../math/Mth.js'
+
 const greater = (number, ...numbers) => {
 
     let max = Math.abs(number)
@@ -37,7 +39,9 @@ class MouseWheelHelper {
                 direction === 'greaterXorY' ? greater(event.deltaX, event.deltaY) :
                 0
 
-            timeline.head.position.basis += delta
+            let value = Mth.clamp(timeline.head.position.basis + delta, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
+
+            timeline.head.position.basis = value
             timeline.headContainer.update()
             timeline.head.updateHead()
 
