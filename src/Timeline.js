@@ -63,6 +63,15 @@ const update = () => {
 
     for (let timeline of instances) {
 
+        if (timeline.dirty) {
+
+            timeline.rootContainer.update()
+            timeline.headContainer.update()
+            timeline.headContainer.forChildren(head => head.updateHead())
+            timeline.dirty = false
+
+        }
+
         timeline.onUpdate.execute()
 
     }

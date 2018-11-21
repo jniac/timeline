@@ -48,7 +48,7 @@ const updateWidth = (division) => {
 //
 //     let widthAutoDivisions = []
 //
-//     parent.forAllChildren((division) => {
+//     parent.forDescendants((division) => {
 //
 //         let prop = LayoutProperty.get(division.props.width)
 //
@@ -167,7 +167,44 @@ class Division extends Node {
 
         updateWidth(this)
         updatePosition(this)
-        this.forAllChildren(child => child.fire('update'))
+
+        this.dirty = false
+        this.fire('update')
+
+        this.forDescendants(child => {
+
+            child.dirty = false
+            child.fire('update')
+
+        })
+
+    }
+
+    setProps(props, compare = true) {
+
+        if (compare) {
+
+            for (let key in props) {
+
+                let value = props[key]
+
+                if (this.props[key] !== value) {
+
+                    this.props[key] = value
+                    this.dirty = true
+                    this.root.dirty = true
+
+                }
+
+            }
+
+        } else {
+
+            Object.assign(this.props, props)
+            this.dirty = true
+            this.root.dirty = true
+
+        }
 
     }
 
