@@ -14,7 +14,7 @@ class Timeline extends Division {
 
     constructor(rootWidth = 800) {
 
-        super()
+        super({ width:rootWidth })
 
         this.range.width = this.width = rootWidth
 
@@ -38,7 +38,7 @@ class Timeline extends Division {
 
     updateHeads() {
 
-        this.headContainer.updateChildren()
+        this.headContainer.update()
         this.headContainer.forChildren(head => head.updateHead())
 
     }

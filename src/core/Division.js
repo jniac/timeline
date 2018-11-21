@@ -5,22 +5,15 @@ import { makeDispatcher } from '../events/Dispatcher.js'
 import Range from '../math/Range.js'
 import LayoutProperty from './LayoutProperty.js'
 
-const updateWidth = (parent) => {
+const updateWidth = (division) => {
 
-    let widthAutoDivisions = []
+    let prop = LayoutProperty.get(division.props.width)
 
-    parent.forAllChildren((division) => {
+    division.forChildren(child => updateWidth(child))
 
-        let prop = LayoutProperty.get(division.props.width)
+    if (prop.auto === false) {
 
-        if (prop.auto) {
-
-            widthAutoDivisions.unshift(division)
-            return
-
-        }
-
-        let referenceDivision = division.parent
+        let referenceDivision = division.parent || division
         let referenceProp = LayoutProperty.get(referenceDivision.props.width)
 
         while (referenceProp.auto || referenceProp.none) {
@@ -33,9 +26,7 @@ const updateWidth = (parent) => {
         let width = prop.compute(referenceDivision.width, division, referenceDivision)
         division.range.width = division.width = width
 
-    })
-
-    for (let division of widthAutoDivisions) {
+    } else {
 
         let totalWidth = 0
 
@@ -46,13 +37,61 @@ const updateWidth = (parent) => {
 
         })
 
-        let prop = LayoutProperty.get(division.props.width)
         let width = prop.compute(totalWidth, division)
         division.range.width = division.width = width
 
     }
 
 }
+
+// const updateWidthOld = (parent) => {
+//
+//     let widthAutoDivisions = []
+//
+//     parent.forAllChildren((division) => {
+//
+//         let prop = LayoutProperty.get(division.props.width)
+//
+//         if (prop.auto) {
+//
+//             widthAutoDivisions.unshift(division)
+//             return
+//
+//         }
+//
+//         let referenceDivision = division.parent
+//         let referenceProp = LayoutProperty.get(referenceDivision.props.width)
+//
+//         while (referenceProp.auto || referenceProp.none) {
+//
+//             referenceDivision = referenceDivision.parent
+//             referenceProp = LayoutProperty.get(referenceDivision.props.width)
+//
+//         }
+//
+//         let width = prop.compute(referenceDivision.width, division, referenceDivision)
+//         division.range.width = division.width = width
+//
+//     })
+//
+//     for (let division of widthAutoDivisions) {
+//
+//         let totalWidth = 0
+//
+//         division.forChildren(child => {
+//
+//             if (child.layout === 'normal')
+//                 totalWidth += child.width
+//
+//         })
+//
+//         let prop = LayoutProperty.get(division.props.width)
+//         let width = prop.compute(totalWidth, division)
+//         division.range.width = division.width = width
+//
+//     }
+//
+// }
 
 const updatePosition = (parent) => {
 
@@ -117,7 +156,14 @@ class Division extends Node {
 
     }
 
-    updateChildren() {
+    // debug
+    getComputedProp(name) {
+
+        return LayoutProperty.get(this.props[name])
+
+    }
+
+    update() {
 
         updateWidth(this)
         updatePosition(this)
@@ -211,8 +257,6 @@ class Division extends Node {
         }
 
     }
-
-    // head relation
 
 }
 
