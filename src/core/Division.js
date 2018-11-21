@@ -39,11 +39,11 @@ const consumeProps = (division, props) => {
 
 }
 
-const updateWidth = (division) => {
+const updateWidth = (parent) => {
 
     let widthAutoDivisions = []
 
-    division.forAllChildren((division) => {
+    parent.forAllChildren((division) => {
 
         // NOTE: '==' is used there, because division.valueOf() is used under the hood, be careful
         if (division.width.auto) {
