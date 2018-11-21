@@ -26,7 +26,7 @@ class Head extends Division {
 
         let { name } = this.props
 
-        let { position } = this.computed
+        let { position } = this
         let positionMin = this.range.min
         let positionMax = this.range.max
 

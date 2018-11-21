@@ -16,8 +16,7 @@ class Timeline extends Division {
 
         super()
 
-        this.width.basis = rootWidth
-        this.range.width = rootWidth
+        this.range.width = this.width = rootWidth
 
         this.rootContainer = this.createDivision({ parent:this, name:'rootContainer', width:'auto' })
         this.headContainer = this.createDivision({ parent:this, name:'headContainer', width:'none', layout:'absolute' })

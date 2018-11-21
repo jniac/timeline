@@ -119,7 +119,7 @@ class TouchDragHelper {
                 if (mobile.position > max)
                     mobile.position += (max - mobile.position) / 4
 
-                timeline.head.position.basis = mobile.position
+                timeline.head.props.position = mobile.position
                 timeline.updateHeads()
 
             }
@@ -133,7 +133,7 @@ class TouchDragHelper {
 
         events.on(target, 'touch-drag-start', () => {
 
-            position = timeline.head.position.basis
+            position = timeline.head.position
 
             mobile.active = false
 
@@ -147,7 +147,7 @@ class TouchDragHelper {
 
             let { min, max } = timeline.rootContainer.range
 
-            timeline.head.position.basis = Mth.limited(position, min, max, limit)
+            timeline.head.props.position = Mth.limited(position, min, max, limit)
             timeline.updateHeads()
 
         })
@@ -155,7 +155,7 @@ class TouchDragHelper {
         events.on(target, 'touch-drag-end', () => {
 
             mobile.active = true
-            mobile.position = timeline.head.position.basis
+            mobile.position = timeline.head.position
             mobile.velocity = -this.getDelta(touch.vx, touch.vy)
 
         })

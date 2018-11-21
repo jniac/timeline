@@ -3,41 +3,7 @@ import { Node } from '../lib/tree.js'
 import { makeDispatcher } from '../events/Dispatcher.js'
 
 import Range from '../math/Range.js'
-import { LayoutProperty, WidthProperty } from './LayoutProperties.js'
-
-const consumeProps = (division, props) => {
-
-    let rest = {}
-
-    if (props) {
-
-        for (let [key, value] of Object.entries(props)) {
-
-            if (key === 'width') {
-
-                division.width.parse(value)
-
-            } else if (key === 'position') {
-
-                division.position.parse(value)
-
-            } else if (key === 'layout') {
-
-                division.layout = value
-
-            } else {
-
-                rest[key] = value
-
-            }
-
-        }
-
-    }
-
-    return rest
-
-}
+import { LayoutProperty } from './LayoutProperties.js'
 
 const updateWidth = (parent) => {
 
@@ -45,8 +11,9 @@ const updateWidth = (parent) => {
 
     parent.forAllChildren((division) => {
 
-        // NOTE: '==' is used there, because division.valueOf() is used under the hood, be careful
-        if (division.width.auto) {
+        let prop = LayoutProperty.get(division.props.width)
+
+        if (prop.auto) {
 
             widthAutoDivisions.unshift(division)
             return
@@ -54,16 +21,17 @@ const updateWidth = (parent) => {
         }
 
         let referenceDivision = division.parent
+        let referenceProp = LayoutProperty.get(referenceDivision.props.width)
 
-        while (referenceDivision.width.auto || referenceDivision.width == 'none') {
+        while (referenceProp.auto || referenceProp.none) {
 
             referenceDivision = referenceDivision.parent
+            referenceProp = LayoutProperty.get(referenceDivision.props.width)
 
         }
 
-        let width = division.width.compute(referenceDivision.range.width, division)
-        division.computed.width = width
-        division.range.width = width
+        let width = prop.compute(referenceDivision.width, division, referenceDivision)
+        division.range.width = division.width = width
 
     })
 
@@ -74,45 +42,46 @@ const updateWidth = (parent) => {
         division.forChildren(child => {
 
             if (child.layout === 'normal')
-                totalWidth += child.range.width
+                totalWidth += child.width
 
         })
 
-        let width = division.width.compute(totalWidth, division)
-        division.computed.width = width
-        division.range.width = width
+        let prop = LayoutProperty.get(division.props.width)
+        let width = prop.compute(totalWidth, division)
+        division.range.width = division.width = width
 
     }
 
 }
 
-const updatePosition = (division) => {
+const updatePosition = (parent) => {
 
     let offset = 0
 
-    division.forChildren((child) => {
+    parent.forChildren((division) => {
 
-        if (child.layout === 'normal') {
+        if (division.props.layout === 'normal') {
 
-            let position = division.range.position + offset
-            child.computed.position = position
-            child.range.position = position
-            offset += child.computed.width
+            let position = parent.position + offset
+            division.position = position
+            division.range.position = position
+            offset += division.width
 
-        } else if (child.layout === 'absolute') {
+        } else if (division.props.layout === 'absolute') {
 
-            // child.range.position = division.range.interpolate(child.position.relative) + child.position.basis
-            let position = division.range.position + child.position.compute(division.computed.width, child)
-            child.computed.position = position
-            child.range.position = position - child.computed.width * child.align
+            let prop = LayoutProperty.get(division.props.position)
+
+            let position = parent.range.position + prop.compute(parent.width, division)
+            division.position = position
+            division.range.position = position - division.width * division.align
 
         } else {
 
-            console.warn(`unhandled layout property: ${child.layout}`)
+            console.warn(`unhandled layout property: ${division.props.layout}`)
 
         }
 
-        updatePosition(child)
+        updatePosition(division)
 
     })
 
@@ -129,21 +98,22 @@ class Division extends Node {
         map.set(this.nodeId, this)
 
         this.layout = 'normal'
-        this.position = new LayoutProperty()
-        this.width = new WidthProperty()
+        this.position = 0
+        this.width = 0
         this.align = 0
-
-        this.computed = {
-            position: 0,
-            width: 0,
-        }
 
         this.range = new Range()
         this.bounds = new Range()
 
         this.localHeads = new WeakMap()
 
-        this.props = consumeProps(this, props)
+        // this.props = consumeProps(this, props)
+        this.props = {
+            position: 0,
+            width: 0,
+            layout: 'normal',
+            ...props
+        }
 
     }
 

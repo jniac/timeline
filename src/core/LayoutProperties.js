@@ -5,90 +5,71 @@
 const percentFunction = str => new Function(`return x => ${str.replace(/(-?\.?\d+[\.\d]*)%/g, (m,n) => `x * ${n} / 100`)}`)()
 const autoFunction = str => new Function(`return x => ${str.replace(/auto/g, 'x')}`)()
 
+
+
+const re = {
+
+    pureNumber:     /^-?\.?\d+[\.\d]*$/,
+    purePercent:    /^-?\.?\d+[\.\d]*%$/,
+    percent:        /%/,
+    auto:           /\bauto\b/,
+
+}
+
+/**
+ * auto-registration:
+ * to avoid new computations for same properties (eg: '50% - 30'),
+ * when the property is NOT a 'number' property, the property is kept in a map
+ */
+
+let map = new Map()
+
 class LayoutProperty {
 
-    constructor() {
+    static get(value) {
 
-        this.reset()
+        return map.get(value) || new LayoutProperty(value)
 
     }
 
-    reset() {
+    constructor(value) {
 
-        this.value = null
+        this.value = value
+
+        // meta
+        this.number = false
+        this.auto = false
+        this.none = false
 
         this.basis = 0
         this.relative = 0
-        // this.weight = 0
+        // this.weight = 0 // todo ?
 
         this.relativeCallback = null
         this.computeCallback = null
 
-    }
 
-    valueOf() {
 
-        return this.value
+        // computation
 
-    }
+        if (value === 'none') {
 
-    parse(value) {
+            this.none = true
 
-        this.reset()
+        } else if (typeof value === 'number' || re.pureNumber.test(value)) {
 
-        this.value = value
-
-        if (typeof value === 'number' || /^-?\.?\d+[\.\d]*$/.test(value)) {
-
+            this.number = true
             this.basis = Number(value)
 
-        } else if (/^-?\.?\d+[\.\d]*%$/.test(value)) {
+        } else if (re.purePercent.test(value)) {
 
             this.relative = Number(value.slice(0, -1)) / 100
 
-        } else if (/%/.test(value)) {
+        } else if (re.percent.test(value)) {
 
             this.relativeCallback = percentFunction(value)
 
-        }
-
-    }
-
-    compute(referenceWidth, division) {
-
-        if (this.computeCallback) {
-
-            return this.computeCallback(referenceWidth, division)
-
-        } else if (this.relativeCallback) {
-
-            return this.relativeCallback(referenceWidth)
-
-        } else {
-
-            return referenceWidth * this.relative + this.basis
-
-        }
-
-    }
-
-}
-
-class WidthProperty extends LayoutProperty {
-
-    reset() {
-
-        super.reset()
-
-        this.auto = false
-
-    }
-
-    parse(value) {
-
-        super.parse(value)
-
-        if (/\bauto\b/.test(value)) {
+        } else if (re.auto.test(value)) {
 
             this.auto = true
 
@@ -104,6 +85,31 @@ class WidthProperty extends LayoutProperty {
 
         }
 
+        // keep reference (computation savings) when property is NOT a number prop
+        if (this.number === false) {
+
+            map.set(value, this)
+
+        }
+
+    }
+
+    compute(referenceDimension, division) {
+
+        if (this.computeCallback) {
+
+            return this.computeCallback(referenceDimension, division)
+
+        } else if (this.relativeCallback) {
+
+            return this.relativeCallback(referenceDimension)
+
+        } else {
+
+            return this.basis + referenceDimension * this.relative
+
+        }
+
     }
 
 }
@@ -111,6 +117,5 @@ class WidthProperty extends LayoutProperty {
 export {
 
     LayoutProperty,
-    WidthProperty,
 
 }
