@@ -18,13 +18,15 @@ class Timeline extends Division {
 
         this.range.width = this.width = rootWidth
 
+        this.onBeforeUpdate = new Stack()
+        this.onUpdate = new Stack()
+
         this.rootContainer = this.createDivision({ parent:this, name:'rootContainer', width:'auto' })
         this.headContainer = this.createDivision({ parent:this, name:'headContainer', width:'none', layout:'absolute' })
 
         let mainHead = new Head({ name:'main', width:'100%' })
         this.headContainer.append(mainHead)
-
-        this.onUpdate = new Stack()
+        mainHead.createMobile()
 
         instances.push(this)
 
@@ -63,11 +65,20 @@ const update = () => {
 
     for (let timeline of instances) {
 
+        timeline.onBeforeUpdate.execute()
+
         if (timeline.dirty) {
 
-            timeline.rootContainer.update()
-            timeline.headContainer.update()
-            timeline.headContainer.forChildren(head => head.updateHead())
+            if (timeline.rootContainer.someDescendant(node => node.dirty))
+                timeline.rootContainer.update()
+
+            if (timeline.headContainer.someDescendant(node => node.dirty))
+                timeline.headContainer.update()
+
+            // NOTE: 'updateHead' should ALWAYS be called when timeline.dirty === true
+            // (division or head layout changes require both to compute again localHeads values)
+            timeline.headContainer.forSomeDescendants(head => head instanceof Head, head => head.updateHead())
+
             timeline.dirty = false
 
         }

@@ -18,10 +18,10 @@ class MouseWheelHelper {
                 direction === 'biggestXorY' ? utils.biggest(event.deltaX, event.deltaY) :
                 0
 
-            let value = timeline.head.position.basis + delta
+            let value = timeline.head.props.position + delta
             value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
 
-            timeline.head.position.basis = value
+            timeline.head.props.position = value
             timeline.updateHeads()
 
         })

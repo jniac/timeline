@@ -11,60 +11,135 @@ let touch = {
     y: 0,
     dx: 0,
     dy: 0,
+    vx: 0,
+    vy: 0,
 
     t: now(),
+
+    current: null,
+
+    start(touchIdentifier, target, x, y) {
+
+        Object.assign(this, {
+
+            active: true,
+            x,
+            y,
+            dx: 0,
+            dy: 0,
+            vx: 0,
+            vy: 0,
+            t: now(),
+            target,
+            touchIdentifier,
+
+        })
+
+        events.fire(this.target, 'touch-drag-start', { propagate:element => element.parentElement })
+
+    },
+
+    move(x, y) {
+
+        let t = now()
+        let dt = (t - this.t) / 1e3 // s (and not ms)
+        let dx = x - this.x
+        let dy = y - this.y
+        let vx = dx / dt
+        let vy = dy / dt
+
+        Object.assign(this, {
+
+            x,
+            y,
+            dx,
+            dy,
+            vx,
+            vy,
+            t,
+
+        })
+
+        events.fire(this.target, 'touch-drag-move', { propagate:element => element.parentElement })
+
+    },
+
+    end() {
+
+        Object.assign(this, {
+
+            active: false,
+
+        })
+
+        events.fire(event.target, 'touch-drag-end', { propagate:element => element.parentElement })
+
+    },
+
+    brutalEnd() {
+
+        Object.assign(this, {
+
+            dx: 0,
+            dy: 0,
+            vx: 0,
+            vy: 0,
+
+        })
+
+        this.end()
+
+    },
 
 }
 
 let init = () => {
 
+    let currentTouch
+
     window.addEventListener('touchstart', (event) => {
 
+        let [eventTouch] = event.changedTouches
+
         // NOTE: ignore multi-touches
-        if (event.touches.length > 1)
-            return
+        if (event.touches.length === 1) {
 
-        let [eventTouch] = event.targetTouches
-        let { clientX:x, clientY:y } = eventTouch
+            let { clientX:x, clientY:y } = eventTouch
 
-        touch.active = true
-        touch.x = x
-        touch.y = y
+            touch.start(eventTouch.identifier, event.target, x, y)
 
-        events.fire(event.target, 'touch-drag-start', { propagate:element => element.parentElement })
+
+        } else {
+
+            touch.brutalEnd()
+
+        }
 
     })
 
     window.addEventListener('touchmove', (event) => {
 
-        let [eventTouch] = event.targetTouches
-        let { clientX:x, clientY:y } = eventTouch
+        let [eventTouch] = event.changedTouches
 
-        let t = now()
-        let dt = (t - touch.t) / 1e3
+        if (touch.active && touch.touchIdentifier === eventTouch.identifier) {
 
-        touch.t = t
+            let { clientX:x, clientY:y } = eventTouch
 
-        touch.dx = x - touch.x
-        touch.dy = y - touch.y
-        touch.x = x
-        touch.y = y
-        touch.vx = touch.dx / dt
-        touch.vy = touch.dy / dt
+            touch.move(x, y)
 
-        events.fire(event.target, 'touch-drag-move', { propagate:element => element.parentElement })
+        }
 
     })
 
     window.addEventListener('touchend', (event) => {
 
-        // NOTE: ignore multi-touches
-        if (event.touches.length > 0)
-            return
+        let [eventTouch] = event.changedTouches
 
-        touch.active = false
+        if (touch.active && touch.touchIdentifier === eventTouch.identifier) {
 
-        events.fire(event.target, 'touch-drag-end', { propagate:element => element.parentElement })
+            touch.end()
+
+        }
 
     })
 
@@ -73,69 +148,21 @@ let init = () => {
 
 }
 
-class Mobile {
-
-    constructor() {
-
-        this.position = 0
-        this.velocity = 0
-        this.friction = .99
-
-    }
-
-    update(dt = 1/60) {
-
-        let { position, velocity, friction } = this
-
-        let f = 1 - friction
-
-        position += velocity * (f === 1 ? dt : (f ** dt - 1) / Math.log(f))
-        velocity *= f ** dt
-
-        Object.assign(this, { position, velocity, friction })
-
-    }
-
-}
-
 class TouchDragHelper {
 
-    constructor(timeline, { target = document.body, direction = 'biggestXorY', limit = 200 } = {}) {
+    constructor(timeline, { target = document.body, direction = 'biggestXorY', overShoot = 1.5, limit = 200 } = {}) {
 
         init()
 
-        let mobile = new Mobile()
-        timeline.onUpdate.add(() => {
-
-            if (mobile.active) {
-
-                mobile.update()
-
-                let { min, max } = timeline.rootContainer.range
-
-                if (mobile.position < min)
-                    mobile.position += (min - mobile.position) / 4
-
-                if (mobile.position > max)
-                    mobile.position += (max - mobile.position) / 4
-
-                timeline.head.props.position = mobile.position
-                timeline.updateHeads()
-
-            }
-
-
-        })
-
         Object.assign(this, { direction })
 
-        let position
+        let headPosition = 0
 
         events.on(target, 'touch-drag-start', () => {
 
-            position = timeline.head.position
+            headPosition = timeline.head.position
 
-            mobile.active = false
+            timeline.head.mobileActive = false
 
         })
 
@@ -143,20 +170,21 @@ class TouchDragHelper {
 
             let delta = this.getDelta(touch.dx, touch.dy)
 
-            position += -delta
+            headPosition += -delta
 
             let { min, max } = timeline.rootContainer.range
+            let limitedPosition = Mth.limited(headPosition, min, max, limit)
 
-            timeline.head.props.position = Mth.limited(position, min, max, limit)
-            timeline.updateHeads()
+            timeline.head.setProps({ position:limitedPosition })
+
 
         })
 
         events.on(target, 'touch-drag-end', () => {
 
-            mobile.active = true
-            mobile.position = timeline.head.position
-            mobile.velocity = -this.getDelta(touch.vx, touch.vy)
+            timeline.head.mobileActive = true
+            timeline.head.mobile.position = timeline.head.position
+            timeline.head.mobile.velocity = -this.getDelta(touch.vx, touch.vy) * overShoot
 
         })
 

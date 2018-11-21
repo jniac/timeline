@@ -1,5 +1,6 @@
 
 import Division from './Division.js'
+import Mobile from './Mobile.js'
 
 let voidLocalHead = {
 
@@ -19,6 +20,50 @@ class Head extends Division {
     constructor(props) {
 
         super({ layout:'absolute', ...props })
+
+    }
+
+    createMobile() {
+
+        this.mobile = new Mobile()
+        this.mobileActive = false
+
+        this.root.onBeforeUpdate.add(() => {
+
+            let { mobileActive, mobile } = this
+
+            if (mobileActive) {
+
+                mobile.min = timeline.rootContainer.range.min
+                mobile.max = timeline.rootContainer.range.max
+
+                mobile.update()
+
+                let { position } = mobile
+
+                this.setProps({ position:Math.round(position) })
+
+            }
+
+        //     let { mobile, mobileActive, root:timeline } = this
+        //
+        //     if (mobileActive) {
+        //
+        //         mobile.update()
+        //
+        //         let { min, max } = timeline.rootContainer.range
+        //
+        //         if (mobile.position < min)
+        //             mobile.position += (min - mobile.position) / 2
+        //
+        //         if (mobile.position > max)
+        //             mobile.position += (max - mobile.position) / 2
+        //
+        //         this.setProps({ position:Math.round(mobile.position) })
+        //
+        //     }
+
+        })
 
     }
 
@@ -97,8 +142,6 @@ class Head extends Division {
                 division.fire(`${name}-overlapExit`, eventOptions)
 
         })
-
-        this.forChildren(head => head.updateHead())
 
     }
 
