@@ -298,6 +298,26 @@ class Node {
 
 	}
 
+	forSomeDescendants(test, callback) {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			if (test(child)) {
+
+				callback(child)
+
+			}
+
+			child.forSomeDescendants(test, callback)
+
+			child = child.next
+
+		}
+
+	}
+
 
 
 	// useful arrays
