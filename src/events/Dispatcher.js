@@ -239,11 +239,11 @@ const fireEvent = (event) => {
 
             callback.call(event.currentTarget, event)
 
-        }
+            if (event.canceled) {
 
-        if (event.canceled) {
+                return
 
-            return
+            }
 
         }
 
@@ -263,33 +263,33 @@ const makeDispatcher = (target) => {
 
         // NOTE: be carefull method signatures should match precisely global method signatures
 
-        on: function(target, eventType, callback, props = null) {
+        on: function(eventType, callback, props = null) {
 
-            on(this, target, eventType, callback, props = null)
-
-            return this
-
-        },
-
-        off: function(target, eventType, callback, props = null) {
-
-            off(this, target, eventType, callback, props = null)
+            on(this, eventType, callback, props = null)
 
             return this
 
         },
 
-        once: function(target, eventType, callback, props = null) {
+        off: function(eventType, callback, props = null) {
 
-            once(this, target, eventType, callback, props = null)
+            off(this, eventType, callback, props = null)
 
             return this
 
         },
 
-        fire: function(event, ...args) {
+        once: function(eventType, callback, props = null) {
 
-            fire(this, event, ...args)
+            once(this, eventType, callback, props = null)
+
+            return this
+
+        },
+
+        fire: function(eventType, eventProps) {
+
+            fire(this, eventType, eventProps)
 
             return this
 
@@ -297,7 +297,7 @@ const makeDispatcher = (target) => {
 
         debugGetListener: function() {
 
-            return map.get(target)
+            return map.get(this)
 
         },
 
