@@ -187,7 +187,12 @@ const propagate = (event) => {
     for (let target of safeArray(event.propagate(event.currentTarget))) {
 
         // fireEvent(cloneEvent(event, target))
-        fireEvent(event.clone(target))
+
+        if (target) {
+
+            fireEvent(event.clone(target))
+
+        }
 
     }
 
