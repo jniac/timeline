@@ -32,11 +32,24 @@ const groupEvery = (array, n) => {
 
 }
 
-const readonly = (target, props, { enumerable = true } = {}) => {
+const readonly = (target, props, { enumerable = true, configurable = false } = {}) => {
 
     for (let [key, value] of Object.entries(props)) {
 
-        Object.defineProperty(target, key, { value, enumerable })
+        Object.defineProperty(target, key, { value, enumerable, configurable })
+
+    }
+
+}
+
+// NOTE: quite the same than readonly, with arguments order inversed
+const defineProperties = (target, options, props) => {
+
+    let { enumerable = true, configurable = false, writable = true } = options || {}
+
+    for (let [key, value] of Object.entries(props)) {
+
+        Object.defineProperty(target, key, { value, enumerable, configurable })
 
     }
 
@@ -64,6 +77,54 @@ const biggest = (number, ...numbers) => {
 
 }
 
+const makeSvg = (elementOrTypeOrArray, { parent, className, ...props } = {}) => {
+
+    if (elementOrTypeOrArray instanceof Array) {
+
+        return elementOrTypeOrArray.map(item => makeSvg(item, { parent, ...props }))
+
+    }
+
+    let element = typeof elementOrTypeOrArray === 'object'
+        ? elementOrTypeOrArray
+        : document.createElementNS('http://www.w3.org/2000/svg', elementOrTypeOrArray)
+
+    if (className) {
+
+        for (let name of className.split(' ')) {
+
+            element.classList.add(name)
+
+        }
+
+    }
+
+    for (let [key, value] of Object.entries(props)) {
+
+        if (value === null) {
+
+            element.removeAttributeNS(null, key)
+
+        } else {
+
+            element.setAttributeNS(null, key, value)
+
+        }
+
+    }
+
+    if (parent) {
+
+        parent.appendChild(element)
+
+    }
+
+    return element
+
+}
+
+
+
 
 
 export {
@@ -71,6 +132,8 @@ export {
     safeArray,
     groupEvery,
     readonly,
+    defineProperties,
     biggest,
+    makeSvg,
 
 }

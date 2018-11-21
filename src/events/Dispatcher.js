@@ -1,5 +1,5 @@
 
-import { safeArray, readonly } from '../utils/utils.js'
+import { safeArray, defineProperties } from '../utils/utils.js'
 
 // NOTE: map could be a WeakMap... when debugging will be done!
 let map = new Map()
@@ -88,46 +88,95 @@ const once = (target, eventType, callback, props = null) => {
 
 }
 
-const makeEvent = (target, type, { cancelable = true, ...eventProps } = {}) => {
+// const makeEvent = (target, type, { cancelable = true, ...eventProps } = {}) => {
+//
+//     let canceled = false
+//     let cancel = cancelable ? () => canceled = true : () => {}
+//
+//     return {
+//
+//         ...eventProps,
+//         target,
+//         currentTarget: target,
+//         type,
+//         cancel,
+//         get cancelable() { return cancelable },
+//         get canceled() { return canceled },
+//
+//     }
+//
+// }
+//
+// const cloneEvent = (event, currentTarget) => {
+//
+//     let {
+//         target,
+//         type,
+//         cancelable,
+//         ...eventProps
+//     } = event
+//
+//     let canceled = false
+//     let cancel = cancelable ? () => canceled = true : () => {}
+//
+//     return {
+//
+//         ...eventProps,
+//         target,
+//         currentTarget,
+//         type,
+//         cancel,
+//         get cancelable() { return cancelable },
+//         get canceled() { return canceled },
+//
+//     }
+//
+// }
 
-    let canceled = false
-    let cancel = cancelable ? () => canceled = true : () => {}
+class Event {
 
-    return {
+    constructor(target, type, { cancelable = true, ...props } = {}) {
 
-        ...eventProps,
-        target,
-        currentTarget: target,
-        type,
-        cancel,
-        get cancelable() { return cancelable },
-        get canceled() { return canceled },
+        defineProperties(this, { enumerable:false }, {
+
+            type,
+            target,
+
+        })
+
+        defineProperties(this, { enumerable:false, configurable:true }, {
+
+            currentTarget: target,
+            canceled: false,
+
+        })
+
+        // enumerable props (important for cloning)
+        defineProperties(this, { enumerable:true }, {
+
+            cancelable,
+            ...props,
+
+        })
 
     }
 
-}
+    cancel() {
 
-const cloneEvent = (event, currentTarget) => {
+        if (this.cancelable)
+            defineProperties(this, { enumerable:false }, { canceled:true })
 
-    let {
-        target,
-        type,
-        cancelable,
-        ...eventProps
-    } = event
+    }
 
-    let canceled = false
-    let cancel = cancelable ? () => canceled = true : () => {}
+    clone(currentTarget) {
 
-    return {
+        let { target, type, ...props } = this
 
-        ...eventProps,
-        target,
-        currentTarget,
-        type,
-        cancel,
-        get cancelable() { return cancelable },
-        get canceled() { return canceled },
+        let event = new Event(target, type, props)
+
+        defineProperties(event, { enumerable:false }, { currentTarget })
+
+        return event
 
     }
 
@@ -137,7 +186,8 @@ const propagate = (event) => {
 
     for (let target of safeArray(event.propagate(event.currentTarget))) {
 
-        fireEvent(cloneEvent(event, target))
+        // fireEvent(cloneEvent(event, target))
+        fireEvent(event.clone(target))
 
     }
 
@@ -148,7 +198,8 @@ const fire = (target, eventType, eventProps) => {
     if (!map.has(target) && (!eventProps || !eventProps.propagate))
         return
 
-    let event = makeEvent(target, eventType, eventProps)
+    // let event = makeEvent(target, eventType, eventProps)
+    let event = new Event(target, eventType, eventProps)
 
     fireEvent(event)
 
@@ -208,7 +259,7 @@ const fireEvent = (event) => {
 
 const makeDispatcher = (target) => {
 
-    readonly(target, {
+    defineProperties(target, { enumerable:false }, {
 
         // NOTE: be carefull method signatures should match precisely global method signatures
 
@@ -250,7 +301,7 @@ const makeDispatcher = (target) => {
 
         },
 
-    }, { enumerable:false })
+    })
 
     return target
 
@@ -263,5 +314,6 @@ export {
     once,
     fire,
     makeDispatcher,
+    Event,
 
 }

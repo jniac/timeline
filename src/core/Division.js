@@ -61,22 +61,26 @@ const updateWidth = (division) => {
 
         }
 
-        division.range.width = division.width.compute(referenceDivision.range.width, division)
+        let width = division.width.compute(referenceDivision.range.width, division)
+        division.computed.width = width
+        division.range.width = width
 
     })
 
     for (let division of widthAutoDivisions) {
 
-        let width = 0
+        let totalWidth = 0
 
         division.forChildren(child => {
 
             if (child.layout === 'normal')
-                width += child.range.width
+                totalWidth += child.range.width
 
         })
 
-        division.range.width = division.width.compute(width, division)
+        let width = division.width.compute(totalWidth, division)
+        division.computed.width = width
+        division.range.width = width
 
     }
 
@@ -90,13 +94,21 @@ const updatePosition = (division) => {
 
         if (child.layout === 'normal') {
 
-            child.range.position = division.range.position + offset
-            offset += child.range.width
+            let position = division.range.position + offset
+            child.computed.position = position
+            child.range.position = position
+            offset += child.computed.width
+
+        } else if (child.layout === 'absolute') {
+
+            // child.range.position = division.range.interpolate(child.position.relative) + child.position.basis
+            let position = division.range.position + child.position.compute(division.computed.width, child)
+            child.computed.position = position
+            child.range.position = position - child.computed.width * child.align
 
         } else {
 
-            // child.range.position = division.range.interpolate(child.position.relative) + child.position.basis
-            child.range.position = division.range.position + child.position.compute(division.range.width, child)
+            console.warn(`unhandled layout property: ${child.layout}`)
 
         }
 
@@ -118,8 +130,13 @@ class Division extends Node {
 
         this.layout = 'normal'
         this.position = new LayoutProperty()
-        // this.anchorPosition = new LayoutProperty()
         this.width = new WidthProperty()
+        this.align = 0
+
+        this.computed = {
+            position: 0,
+            width: 0,
+        }
 
         this.range = new Range()
         this.bounds = new Range()

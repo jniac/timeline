@@ -64,8 +64,32 @@ const spow = (x, power) => x >= 0 ? Math.pow(x, power) : -Math.pow(-x, power)
  * f'(0) = 1
  * f'(limit) = 1/4 * limit
  * f'(Infinity) = 0
+ * https://www.desmos.com/calculator/z1fdr7v8hd
  */
 const limit = (x, limit = 1, ratio = 1) => x * ratio * limit / (x * ratio + limit)
+
+/**
+ * kind of a mix between clamp() & limit()
+ */
+const limited = (x, min, max, limit) => {
+
+    if (x < min) {
+
+        let d = min - x
+        return min - d * limit / (d + limit)
+
+    }
+
+    if (x > max) {
+
+        let d = x - max
+        return max + d * limit / (d + limit)
+
+    }
+
+    return x
+
+}
 
 /**
  * https://jsfiddle.net/jniac/mwf019mg/
@@ -240,6 +264,7 @@ export default {
 	remap,
 	spow,
 	limit,
+	limited,
 	pcurve,
 	gain,
 	gainBind,

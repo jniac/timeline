@@ -1,47 +1,11 @@
 
-import * as utils from '../utils/utils.js'
-
-const makeSvg = (elementOrTypeOrArray, { parent, ...props }) => {
-
-    if (elementOrTypeOrArray instanceof Array) {
-
-        return elementOrTypeOrArray.map(item => makeSvg(item, { parent, ...props }))
-
-    }
-
-    let element = typeof elementOrTypeOrArray === 'object'
-        ? elementOrTypeOrArray
-        : document.createElementNS('http://www.w3.org/2000/svg', elementOrTypeOrArray)
-
-    for (let [key, value] of Object.entries(props)) {
-
-        if (value === null) {
-
-            element.removeAttributeNS(null, key)
-
-        } else {
-
-            element.setAttributeNS(null, key, value)
-
-        }
-
-    }
-
-    if (parent) {
-
-        parent.appendChild(element)
-
-    }
-
-    return element
-
-}
+import { groupEvery, makeSvg } from '../utils/utils.js'
 
 let defaultColors = ['#33f', '#f33', '#f3f']
 
 const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) => {
 
-    const makePoints = (...array) => utils.groupEvery(array, 2).map(point => point.join(',')).join(' ')
+    const makePoints = (...array) => groupEvery(array, 2).map(point => point.join(',')).join(' ')
     const min = (...args) => Math.min(...args)
     const max = (...args) => Math.max(...args)
 
@@ -52,7 +16,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
     let y = offsetY
 
     // let color = division.props.color || defaultColors[division.nodeId % defaultColors.length]
-    let color = '#333'
+    let color = division.props.color || '#333'
 
     let g = makeSvg('g', { parent:helper.container, stroke:color, transform:`translate(${position}, 0)` })
     g.classList.add(`node${division.nodeId}`)
@@ -62,11 +26,23 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
     let lineStart = makeSvg('line', { parent:g, x1:0, x2:0, y1:y-th, y2:y+th })
     let lineEnd = makeSvg('line',   { parent:g, x1:width, x2:width, y1:y-th, y2:y+th })
 
+    if (true) {
+
+        let circle = makeSvg('circle', { parent:g, cx:width * division.align, cy:y, r:1, fill:color })
+
+        division.on('main-stateChange', ({ values:{ state } }) => {
+            let r = state === 0 ? 1.5 : 1
+            let fill = state === 0 ? '#ddd' : color
+            makeSvg(circle, { r, fill })
+        })
+
+    }
+
     if (drawArrow) {
 
         let a = 2 // arrow margin
-        let arrowStart = makeSvg('polyline', { parent:g, fill:'none', stroke:'#333', points:makePoints(min(width,a)+th*1.2,y-th*1.2,min(width,a),y,min(width,a)+th*1.2,y+th*1.2) })
-        let arrowEnd = makeSvg('polyline', { parent:g, fill:'none', stroke:'#333', points:makePoints(max(0,width-a)-th*1.2,y-th*1.2,max(0,width-a),y,max(0,width-a)-th*1.2,y+th*1.2) })
+        let arrowStart = makeSvg('polyline', { parent:g, fill:'none', stroke:color, points:makePoints(min(width,a)+th*1.2,y-th*1.2,min(width,a),y,min(width,a)+th*1.2,y+th*1.2) })
+        let arrowEnd = makeSvg('polyline', { parent:g, fill:'none', stroke:color, points:makePoints(max(0,width-a)-th*1.2,y-th*1.2,max(0,width-a),y,max(0,width-a)-th*1.2,y+th*1.2) })
 
         division.on('main-stateChange', ({ values:{ state } }) => {
             makeSvg(arrowStart, { visibility:state === -1 ? null : 'hidden' })
@@ -111,10 +87,12 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
 
 const createStage = (helper, timeline) => {
 
-    let heap = [...timeline.rootContainer.iChildren()]
     let stages = []
     let totalHeight = 0
-    let stageMargin = 40
+    let stageMargin = 28
+
+    let heap = [timeline.rootContainer]
+
     let info = new Map()
 
     while (heap.length) {
@@ -163,16 +141,15 @@ const createStage = (helper, timeline) => {
 
     }
 
+    return { stages, totalHeight }
 
 }
 
 class SvgTimelineHelper {
 
-    constructor(timeline) {
+    constructor(timeline, { scale = 1/16 } = {}) {
 
-        this.scale = 1 / 16
-
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        let svg = makeSvg('svg')
         svg.classList.add('svg-timeline-helper')
         let container = makeSvg('g', { parent:svg, transform:'translate(20, 10)' })
 
@@ -181,14 +158,15 @@ class SvgTimelineHelper {
             timeline,
             svg,
             container,
+            scale,
 
         })
 
-        createStage(this, timeline)
+        let stage = createStage(this, timeline)
 
         for (let division of timeline.headContainer.iChildren()) {
 
-            drawDivision(this, division, 100)
+            drawDivision(this, division, stage.totalHeight)
 
         }
 

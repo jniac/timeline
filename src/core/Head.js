@@ -4,7 +4,8 @@ import Division from './Division.js'
 let voidLocalHead = {
 
     ratio: NaN,
-    ratioEnd: NaN,
+    ratioMin: NaN,
+    ratioMax: NaN,
 
     state: NaN,
 
@@ -25,15 +26,17 @@ class Head extends Division {
 
         let { name } = this.props
 
-        let { position, width } = this.range
-        let positionEnd = position + width
+        let { position } = this.computed
+        let positionMin = this.range.min
+        let positionMax = this.range.max
 
         this.root.rootContainer.forAllChildren((division) => {
 
             let old = division.localHeads.get(this) || voidLocalHead
 
             let ratio = division.range.ratio(position)
-            let ratioEnd = division.range.ratio(positionEnd)
+            let ratioMin = division.range.ratio(positionMin)
+            let ratioMax = division.range.ratio(positionMax)
 
             let intersects = this.range.intersects(division.range, .0001)
             let state = intersects ? 0 : this.range.max < division.range.min ? -1 : 1
@@ -55,7 +58,8 @@ class Head extends Division {
             let values = {
 
                 ratio,
-                ratioEnd,
+                ratioMin,
+                ratioMax,
 
                 state,
 
