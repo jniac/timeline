@@ -25,7 +25,7 @@ class Node {
 			child.depth = this.depth + 1
 			child.root = this.root
 
-			child.forAllChildren(node => node.depth = node.parent.depth + 1)
+			child.forDescendants(node => node.depth = node.parent.depth + 1)
 
 			if (this.lastChild) {
 
@@ -228,6 +228,44 @@ class Node {
 
 
 
+	// array like tests
+
+	someDescendant(test) {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			if (test(child) || child.someDescendant(test))
+				return true
+
+			child = child.next
+
+		}
+
+		return false
+
+	}
+
+	findDescendant(test) {
+
+		let child = this.firstChild
+
+		while(child) {
+
+			let result = test(child) ? child : child.findDescendant(test)
+
+			if (result)
+				return result
+
+			child = child.next
+
+		}
+
+		return undefined
+
+	}
+
 	// callback
 
 	forChildren(callback) {
@@ -244,7 +282,7 @@ class Node {
 
 	}
 
-	forAllChildren(callback) {
+	forDescendants(callback) {
 
 		let child = this.firstChild
 
@@ -252,7 +290,7 @@ class Node {
 
 			callback(child)
 
-			child.forAllChildren(callback)
+			child.forDescendants(callback)
 
 			child = child.next
 

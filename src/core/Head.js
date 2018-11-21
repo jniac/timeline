@@ -30,7 +30,7 @@ class Head extends Division {
         let positionMin = this.range.min
         let positionMax = this.range.max
 
-        this.root.rootContainer.forAllChildren((division) => {
+        this.root.rootContainer.forDescendants((division) => {
 
             let old = division.localHeads.get(this) || voidLocalHead
 
