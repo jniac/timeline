@@ -38,7 +38,7 @@ class Timeline extends Division {
 
     }
 
-    updateHeads() {
+    forceUpdateHeads() {
 
         this.headContainer.update()
         this.headContainer.forChildren(head => head.updateHead())

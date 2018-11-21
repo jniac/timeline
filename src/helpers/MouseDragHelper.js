@@ -39,7 +39,7 @@ class MouseDragHelper {
             value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
 
             timeline.head.position.basis = value
-            timeline.updateHeads()
+            timeline.forceUpdateHeads()
 
         }
 

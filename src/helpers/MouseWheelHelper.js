@@ -22,7 +22,7 @@ class MouseWheelHelper {
             value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
 
             timeline.head.props.position = value
-            timeline.updateHeads()
+            timeline.forceUpdateHeads()
 
         })
 
