@@ -2,100 +2,17 @@
 import * as utils from '../utils/utils.js'
 import Mth from '../math/Mth.js'
 import * as events from '../events/Dispatcher.js'
+import Pointer from './Pointer.js'
 
 const now = () => performance.now()
 
-let touch = {
 
-    x: 0,
-    y: 0,
-    dx: 0,
-    dy: 0,
-    vx: 0,
-    vy: 0,
 
-    t: now(),
-
-    current: null,
-
-    start(touchIdentifier, target, x, y) {
-
-        Object.assign(this, {
-
-            active: true,
-            x,
-            y,
-            dx: 0,
-            dy: 0,
-            vx: 0,
-            vy: 0,
-            t: now(),
-            target,
-            touchIdentifier,
-
-        })
-
-        events.fire(this.target, 'touch-drag-start', { propagate:element => element.parentElement })
-
-    },
-
-    move(x, y) {
-
-        let t = now()
-        let dt = (t - this.t) / 1e3 // s (and not ms)
-        let dx = x - this.x
-        let dy = y - this.y
-        let vx = dx / dt
-        let vy = dy / dt
-
-        Object.assign(this, {
-
-            x,
-            y,
-            dx,
-            dy,
-            vx,
-            vy,
-            t,
-
-        })
-
-        events.fire(this.target, 'touch-drag-move', { propagate:element => element.parentElement })
-
-    },
-
-    end() {
-
-        Object.assign(this, {
-
-            active: false,
-
-        })
-
-        events.fire(event.target, 'touch-drag-end', { propagate:element => element.parentElement })
-
-    },
-
-    brutalEnd() {
-
-        Object.assign(this, {
-
-            dx: 0,
-            dy: 0,
-            vx: 0,
-            vy: 0,
-
-        })
-
-        this.end()
-
-    },
-
-}
+let pointer = new Pointer()
 
 let init = () => {
 
-    let currentTouch
+    let currentTouchIdentifier
 
     window.addEventListener('touchstart', (event) => {
 
@@ -106,12 +23,13 @@ let init = () => {
 
             let { clientX:x, clientY:y } = eventTouch
 
-            touch.start(eventTouch.identifier, event.target, x, y)
+            currentTouchIdentifier = eventTouch.identifier
 
+            pointer.dragStart(event.target, x, y)
 
         } else {
 
-            touch.brutalEnd()
+            pointer.dragBrutalEnd()
 
         }
 
@@ -121,11 +39,11 @@ let init = () => {
 
         let [eventTouch] = event.changedTouches
 
-        if (touch.active && touch.touchIdentifier === eventTouch.identifier) {
+        if (eventTouch.identifier === currentTouchIdentifier) {
 
             let { clientX:x, clientY:y } = eventTouch
 
-            touch.move(x, y)
+            pointer.dragMove(x, y)
 
         }
 
@@ -135,9 +53,9 @@ let init = () => {
 
         let [eventTouch] = event.changedTouches
 
-        if (touch.active && touch.touchIdentifier === eventTouch.identifier) {
+        if (eventTouch.identifier === currentTouchIdentifier) {
 
-            touch.end()
+            pointer.dragEnd()
 
         }
 
@@ -158,7 +76,7 @@ class TouchDragHelper {
 
         let headPosition = 0
 
-        events.on(target, 'touch-drag-start', () => {
+        events.on(target, 'pointer-drag-start', () => {
 
             headPosition = timeline.head.position
 
@@ -166,9 +84,9 @@ class TouchDragHelper {
 
         })
 
-        events.on(target, 'touch-drag-move', () => {
+        events.on(target, 'pointer-drag-move', () => {
 
-            let delta = this.getDelta(touch.dx, touch.dy)
+            let delta = this.getDelta(pointer.dx, pointer.dy)
 
             headPosition += -delta
 
@@ -180,11 +98,11 @@ class TouchDragHelper {
 
         })
 
-        events.on(target, 'touch-drag-end', () => {
+        events.on(target, 'pointer-drag-end', () => {
 
             timeline.head.mobileActive = true
             timeline.head.mobile.position = timeline.head.position
-            timeline.head.mobile.velocity = -this.getDelta(touch.vx, touch.vy) * overShoot
+            timeline.head.mobile.velocity = -this.getDelta(pointer.vx, pointer.vy) * overShoot
 
         })
 
@@ -208,7 +126,7 @@ class TouchDragHelper {
 
 utils.readonly(TouchDragHelper, {
 
-    touch,
+    pointer,
 
 })
 
