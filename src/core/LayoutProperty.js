@@ -114,8 +114,4 @@ class LayoutProperty {
 
 }
 
-export {
-
-    LayoutProperty,
-
-}
+export default LayoutProperty
