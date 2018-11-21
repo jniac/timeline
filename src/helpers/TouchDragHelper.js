@@ -1,20 +1,13 @@
 
-import * as utils from '../utils/utils.js'
-import Mth from '../math/Mth.js'
-import * as events from '../events/Dispatcher.js'
-import Pointer from './Pointer.js'
+import DragHelper from './DragHelper.js'
 
-const now = () => performance.now()
-
-
-
-let pointer = new Pointer()
-
-let init = () => {
+let init = (pointer) => {
 
     let currentTouchIdentifier
 
     window.addEventListener('touchstart', (event) => {
+
+        console.log(event)
 
         let [eventTouch] = event.changedTouches
 
@@ -66,68 +59,16 @@ let init = () => {
 
 }
 
-class TouchDragHelper {
+class TouchDragHelper extends DragHelper {
 
     constructor(timeline, { target = document.body, direction = 'biggestXorY', overShoot = 1.5, limit = 200 } = {}) {
 
-        init()
+        super({ timeline, target, direction, overShoot, limit })
 
-        Object.assign(this, { direction })
-
-        let headPosition = 0
-
-        events.on(target, 'pointer-drag-start', () => {
-
-            headPosition = timeline.head.position
-
-            timeline.head.mobileActive = false
-
-        })
-
-        events.on(target, 'pointer-drag-move', () => {
-
-            let delta = this.getDelta(pointer.dx, pointer.dy)
-
-            headPosition += -delta
-
-            let { min, max } = timeline.rootContainer.range
-            let limitedPosition = Mth.limited(headPosition, min, max, limit)
-
-            timeline.head.setProps({ position:limitedPosition })
-
-
-        })
-
-        events.on(target, 'pointer-drag-end', () => {
-
-            timeline.head.mobileActive = true
-            timeline.head.mobile.position = timeline.head.position
-            timeline.head.mobile.velocity = -this.getDelta(pointer.vx, pointer.vy) * overShoot
-
-        })
+        init(this.pointer)
 
     }
 
-    getDelta(x, y) {
-
-        let { direction } = this
-
-        return (
-
-            direction === 'x' ? x :
-            direction === 'y' ? y :
-            direction === 'biggestXorY' ? utils.biggest(x, y) :
-            0
-
-        )
-
-    }
 }
-
-utils.readonly(TouchDragHelper, {
-
-    pointer,
-
-})
 
 export { TouchDragHelper }

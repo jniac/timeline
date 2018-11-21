@@ -1,24 +1,35 @@
 
-import Mth from '../math/Mth.js'
+import DragHelper from './DragHelper.js'
 
-let mouse = {
+let init = (pointer) => {
 
-    x: 0,
-    y: 0,
+    window.addEventListener('mousedown', (event) => {
 
-}
+        let { target, clientX:x, clientY:y } = event
 
-let init = () => {
+        pointer.dragStart(target, x, y)
+
+    })
 
     window.addEventListener('mousemove', (event) => {
 
         let { clientX:x, clientY:y } = event
 
-        mouse.dx = x - mouse.x
-        mouse.dy = y - mouse.y
+        if (pointer.dragging) {
 
-        mouse.x = x
-        mouse.y = y
+            pointer.dragMove(x, y)
+
+        } else {
+
+            pointer.move(x, y)
+
+        }
+
+    })
+
+    window.addEventListener('mouseup', (event) => {
+
+        pointer.dragEnd()
 
     })
 
@@ -27,35 +38,13 @@ let init = () => {
 
 }
 
-class MouseDragHelper {
+class MouseDragHelper extends DragHelper {
 
-    constructor(timeline, target = window) {
+    constructor(timeline, { target = document.body, direction = 'biggestXorY', overShoot = 1.5, limit = 200 } = {}) {
 
-        init()
+        super({ timeline, target, direction, overShoot, limit })
 
-        const onMouseMove = () => {
-
-            let value = timeline.head.position.basis - mouse.dy
-            value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
-
-            timeline.head.position.basis = value
-            timeline.forceUpdateHeads()
-
-        }
-
-        const onMouseUp = (event) => {
-
-            window.removeEventListener('mousemove', onMouseMove)
-            window.removeEventListener('mouseup', onMouseUp)
-
-        }
-
-        target.addEventListener('mousedown', (event) => {
-
-            window.addEventListener('mousemove', onMouseMove)
-            window.addEventListener('mouseup', onMouseUp)
-
-        })
+        init(this.pointer)
 
     }
 

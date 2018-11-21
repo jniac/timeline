@@ -45,10 +45,7 @@ class Pointer {
 
     }
 
-    dragMove(x, y) {
-
-        if (this.dragging === false)
-            throw `Pointer.dragMove: oups, dragging is false`
+    move(x, y) {
 
         let t = now()
         let dt = (t - this.t) / 1e3 // s (and not ms)
@@ -58,6 +55,17 @@ class Pointer {
         let vy = dy / dt
 
         this.set({ t, dt, x, y, dx, dy, vx, vy })
+
+        // NOTE: for the time being, do not fire event on move (quite ennoying because of target handling)
+
+    }
+
+    dragMove(x, y) {
+
+        if (this.dragging === false)
+            throw `Pointer.dragMove: oups, dragging is false`
+
+        this.move(x, y)
 
         events.fire(this.dragTarget, 'pointer-drag-move', { pointer:this, propagate:element => element.parentElement })
 
