@@ -96,7 +96,11 @@ class LayoutProperty {
 
     compute(referenceDimension, division) {
 
-        if (this.computeCallback) {
+        if (this.number) {
+
+            return this.basis
+
+        } else if (this.computeCallback) {
 
             return this.computeCallback(referenceDimension, division)
 
