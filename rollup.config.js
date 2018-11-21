@@ -5,7 +5,7 @@ export default {
 
     output: {
         format: 'es',
-        file: 'build/Timeline.module.js',
+        file: 'build/Timeline.js',
         indent: '\t',
     }
 
