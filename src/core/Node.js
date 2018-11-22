@@ -14,32 +14,55 @@ class Node {
 
 	}
 
-	append(...children) {
+	/**
+	 * [Fondamental]
+	 * Action of inserting a child into the current node.
+	 * append(), appendTo() will invoke insert()
+	 * Note: A 'dirty' design will have to override this method.
+	 */
+	insert(child, before = null) {
 
-		for (let child of children) {
+		if (child.parent)
+			child.parent.remove(child)
 
-			if (child.parent)
-				child.parent.remove(child)
+		child.parent = this
+		child.depth = this.depth + 1
+		child.root = this.root
 
-			child.parent = this
-			child.depth = this.depth + 1
-			child.root = this.root
+		child.forDescendants(node => node.depth = node.parent.depth + 1)
 
-			child.forDescendants(node => node.depth = node.parent.depth + 1)
+		if (this.lastChild) {
 
-			if (this.lastChild) {
+			if (before && before.parent === this) {
 
-				this.lastChild.next = child
-				child.previous = this.lastChild
+				child.next = before
+				child.previous = before.previous
 
-				this.lastChild = child
+				before.previous = child
+
+				if (child.previous) {
+
+					child.previous.next = child
+
+				} else {
+
+					this.firstChild = child
+
+				}
 
 			} else {
 
-				this.firstChild =
+				child.previous = this.lastChild
+				this.lastChild.next = child
+
 				this.lastChild = child
 
 			}
+
+		} else {
+
+			this.firstChild =
+			this.lastChild = child
 
 		}
 
@@ -47,6 +70,12 @@ class Node {
 
 	}
 
+	/**
+	 * [Fondamental]
+	 * Action of removing children from the current node.
+	 * detach() will invoke remove()
+	 * Note: A 'dirty' design will have to override this method.
+	 */
 	remove(...children) {
 
 		for (let child of children) {
@@ -76,6 +105,11 @@ class Node {
 
 	}
 
+	/**
+	 * [Fondamental]
+	 * Action of removing ALL children from the current node.
+	 * Note: A 'dirty' design will have to override this method.
+	 */
 	removeAll() {
 
 		let child = this.firstChild
@@ -98,6 +132,22 @@ class Node {
 
 	}
 
+
+
+	// utils
+
+	append(...children) {
+
+		for (let child of children) {
+
+			this.insert(child)
+
+		}
+
+		return this
+
+	}
+
 	appendTo(parent) {
 
 		parent.append(this)
@@ -111,24 +161,6 @@ class Node {
 		if (this.parent) {
 
 			this.parent.remove(this)
-
-		}
-
-		return this
-
-	}
-
-	walk(callback) {
-
-		callback(this)
-
-		let child = this.firstChild
-
-		while(child) {
-
-			child.walk(callback)
-
-			child = child.next
 
 		}
 
