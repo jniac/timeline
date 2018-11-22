@@ -69,10 +69,10 @@ const update = () => {
 
         if (timeline.dirty) {
 
-            if (timeline.rootContainer.someDescendant(node => node.dirty))
+            if (timeline.rootContainer.dirty || timeline.rootContainer.someDescendant(node => node.dirty))
                 timeline.rootContainer.update()
 
-            if (timeline.headContainer.someDescendant(node => node.dirty))
+            if (timeline.headContainer.dirty || timeline.headContainer.someDescendant(node => node.dirty))
                 timeline.headContainer.update()
 
             // NOTE: 'updateHead' should ALWAYS be called when timeline.dirty === true
