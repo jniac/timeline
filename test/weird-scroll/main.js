@@ -1,12 +1,15 @@
 
 import Timeline, { Mth, Division, helpers } from '../../src/Timeline.js'
+// import Timeline, { Mth, Division, helpers } from '../../build/Timeline.js'
+
 import makeCircle from './makeCircle.js'
 
 const withElement = (selector, callback) => [...document.querySelectorAll(selector)].forEach(callback)
 
 let timeline = new Timeline(window.innerHeight)
 
-timeline.head.align = .5
+// timeline.head.align = .5
+timeline.head.setProps({ translate:'-50%' })
 
 let circle1 = makeCircle({ parent:document.querySelector('#part3 .content:first-child') })
 let circle2 = makeCircle({ parent:document.querySelector('#part3 .content:last-child') })

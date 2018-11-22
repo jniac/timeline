@@ -99,6 +99,9 @@ const updatePosition = (parent) => {
 
     parent.forChildren((division) => {
 
+        let translate = LayoutProperty.get(division.props.translate).compute(division.width, division, division)
+        division.translate = translate
+
         if (division.props.layout === 'normal') {
 
             let position = parent.position + offset
@@ -110,9 +113,10 @@ const updatePosition = (parent) => {
 
             let prop = LayoutProperty.get(division.props.position)
 
-            let position = parent.range.position + prop.compute(parent.width, division)
+            let position = parent.range.position + prop.compute(parent.width, division, parent)
             division.position = position
-            division.range.position = position - division.width * division.align
+            // division.range.position = position - division.width * division.align
+            division.range.position = position + translate
 
         } else {
 
@@ -139,7 +143,7 @@ class Division extends Node {
         this.layout = 'normal'
         this.position = 0
         this.width = 0
-        this.align = 0
+        this.translate = 0
 
         this.range = new Range()
         this.bounds = new Range()

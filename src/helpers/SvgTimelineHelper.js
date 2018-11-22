@@ -28,7 +28,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
 
     if (true) {
 
-        let circle = makeSvg('circle', { parent:g, cx:width * division.align, cy:y, r:1, fill:color })
+        let circle = makeSvg('circle', { parent:g, cx:-division.translate * scale, cy:y, r:1, fill:color })
 
         division.on('main-stateChange', ({ values:{ state } }) => {
             let r = state === 0 ? 1.5 : 1
