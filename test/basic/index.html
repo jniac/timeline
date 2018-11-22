@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="../common/main.css">
+        <style media="screen">
+            * {
+                color: white;
+            }
+            body {
+                padding-top: 100px;
+            }
+            .wrapper {
+                --h: calc(100vh - 200px);
+                width: 300px;
+                height: var(--h);
+                background-color: white;
+                overflow: hidden;
+                user-select: none;
+            }
+        </style>
+        <script type="text/javascript">
+        function bench(...a){const b='object'==typeof performance?performance.now.bind(performance):Date.now.bind(Date);console.log(`\ntest bench of ${a.length} functions`);let{duration:c,costPrecision:d}=bench,e,g,h,j;for(e=b(),h=0;b()-e<c;)h++;g=b()-e,j=g/h,console.log(`-- dt: ${g.toFixed(1)}ms count: ${h}op cost: ${j.toFixed(d)}ms`);let k=h;for(let[l,m]of a.entries()){for(e=b(),h=0;b()-e<c;)m(),h++;g=b()-e,j=g/h;let o=k/h;m.name&&console.log(m.name+':'),console.log(`#${l} dt: ${g.toFixed(1)}ms count: ${bench.formatBigNumber(h)}op cost: ${j.toFixed(d)}ms x${o.toFixed(3)} slower`)}}Object.assign(bench,{duration:500,costPrecision:6,formatBigNumber:(a,{precision:b=0,separator:c=','}={})=>a.toFixed().replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1'+c)});
+        </script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="content">
+                <div style="background-color:#c7bc90; height:100px;"></div>
+                <div style="background-color:#6d9e7e; height:calc(var(--h) * .5 - 100px);"></div>
+                <div style="position:relative;">
+                    <div style="background:#c7bc90; height:50px;"></div>
+                    <div style="background:#375a4a; height:100px;"></div>
+                    <div style="background:#6d9e7e; height:50px;"></div>
+                    <div style="border:solid 5px #ead437; position:absolute; top:0; width:100%; height:100%;"></div>
+                    <div style="background:#ead437; position:absolute; top:50%; width:100%; height:5px;"></div>
+                </div>
+                <div style="background-color:#375a4a; height:calc(var(--h) * .5 - 100px);"></div>
+                <div style="background-color:#c7bc90; height:var(--h);"></div>
+                <div style="background:#375a4a; height:100px; font-size:3em;" class="centered" id="hoho">
+                    <div>
+                        Hello you
+                    </div>
+                </div>
+                <div style="background-color:#c7bc90; height:var(--h);"></div>
+            </div>
+        </div>
+        <script src="main.js" type="module"></script>
+    </body>
+</html>

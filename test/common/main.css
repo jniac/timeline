@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: #eee;
+    overflow: hidden;
+}
+svg.svg-timeline-helper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
