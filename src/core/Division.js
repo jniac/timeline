@@ -180,6 +180,31 @@ class Division extends Node {
 
     }
 
+    setDirty() {
+
+        this.dirty = true
+        this.root.dirty = true
+
+    }
+
+    // override
+    insert(child, before = null) {
+
+        super.insert(child, before)
+
+        this.setDirty()
+
+    }
+
+    // override
+    remove(...children) {
+
+        super.remove(...children)
+
+        this.setDirty()
+
+    }
+
     setProps(props, compare = true) {
 
         if (compare) {
@@ -191,8 +216,7 @@ class Division extends Node {
                 if (this.props[key] !== value) {
 
                     this.props[key] = value
-                    this.dirty = true
-                    this.root.dirty = true
+                    this.setDirty()
 
                 }
 
