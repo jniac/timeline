@@ -127,7 +127,7 @@ const createStage = (helper, timeline) => {
 
             }
 
-            heap.push(...division.iChildren())
+            heap.push(...division.children)
 
         }
 
@@ -164,7 +164,7 @@ class SvgTimelineHelper {
 
         let stage = createStage(this, timeline)
 
-        for (let division of timeline.headContainer.iChildren()) {
+        for (let division of timeline.headContainer.children) {
 
             drawDivision(this, division, stage.totalHeight)
 
