@@ -1,8 +1,8 @@
 
-import { Node } from '../lib/tree.js'
 import { makeDispatcher } from '../events.js'
 
 import Range from '../math/Range.js'
+import Node from './Node.js'
 import LayoutProperty from './LayoutProperty.js'
 
 const updateWidth = (division) => {
