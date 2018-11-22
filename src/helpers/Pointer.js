@@ -1,5 +1,5 @@
 
-import * as events from '../events/Dispatcher.js'
+import * as events from '../events.js'
 
 const now = () => performance.now()
 

@@ -351,3 +351,14 @@ export {
     Event,
 
 }
+
+export default {
+
+    on,
+    off,
+    once,
+    fire,
+    makeDispatcher,
+    Event,
+
+}
