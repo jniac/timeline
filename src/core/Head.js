@@ -45,24 +45,6 @@ class Head extends Division {
 
             }
 
-        //     let { mobile, mobileActive, root:timeline } = this
-        //
-        //     if (mobileActive) {
-        //
-        //         mobile.update()
-        //
-        //         let { min, max } = timeline.rootContainer.range
-        //
-        //         if (mobile.position < min)
-        //             mobile.position += (min - mobile.position) / 2
-        //
-        //         if (mobile.position > max)
-        //             mobile.position += (max - mobile.position) / 2
-        //
-        //         this.setProps({ position:Math.round(mobile.position) })
-        //
-        //     }
-
         })
 
     }

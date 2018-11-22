@@ -42,19 +42,6 @@ const readonly = (target, props, { enumerable = true, configurable = false } = {
 
 }
 
-// NOTE: quite the same than readonly, with arguments order inversed
-const defineProperties = (target, options, props) => {
-
-    let { enumerable = true, configurable = false, writable = true } = options || {}
-
-    for (let [key, value] of Object.entries(props)) {
-
-        Object.defineProperty(target, key, { value, enumerable, configurable })
-
-    }
-
-}
-
 const biggest = (number, ...numbers) => {
 
     let max = Math.abs(number)
@@ -132,7 +119,6 @@ export {
     safeArray,
     groupEvery,
     readonly,
-    defineProperties,
     biggest,
     makeSvg,
 

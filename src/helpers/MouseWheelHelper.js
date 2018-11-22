@@ -1,5 +1,4 @@
 
-import Mth from '../math/Mth.js'
 import * as utils from '../utils/utils.js'
 
 class MouseWheelHelper {
@@ -8,21 +7,20 @@ class MouseWheelHelper {
 
         Object.assign(this, { direction })
 
+        let delta = 0
+
         target.addEventListener('wheel', (event) => {
 
             let { direction } = this
 
-            let delta =
+            delta =
                 direction === 'y' ? event.deltaY :
                 direction === 'x' ? event.deltaX :
                 direction === 'biggestXorY' ? utils.biggest(event.deltaX, event.deltaY) :
                 0
 
-            let value = timeline.head.props.position + delta
-            value = Mth.clamp(value, timeline.rootContainer.range.min, timeline.rootContainer.range.max - timeline.head.width)
-
-            timeline.head.props.position = value
-            timeline.forceUpdateHeads()
+            timeline.head.mobileActive = true
+            timeline.head.mobile.position += delta
 
         })
 
