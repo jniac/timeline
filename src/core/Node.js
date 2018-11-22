@@ -196,7 +196,7 @@ class Node {
 
 	}
 
-	*iAllChildren() {
+	*iDescendants() {
 
 		let child = this.firstChild
 
@@ -204,7 +204,7 @@ class Node {
 
 			yield child
 
-			yield* child.iAllChildren()
+			yield* child.iDescendants()
 
 			child = child.next
 
@@ -334,9 +334,9 @@ class Node {
 
 	}
 
-	get allChildren() {
+	get descendants() {
 
-		return [...this.iAllChildren()]
+		return [...this.iDescendants()]
 
 	}
 
@@ -348,7 +348,7 @@ class Node {
 
 		let intro = []
 
-		for (let parent of this.iAncestors())
+		for (let parent of this.ancestors)
 			intro.unshift(parent.next ? '│ ' : '  ')
 
 		return intro.join('') + (!this.parent ? (this.next ? '┌' : '─') : (this.next ? '├' : '└')) + '─' + (this.firstChild ? '┬' : '─') + '─ Node#' + this.nodeId
@@ -357,7 +357,7 @@ class Node {
 
 	toGraphString(callback) {
 
-		return [this, ...this.iAllChildren()].map(node => node.toGraphStringLine() + (callback ? ` ${callback(node)}` : '')).join('\n')
+		return [this, ...this.descendants].map(node => node.toGraphStringLine() + (callback ? ` ${callback(node)}` : '')).join('\n')
 
 	}
 

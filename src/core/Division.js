@@ -214,7 +214,7 @@ class Division extends Node {
 
             let id = typeof selector === 'number' ? selector : Number(selector.slice(1))
 
-            for (let child of this.iAllChildren()) {
+            for (let child of this.iDescendants()) {
 
                 if (child.nodeId === id) {
 
@@ -230,7 +230,7 @@ class Division extends Node {
 
             let entries = Object.entries(selector)
 
-            for (let child of this.iAllChildren()) {
+            for (let child of this.iDescendants()) {
 
                 if (entries.every(([key, value]) => child.props[key] === value)) {
 
@@ -246,7 +246,7 @@ class Division extends Node {
 
             if (/^[\w-]+$/.test(selector)) {
 
-                for (let child of this.iAllChildren()) {
+                for (let child of this.iDescendants()) {
 
                     if (child.props.name === selector) {
 
