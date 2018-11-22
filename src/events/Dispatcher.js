@@ -1,5 +1,15 @@
 
-import { safeArray, defineProperties } from '../utils/utils.js'
+const defineProperties = (target, options, props) => {
+
+    let { enumerable = true, configurable = false, writable = true } = options || {}
+
+    for (let [key, value] of Object.entries(props)) {
+
+        Object.defineProperty(target, key, { value, enumerable, configurable })
+
+    }
+
+}
 
 // NOTE: map could be a WeakMap... when debugging will be done!
 let map = new Map()
@@ -184,9 +194,11 @@ class Event {
 
 const propagate = (event) => {
 
-    for (let target of safeArray(event.propagate(event.currentTarget))) {
+    let result = event.propagate(event.currentTarget)
 
-        // fireEvent(cloneEvent(event, target))
+    let array = typeof result[Symbol.iterator] === 'function' ? result : [result]
+
+    for (let target of array) {
 
         if (target) {
 
@@ -199,6 +211,20 @@ const propagate = (event) => {
 }
 
 const fire = (target, eventType, eventProps) => {
+
+    let array = eventType.split(/\s*,\s*|\s+/)
+
+    if (array.length > 1) {
+
+        for (let eventType of array) {
+
+            fire(target, eventType, eventProps)
+
+        }
+
+        return
+
+    }
 
     if (!map.has(target) && (!eventProps || !eventProps.propagate))
         return
