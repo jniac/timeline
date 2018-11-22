@@ -259,7 +259,11 @@ const fireEvent = (event) => {
 
         let match = false
 
-        if (typeof eventType === 'string') {
+        if (eventType === '*') {
+
+            match = true
+
+        } else if (typeof eventType === 'string') {
 
             match = eventType === event.type
 
