@@ -7,8 +7,6 @@ let init = (pointer) => {
 
     window.addEventListener('touchstart', (event) => {
 
-        console.log(event)
-
         let [eventTouch] = event.changedTouches
 
         // NOTE: ignore multi-touches

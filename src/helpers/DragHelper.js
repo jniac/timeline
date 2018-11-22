@@ -36,7 +36,7 @@ class DragHelper {
 
             headPosition = timeline.head.position
 
-            timeline.head.mobileActive = false
+            timeline.head.stopPhysics()
 
         })
 
@@ -55,9 +55,9 @@ class DragHelper {
 
         events.on(target, 'pointer-drag-end', () => {
 
-            timeline.head.mobileActive = true
-            timeline.head.mobile.position = timeline.head.position
-            timeline.head.mobile.velocity = -this.getDelta(pointer.vx, pointer.vy) * overShoot
+            let velocity = -this.getDelta(pointer.vx, pointer.vy) * overShoot
+
+            timeline.head.startPhysics({ velocity })
 
         })
 

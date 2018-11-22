@@ -26,7 +26,7 @@ class Timeline extends Division {
 
         let mainHead = new Head({ name:'main', width:'100%' })
         this.headContainer.append(mainHead)
-        mainHead.createMobile()
+        mainHead.initPhysics()
 
         instances.push(this)
 

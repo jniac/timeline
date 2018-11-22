@@ -19,8 +19,11 @@ class MouseWheelHelper {
                 direction === 'biggestXorY' ? utils.biggest(event.deltaX, event.deltaY) :
                 0
 
-            timeline.head.mobileActive = true
-            timeline.head.mobile.position += delta
+            timeline.head.updatePhysics({
+
+                positionDelta: delta,
+
+            })
 
         })
 

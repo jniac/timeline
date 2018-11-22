@@ -23,16 +23,16 @@ class Head extends Division {
 
     }
 
-    createMobile() {
+    initPhysics() {
 
         this.mobile = new Mobile()
-        this.mobileActive = false
+        this.physicsActive = false
 
         this.root.onBeforeUpdate.add(() => {
 
-            let { mobileActive, mobile } = this
+            let { physicsActive, mobile } = this
 
-            if (mobileActive) {
+            if (physicsActive) {
 
                 mobile.min = timeline.rootContainer.range.min
                 mobile.max = timeline.rootContainer.range.max
@@ -46,6 +46,35 @@ class Head extends Division {
             }
 
         })
+
+    }
+
+    startPhysics({ velocity = 0 }) {
+
+        this.physicsActive = true
+        this.mobile.position = this.position
+        this.mobile.velocity = velocity
+
+    }
+
+    updatePhysics({ position, velocity, positionDelta }) {
+
+        this.physicsActive = true
+
+        if (position !== undefined)
+            this.mobile.position = position
+
+        if (positionDelta !== undefined)
+            this.mobile.position += positionDelta
+
+        if (velocity !== undefined)
+            this.mobile.velocity = velocity
+
+    }
+
+    stopPhysics() {
+
+        this.physicsActive = false
 
     }
 
