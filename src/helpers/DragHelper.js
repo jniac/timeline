@@ -1,6 +1,6 @@
 
 import Mth from '../math/Mth.js'
-import * as events from '../events.js'
+import events from '../events.js'
 import * as utils from '../utils/utils.js'
 import Pointer from './Pointer.js'
 

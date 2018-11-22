@@ -1,5 +1,5 @@
 
-import * as events from '../events.js'
+import events from '../events.js'
 
 const now = () => performance.now()
 
