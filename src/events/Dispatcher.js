@@ -196,6 +196,9 @@ const propagate = (event) => {
 
     let result = event.propagate(event.currentTarget)
 
+    if (!result)
+        return
+
     let array = typeof result[Symbol.iterator] === 'function' ? result : [result]
 
     for (let target of array) {
