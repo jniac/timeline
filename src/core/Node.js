@@ -324,19 +324,19 @@ class Node {
 
 	get ancestors() {
 
-		return [...this.iAncestors()]
+		return Array.from(this.iAncestors())
 
 	}
 
 	get children() {
 
-		return [...this.iChildren()]
+		return Array.from(this.iChildren())
 
 	}
 
 	get descendants() {
 
-		return [...this.iDescendants()]
+		return Array.from(this.iDescendants())
 
 	}
 
