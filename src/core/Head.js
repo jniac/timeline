@@ -21,6 +21,7 @@ class Head extends Division {
 
         super({ layout:'absolute', ...props })
 
+
     }
 
     initPhysics() {
@@ -86,6 +87,8 @@ class Head extends Division {
         let positionMin = this.range.min
         let positionMax = this.range.max
 
+        let divisionThatWillFireEvents = []
+
         this.root.rootContainer.forDescendants((division) => {
 
             let old = division.localHeads.get(this) || voidLocalHead
@@ -97,6 +100,7 @@ class Head extends Division {
             let intersects = this.range.intersects(division.range, .0001)
             let state = intersects ? 0 : this.range.max < division.range.min ? -1 : 1
 
+            // triggers:
             let stateChange = state !== old.state
 
             // overlap === 1 when the [head] is entirely covered by the [division]
@@ -126,7 +130,56 @@ class Head extends Division {
 
             division.localHeads.set(this, values)
 
+            division.triggers = {
+                stateChange,
+                overlapEnter,
+                overlapExit,
+                overlap,
+                overflowEnter,
+                overflowExit,
+                overflow,
+                progress,
+            }
+
+            if (
+                stateChange
+                || overlapEnter
+                || overlapExit
+                || overlap
+                || overflowEnter
+                || overflowExit
+                || overflow
+                || progress
+            )
+                divisionThatWillFireEvents.push(division)
+
+        })
+
+        // NOTE:
+        // sort the division in order to let the "most significant" division fire events last
+        divisionThatWillFireEvents.sort((A, B) => {
+
+            let Avalues = A.localHeads.get(this)
+            let Bvalues = B.localHeads.get(this)
+
+            return Math.abs(Bvalues.state) - Math.abs(Avalues.state)
+
+        })
+
+        for (let division of divisionThatWillFireEvents) {
+
+            let values = division.localHeads.get(this)
             let eventOptions = { values }
+            let {
+                stateChange,
+                overlapEnter,
+                overlapExit,
+                overlap,
+                overflowEnter,
+                overflowExit,
+                overflow,
+                progress,
+            } = division.triggers
 
             if (stateChange)
                 division.fire(`${name}-stateChange`, eventOptions)
@@ -152,7 +205,7 @@ class Head extends Division {
             if (overlapExit)
                 division.fire(`${name}-overlapExit`, eventOptions)
 
-        })
+        }
 
     }
 
