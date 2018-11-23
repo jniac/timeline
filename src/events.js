@@ -63,7 +63,7 @@ const off = (target, eventType, callback, props = null) => {
     for (let bundle, i = 0; bundle = array[i]; i++) {
 
         let match =
-            (eventType === 'all' || String(eventType) === String(bundle.eventType))
+            (eventType === true || eventType === 'all' || String(eventType) === String(bundle.eventType))
             && (!callback || callback === bundle.callback)
             && entries.every(([key, value]) => bundle[key] === value)
 
