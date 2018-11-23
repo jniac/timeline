@@ -172,6 +172,27 @@ class SvgTimelineHelper {
 
     }
 
+    setStyle(props) {
+
+        Object.assign(this.svg.style, props)
+
+        return this
+
+    }
+
+    activeSpaceKey() {
+
+        window.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                this.setStyle({ display:this.svg.style.display ? null : 'none' })
+                event.preventDefault()
+            }
+        })
+
+        return this
+
+    }
+
 }
 
 export { SvgTimelineHelper }
