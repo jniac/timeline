@@ -113,6 +113,10 @@ class Head extends Division {
             let overflowEnter = overflow > 0 && old.overflow === 0
             let overflowExit = overflow === 0 && old.overflow > 0
 
+            // proximity is a number indicating ... the proximity betwenn the [head] and the current [division]
+            // the higher the greatest proximity
+            let proximity = intersects ? overlap + overflow : this.range.max < division.range.min ? -division.range.min + this.range.max : -this.range.min + division.range.max
+
             let progress = stateChange || overlap || old.overlap || overflow || old.overflow
 
             let values = {
@@ -122,6 +126,7 @@ class Head extends Division {
                 ratioMax,
 
                 state,
+                proximity,
 
                 overlap,
                 overflow,
@@ -157,20 +162,18 @@ class Head extends Division {
 
         // NOTE:
         // sort the division in order to let the "most significant" division fire events last
-        divisionThatWillFireEvents.sort((A, B) => {
+        divisionThatWillFireEvents.sort((A, B) => (
 
-            let Avalues = A.localHeads.get(this)
-            let Bvalues = B.localHeads.get(this)
+            A.localHeads.get(this).proximity - B.localHeads.get(this).proximity
 
-            return Math.abs(Bvalues.state) - Math.abs(Avalues.state)
-
-        })
+        ))
 
         for (let division of divisionThatWillFireEvents) {
 
-            let values = division.localHeads.get(this)
-            let eventOptions = { values }
+            let eventOptions = { values:division.localHeads.get(this) }
+
             let {
+
                 stateChange,
                 overlapEnter,
                 overlapExit,
@@ -179,6 +182,7 @@ class Head extends Division {
                 overflowExit,
                 overflow,
                 progress,
+                
             } = division.triggers
 
             if (stateChange)
