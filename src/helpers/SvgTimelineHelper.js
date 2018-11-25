@@ -166,7 +166,7 @@ class SvgTimelineHelper {
 
         for (let division of timeline.headContainer.children) {
 
-            drawDivision(this, division, stage.totalHeight)
+            drawDivision(this, division, stage.totalHeight, { drawArrow:false })
 
         }
 
