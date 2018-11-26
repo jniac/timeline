@@ -32,7 +32,7 @@ const updateWidth = (division) => {
 
         division.forChildren(child => {
 
-            if (child.layout === 'normal')
+            if (child.props.layout === 'normal')
                 totalWidth += child.width
 
         })
@@ -80,6 +80,20 @@ const updatePosition = (parent) => {
 
 }
 
+const updateBounds = (parent) => {
+
+    parent.bounds.copy(parent.range)
+
+    parent.forChildren((division) => {
+
+        updateBounds(division)
+
+        parent.bounds.union(division.bounds)
+
+    })
+
+}
+
 let map = new Map()
 
 class Division extends Node {
@@ -90,7 +104,6 @@ class Division extends Node {
 
         map.set(this.nodeId, this)
 
-        this.layout = 'normal'
         this.position = 0
         this.width = 0
         this.translate = 0
@@ -108,6 +121,9 @@ class Division extends Node {
 
     }
 
+    // TEMP: to be removed
+    get layout() { throw 'this should not happened' }
+
     // debug
     getComputedProp(name) {
 
@@ -119,6 +135,7 @@ class Division extends Node {
 
         updateWidth(this)
         updatePosition(this)
+        updateBounds(this)
 
         this.dirty = false
         this.fire('update')

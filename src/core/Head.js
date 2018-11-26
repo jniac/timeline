@@ -4,6 +4,8 @@ import Mobile from './Mobile.js'
 
 let voidLocalHead = {
 
+    boundsIntersect: false,
+
     ratio: NaN,
     ratioMin: NaN,
     ratioMax: NaN,
@@ -105,6 +107,8 @@ class Head extends Division {
             let ratioMin = division.range.ratio(positionMin)
             let ratioMax = division.range.ratio(positionMax)
 
+            let boundsIntersect = this.bounds.intersects(division.bounds, .0001)
+
             let intersects = this.range.intersects(division.range, .0001)
             let state = intersects ? 0 : this.range.max < division.range.min ? -1 : 1
 
@@ -125,9 +129,11 @@ class Head extends Division {
             // the higher the greatest proximity
             let proximity = intersects ? overlap + overflow : this.range.max < division.range.min ? -division.range.min + this.range.max : -this.range.min + division.range.max
 
-            let progress = stateChange || overlap || old.overlap || overflow || old.overflow
+            let progress = boundsIntersect || old.boundsIntersect || stateChange || overlap || old.overlap || overflow || old.overflow
 
             let values = {
+
+                boundsIntersect,
 
                 ratio,
                 ratioMin,
