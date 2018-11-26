@@ -118,7 +118,7 @@ const createStage = (helper, timeline) => {
 
     let stages = []
     let totalHeight = 0
-    let stageMargin = 28
+    let { stageMargin, divisionShift } = helper
 
     let heap = [timeline.rootContainer]
 
@@ -144,7 +144,7 @@ const createStage = (helper, timeline) => {
 
             stage[stageIndex] ? stage[stageIndex].push(division) : stage[stageIndex] = [division]
 
-            let offsetY = totalHeight + (stageIndex + .5) * 6 + stageMargin * .5
+            let offsetY = totalHeight + (stageIndex + .5) * divisionShift + stageMargin * .5
 
             drawDivision(helper, division, offsetY)
 
@@ -160,7 +160,7 @@ const createStage = (helper, timeline) => {
 
         }
 
-        let height = stage.length * 6 + stageMargin
+        let height = stage.length * divisionShift + stageMargin
 
         totalHeight += height
 
@@ -176,7 +176,7 @@ const createStage = (helper, timeline) => {
 
 class SvgTimelineHelper {
 
-    constructor(timeline, { scale = 1/16 } = {}) {
+    constructor(timeline, { scale = 1/16, stageMargin = 28, divisionShift = 6 } = {}) {
 
         let svg = makeSvg('svg')
         svg.classList.add('svg-timeline-helper')
@@ -188,6 +188,8 @@ class SvgTimelineHelper {
             svg,
             container,
             scale,
+            stageMargin,
+            divisionShift,
 
         })
 
