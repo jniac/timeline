@@ -3,11 +3,13 @@ import { groupEvery, makeSvg } from '../utils/utils.js'
 
 let defaultColors = ['#33f', '#f33', '#f3f']
 
+const min = (...args) => Math.min(...args)
+const max = (...args) => Math.max(...args)
+const shortNumber = n => n.toFixed(1).replace(/\.0$/, '')
+
 const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) => {
 
-    const makePoints = (...array) => groupEvery(array, 2).map(point => point.join(',')).join(' ')
-    const min = (...args) => Math.min(...args)
-    const max = (...args) => Math.max(...args)
+    const makePoints = (...array) => groupEvery(array, 2).map(point => point.map(shortNumber).join(',')).join(' ')
 
     let { timeline, scale } = helper
 
@@ -89,14 +91,26 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
 
     let { scale } = helper
 
-    let x1 = division.parent.range.interpolate(.5) * scale
-    let y1 = parentOffsetY
-    let x2 = division.range.interpolate(.5) * scale
-    let y2 = offsetY
+    let className = `link-${division.parent.nodeId}-${division.nodeId}`
+    let path = makeSvg('path', { className, parent:helper.container, fill:'none', opacity:.25 })
 
-    // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
-    let d = `M ${x1},${y1} C ${x1},${mix(y1,y2,2/3)} ${x2},${mix(y1,y2,1/3)} ${x2},${y2}`
-    makeSvg('path', { parent:helper.container, d, stroke:'#333', fill:'none', opacity:.25 })
+    const update = () => {
+
+        let x1 = division.parent.range.interpolate(.5) * scale
+        let y1 = parentOffsetY
+        let x2 = division.range.interpolate(.5) * scale
+        let y2 = offsetY
+
+        let d = `M ${shortNumber(x1)},${shortNumber(y1)} C ${shortNumber(x1)},${shortNumber(mix(y1,y2,2/3))} ${shortNumber(x2)},${shortNumber(mix(y1,y2,1/3))} ${shortNumber(x2)},${shortNumber(y2)}`
+        let color = division.props.color || '#333'
+        let className = `link-${division.parent.nodeId}-${division.nodeId}`
+        makeSvg(path, { d, stroke:color })
+
+    }
+
+    division.on('update', update)
+
+    update()
 
 }
 
