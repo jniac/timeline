@@ -7,6 +7,21 @@ const min = (...args) => Math.min(...args)
 const max = (...args) => Math.max(...args)
 const shortNumber = n => n.toFixed(1).replace(/\.0$/, '')
 
+const getColor = (division) => {
+
+    while (division) {
+
+        if ('color' in division.props)
+            return division.props.color
+
+        division = division.parent
+
+    }
+
+    return '#333'
+
+}
+
 const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) => {
 
     const makePoints = (...array) => groupEvery(array, 2).map(point => point.map(shortNumber).join(',')).join(' ')
@@ -18,7 +33,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
     let y = offsetY
 
     // let color = division.props.color || defaultColors[division.nodeId % defaultColors.length]
-    let color = division.props.color || '#333'
+    let color = getColor(division)
 
     let g = makeSvg('g', { parent:helper.container, stroke:color, transform:`translate(${position}, 0)` })
     g.classList.add(`node${division.nodeId}`)
@@ -102,7 +117,7 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
         let y2 = offsetY
 
         let d = `M ${shortNumber(x1)},${shortNumber(y1)} C ${shortNumber(x1)},${shortNumber(mix(y1,y2,2/3))} ${shortNumber(x2)},${shortNumber(mix(y1,y2,1/3))} ${shortNumber(x2)},${shortNumber(y2)}`
-        let color = division.props.color || '#333'
+        let color = getColor(division)
         let className = `link-${division.parent.nodeId}-${division.nodeId}`
         makeSvg(path, { d, stroke:color })
 
