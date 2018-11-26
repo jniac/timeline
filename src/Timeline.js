@@ -67,7 +67,7 @@ const update = () => {
 
         timeline.onBeforeUpdate.execute()
 
-        if (timeline.dirty) {
+        if (timeline.isDirty()) {
 
             if (timeline.rootContainer.dirty || timeline.rootContainer.someDescendant(node => node.dirty))
                 timeline.rootContainer.update()

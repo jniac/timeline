@@ -111,6 +111,9 @@ class Division extends Node {
         this.range = new Range()
         this.bounds = new Range()
 
+        this.dirty = true
+        this.dirtyChildren = true
+
         // this.props = consumeProps(this, props)
         this.props = {
             position: 0,
@@ -138,6 +141,7 @@ class Division extends Node {
         updateBounds(this)
 
         this.dirty = false
+        this.dirtyChildren = false
         this.fire('update')
 
         this.forDescendants(child => {
@@ -152,7 +156,13 @@ class Division extends Node {
     setDirty() {
 
         this.dirty = true
-        this.root.dirty = true
+        this.root.dirtyChildren = true
+
+    }
+
+    isDirty() {
+
+        return this.dirty || this.dirtyChildren
 
     }
 
