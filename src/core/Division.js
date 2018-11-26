@@ -44,55 +44,6 @@ const updateWidth = (division) => {
 
 }
 
-// const updateWidthOld = (parent) => {
-//
-//     let widthAutoDivisions = []
-//
-//     parent.forDescendants((division) => {
-//
-//         let prop = LayoutProperty.get(division.props.width)
-//
-//         if (prop.auto) {
-//
-//             widthAutoDivisions.unshift(division)
-//             return
-//
-//         }
-//
-//         let referenceDivision = division.parent
-//         let referenceProp = LayoutProperty.get(referenceDivision.props.width)
-//
-//         while (referenceProp.auto || referenceProp.none) {
-//
-//             referenceDivision = referenceDivision.parent
-//             referenceProp = LayoutProperty.get(referenceDivision.props.width)
-//
-//         }
-//
-//         let width = prop.compute(referenceDivision.width, division, referenceDivision)
-//         division.range.width = division.width = width
-//
-//     })
-//
-//     for (let division of widthAutoDivisions) {
-//
-//         let totalWidth = 0
-//
-//         division.forChildren(child => {
-//
-//             if (child.layout === 'normal')
-//                 totalWidth += child.width
-//
-//         })
-//
-//         let prop = LayoutProperty.get(division.props.width)
-//         let width = prop.compute(totalWidth, division)
-//         division.range.width = division.width = width
-//
-//     }
-//
-// }
-
 const updatePosition = (parent) => {
 
     let offset = 0
@@ -115,7 +66,6 @@ const updatePosition = (parent) => {
 
             let position = parent.range.position + prop.compute(parent.width, division, parent)
             division.position = position
-            // division.range.position = position - division.width * division.align
             division.range.position = position + translate
 
         } else {
