@@ -5,11 +5,17 @@ import Range from '../math/Range.js'
 import Node from './Node.js'
 import LayoutProperty from './LayoutProperty.js'
 
+// FIXME: the design is absolutely not satisfactory
+// width & position rendering should use a more subtle method
+// each division should determine its dependencies, and wait for dependencies rendering before rendering itself
+// this should probably be done with a while loop and one or several sets
+// until that implementation, a poor solution is retained: 'non-absolute' children are rendered before 'absolute' children
 const updateWidth = (division) => {
 
     let prop = LayoutProperty.get(division.props.width)
 
-    division.forChildren(child => updateWidth(child))
+    if (division.props.layout !== 'absolute')
+        division.forChildren(child => updateWidth(child))
 
     if (prop.auto === false) {
 
@@ -41,6 +47,9 @@ const updateWidth = (division) => {
         division.range.width = division.width = width
 
     }
+
+    if (division.props.layout === 'absolute')
+        division.forChildren(child => updateWidth(child))
 
 }
 
