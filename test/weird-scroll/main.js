@@ -94,6 +94,8 @@ withElement('#part1,#part2', (element) => {
 
 })
 
+timeline.createDivision({ parent:'scroll2', layout:'absolute', color:'green', position:'100%' })
+
 withElement('#part3 .content', (element) => {
 
     timeline.createDivision({ name:element.id, width:element.offsetWidth, parent:'scroll2' })
@@ -110,6 +112,19 @@ withElement('#part4,#part5', (element) => {
 
 timeline.update()
 timeline.rootContainer.setDirty()
+
+timeline.createDivision({
+    name: 'qux',
+    layout: 'absolute',
+    width: () => Math.random() * 1000 | 0,
+    color: 'blue',
+}).createDivision({
+    name: 'foo',
+    layout: 'absolute',
+    position: '100%',
+    width: '100%',
+    color: 'red',
+})
 
 
 

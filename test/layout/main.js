@@ -54,6 +54,7 @@ timeline.createDivision({
     color: 'blue',
     layout: 'absolute',
     position: '25%',
+    width: '50%',
 })
 
 // green
@@ -69,12 +70,12 @@ timeline.createDivision({
     name: 'green-2',
     color: 'green',
     layout: 'absolute',
-    // position: '25%',
+    position: '25%',
     width: '100%',
 })
 
-timeline.update()
-timeline.rootContainer.setDirty()
+// timeline.update()
+// timeline.rootContainer.setDirty()
 
 let svgHelper = new Timeline.helpers.SvgTimelineHelper(timeline, { scale:1/12 })
 svgHelper.activeSpaceKey()
