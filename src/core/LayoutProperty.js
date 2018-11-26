@@ -38,6 +38,7 @@ class LayoutProperty {
 
         // meta
         this.number = false
+        this.function = false
         this.auto = false
         this.none = false
 
@@ -56,6 +57,11 @@ class LayoutProperty {
 
             this.none = true
 
+        } else if (typeof value === 'function') {
+
+            this.function = true
+            this.computeCallback = value
+
         } else if (typeof value === 'number' || re.pureNumber.test(value)) {
 
             this.number = true
@@ -67,7 +73,12 @@ class LayoutProperty {
 
         } else if (re.percent.test(value)) {
 
-            this.relativeCallback = percentFunction(value)
+            try {
+                this.relativeCallback = percentFunction(value)
+
+            } catch(e){
+                console.log(value)
+            }
 
         } else if (re.auto.test(value)) {
 
@@ -86,6 +97,7 @@ class LayoutProperty {
         }
 
         // keep reference (computation savings) when property is NOT a number prop
+        // NOTE: when property is NOT a function too?
         if (this.number === false) {
 
             map.set(value, this)
