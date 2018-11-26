@@ -76,7 +76,7 @@ const update = () => {
                 timeline.headContainer.update()
 
             // NOTE: 'updateHead' should ALWAYS be called when timeline.dirty === true
-            // (division or head layout changes require both to compute again localHeads values)
+            // (division or head layout changes require both to compute again head's [localValues])
             timeline.headContainer.forSomeDescendants(head => head instanceof Head, head => head.updateHead())
 
             timeline.dirty = false

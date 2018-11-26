@@ -148,8 +148,6 @@ class Division extends Node {
         this.range = new Range()
         this.bounds = new Range()
 
-        this.localHeads = new WeakMap()
-
         // this.props = consumeProps(this, props)
         this.props = {
             position: 0,

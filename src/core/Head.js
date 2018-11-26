@@ -9,6 +9,7 @@ let voidLocalHead = {
     ratioMax: NaN,
 
     state: NaN,
+    proximity: -Infinity,
 
     overlap: 0,
     overflow: 0,
@@ -21,6 +22,7 @@ class Head extends Division {
 
         super({ layout:'absolute', ...props })
 
+        this.localValues = new WeakMap()
 
     }
 
@@ -79,6 +81,12 @@ class Head extends Division {
 
     }
 
+    getLocalValues(division) {
+
+        return this.localValues.get(division) || voidLocalHead
+
+    }
+
     updateHead() {
 
         let { name } = this.props
@@ -91,7 +99,7 @@ class Head extends Division {
 
         this.root.rootContainer.forDescendants((division) => {
 
-            let old = division.localHeads.get(this) || voidLocalHead
+            let old = this.getLocalValues(division)
 
             let ratio = division.range.ratio(position)
             let ratioMin = division.range.ratio(positionMin)
@@ -133,7 +141,7 @@ class Head extends Division {
 
             }
 
-            division.localHeads.set(this, values)
+            this.localValues.set(division, values)
 
             division.triggers = {
                 stateChange,
@@ -164,13 +172,13 @@ class Head extends Division {
         // sort the division in order to let the "most significant" division fire events last
         divisionThatWillFireEvents.sort((A, B) => (
 
-            A.localHeads.get(this).proximity - B.localHeads.get(this).proximity
+            this.localValues.get(A).proximity - this.localValues.get(B).proximity
 
         ))
 
         for (let division of divisionThatWillFireEvents) {
 
-            let eventOptions = { values:division.localHeads.get(this) }
+            let eventOptions = { values:this.localValues.get(division) }
 
             let {
 
@@ -182,7 +190,7 @@ class Head extends Division {
                 overflowExit,
                 overflow,
                 progress,
-                
+
             } = division.triggers
 
             if (stateChange)
