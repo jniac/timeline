@@ -208,6 +208,9 @@ class SvgTimelineHelper {
 
         })
 
+        // force update
+        timeline.update()
+
         let stage = createStage(this, timeline)
 
         for (let division of timeline.headContainer.children) {
@@ -215,6 +218,9 @@ class SvgTimelineHelper {
             drawDivision(this, division, stage.totalHeight, { drawArrow:false })
 
         }
+
+        // NOTE: this is for drawing overlap stroke-width
+        timeline.forceUpdateHeads()
 
     }
 
