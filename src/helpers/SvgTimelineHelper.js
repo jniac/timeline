@@ -9,7 +9,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
     const min = (...args) => Math.min(...args)
     const max = (...args) => Math.max(...args)
 
-    let { scale } = helper
+    let { timeline, scale } = helper
 
     let position = division.range.position * scale
     let width = division.range.width * scale
@@ -30,11 +30,16 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
 
         let circle = makeSvg('circle', { parent:g, cx:-division.translate * scale, cy:y, r:1, fill:color })
 
-        division.on('main-stateChange', ({ values:{ state } }) => {
+        let onStateChange = () => {
+
+            let { state } = timeline.head.getLocalValues(division)
             let r = state === 0 ? 1.5 : 1
             let fill = state === 0 ? '#ddd' : color
             makeSvg(circle, { r, fill })
-        })
+
+        }
+
+        division.on('main-stateChange', onStateChange)
 
     }
 
