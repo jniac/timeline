@@ -45,13 +45,22 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
 
     if (drawArrow) {
 
+        let endPoints = width => makePoints(max(0,width-a)-th*1.2,y-th*1.2,max(0,width-a),y,max(0,width-a)-th*1.2,y+th*1.2)
+
         let a = 2 // arrow margin
         let arrowStart = makeSvg('polyline', { parent:g, fill:'none', stroke:color, points:makePoints(min(width,a)+th*1.2,y-th*1.2,min(width,a),y,min(width,a)+th*1.2,y+th*1.2) })
-        let arrowEnd = makeSvg('polyline', { parent:g, fill:'none', stroke:color, points:makePoints(max(0,width-a)-th*1.2,y-th*1.2,max(0,width-a),y,max(0,width-a)-th*1.2,y+th*1.2) })
+        let arrowEnd = makeSvg('polyline', { parent:g, fill:'none', stroke:color, points:endPoints(width) })
 
         division.on('main-stateChange', ({ values:{ state } }) => {
             makeSvg(arrowStart, { visibility:state === -1 ? null : 'hidden' })
             makeSvg(arrowEnd, { visibility:state === 1 ? null : 'hidden' })
+        })
+
+        division.on('update', () => {
+
+            let width = division.range.width * scale
+            makeSvg(arrowEnd, { points:endPoints(width) })
+
         })
 
     }
@@ -62,6 +71,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
         let width = division.range.width * scale
 
         makeSvg(g, { transform:`translate(${position}, 0)` })
+        makeSvg(lineMain, { x2:width })
         makeSvg(lineEnd, { x1:width, x2:width })
 
     }
