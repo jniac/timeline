@@ -41,6 +41,10 @@ timeline.createDivision({
     name: 'scroll2',
     width: `auto - ${document.querySelector('#part3 .wrapper').offsetWidth}`,
 
+}).on('update', ({ target }) => {
+
+    console.log('update', target.width)
+
 }).on(/main-progress/, ({ target:division, values }) => {
 
     let x = division.range.width * Mth.clamp(values.ratio)
@@ -74,22 +78,31 @@ timeline.createDivision({ name:'bound-max', parent:'scroll3', layout:'absolute',
 
 
 
+window.addEventListener('resize', (event) => {
+
+    let width = `auto - ${document.querySelector('#part3 .wrapper').offsetWidth}`
+    // setProps will auto re-render the timeline
+    timeline.fetchDivision('scroll2').setProps({ width })
+
+})
+
+// populating divisions:
 
 withElement('#part1,#part2', (element) => {
 
-    timeline.createDivision({ width:element.offsetHeight, parent:'scroll1' })
+    timeline.createDivision({ name:element.id, width:element.offsetHeight, parent:'scroll1' })
 
 })
 
 withElement('#part3 .content', (element) => {
 
-    timeline.createDivision({ width:element.offsetWidth, parent:'scroll2' })
+    timeline.createDivision({ name:element.id, width:element.offsetWidth, parent:'scroll2' })
 
 })
 
 withElement('#part4,#part5', (element) => {
 
-    timeline.createDivision({ width:element.offsetHeight, parent:'scroll3' })
+    timeline.createDivision({ name:element.id, width:element.offsetHeight, parent:'scroll3' })
 
 })
 
