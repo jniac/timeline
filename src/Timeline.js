@@ -61,8 +61,6 @@ class Timeline extends Division {
 
 const update = () => {
 
-    requestAnimationFrame(update)
-
     for (let timeline of instances) {
 
         timeline.onBeforeUpdate.execute()
@@ -86,6 +84,8 @@ const update = () => {
         timeline.onUpdate.execute()
 
     }
+    
+    requestAnimationFrame(update)
 
 }
 
