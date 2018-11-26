@@ -39,8 +39,8 @@ class Head extends Division {
 
             if (physicsActive) {
 
-                mobile.min = timeline.rootContainer.range.min
-                mobile.max = timeline.rootContainer.range.max
+                mobile.min = this.root.rootContainer.range.min
+                mobile.max = this.root.rootContainer.range.max
 
                 mobile.update()
 
