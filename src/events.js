@@ -345,6 +345,20 @@ const makeDispatcher = (target) => {
 
 }
 
+const debugGetCount = () => {
+
+    let count = 0
+
+    for (let { array } of map.values()) {
+
+        count += array.length
+
+    }
+
+    return count
+
+}
+
 export {
 
     on,
@@ -353,6 +367,10 @@ export {
     fire,
     makeDispatcher,
     Event,
+
+    // TEMP: for debugging
+    map,
+    debugGetCount,
 
 }
 
@@ -364,5 +382,9 @@ export default {
     fire,
     makeDispatcher,
     Event,
+
+    // TEMP: for debugging
+    map,
+    debugGetCount,
 
 }
