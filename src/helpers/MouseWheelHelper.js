@@ -9,7 +9,7 @@ class MouseWheelHelper {
 
         let delta = 0
 
-        target.addEventListener('wheel', (event) => {
+        const onWheel = (event) => {
 
             let { direction } = this
 
@@ -25,7 +25,11 @@ class MouseWheelHelper {
 
             })
 
-        })
+        }
+
+        target.addEventListener('wheel', onWheel)
+
+        timeline.on('destroy', () => target.removeEventListener('wheel', onWheel))
 
     }
 

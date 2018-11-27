@@ -122,6 +122,7 @@ class Division extends Node {
 
         this.dirty = true
         this.dirtyChildren = true
+        this.destroyed = false
 
         // this.props = consumeProps(this, props)
         this.props = {
@@ -190,6 +191,33 @@ class Division extends Node {
         super.remove(...children)
 
         this.setDirty()
+
+    }
+
+    // TODO: test destroy
+    destroy() {
+
+        let { parent } = this
+
+        let array = []
+
+        this.forDescendants(division => array.push(division), { bottomUp:true })
+
+        for (let division of array) {
+
+            division.destroy()
+
+        }
+
+        this.destroyed = true
+
+        if (parent)
+            parent.remove(this)
+
+        this.fire('destroy', { parent })
+
+        // remove all listeners
+        this.off(true)
 
     }
 

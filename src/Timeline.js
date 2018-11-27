@@ -11,6 +11,15 @@ import requestAnimationFrame from './utils/requestAnimationFrame.js'
 
 let instances = []
 
+const removeFromInstances = (timeline) => {
+
+    let index = instances.indexOf(timeline)
+
+    if (index !== -1)
+        instances.splice(index, 1)
+
+}
+
 class Timeline extends Division {
 
     constructor(rootWidth = 800) {
@@ -52,6 +61,7 @@ class Timeline extends Division {
 
     }
 
+    // override
     toGraphString({ bottomUp = false } = {}) {
 
         let callback = node => `${node.props.name ? node.props.name + ' ' : ''}${node.range.position}:${node.range.width}`
@@ -63,25 +73,25 @@ class Timeline extends Division {
     // override
     destroy() {
 
-        this.destroyed = true
+        super.destroy()
+
+        onBeforeUpdate.add(() => removeFromInstances(this))
 
     }
 
 }
 
-const destroy = (timeline) => {
-
-    timeline.forSomeDescendants((division) => {
-
-        division.destroy()
-
-    })
-
-}
+let onBeforeUpdate = new Stack()
+let onUpdate = new Stack()
 
 const update = () => {
 
+    onBeforeUpdate.execute()
+
     for (let timeline of instances) {
+
+        if (timeline.destroyed)
+            continue
 
         timeline.onBeforeUpdate.execute()
 
@@ -104,6 +114,8 @@ const update = () => {
         timeline.onUpdate.execute()
 
     }
+
+    onUpdate.execute()
 
     requestAnimationFrame(update)
 

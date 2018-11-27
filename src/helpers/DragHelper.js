@@ -28,19 +28,19 @@ class DragHelper {
 
     init() {
 
-        let { pointer, target, timeline, overShoot, limit } = this
+        let { pointer, target = document.body, timeline, overShoot, limit } = this
 
         let headPosition = 0
 
-        events.on(target, 'pointer-drag-start', () => {
+        const onPointerDragStart = () => {
 
             headPosition = timeline.head.position
 
             timeline.head.stopPhysics()
 
-        })
+        }
 
-        events.on(target, 'pointer-drag-move', () => {
+        const onPointerDragMove = () => {
 
             let delta = this.getDelta(pointer.dx, pointer.dy)
 
@@ -51,13 +51,25 @@ class DragHelper {
 
             timeline.head.setProps({ position:limitedPosition })
 
-        })
+        }
 
-        events.on(target, 'pointer-drag-end', () => {
+        const onPointerDragEnd = () => {
 
             let velocity = -this.getDelta(pointer.vx, pointer.vy) * overShoot
 
             timeline.head.startPhysics({ velocity })
+
+        }
+
+        events.on(target, 'pointer-drag-start', onPointerDragStart)
+        events.on(target, 'pointer-drag-move', onPointerDragMove)
+        events.on(target, 'pointer-drag-end', onPointerDragEnd)
+
+        timeline.on('destroy', () => {
+
+            events.off(target, 'pointer-drag-start', onPointerDragStart)
+            events.off(target, 'pointer-drag-move', onPointerDragMove)
+            events.off(target, 'pointer-drag-end', onPointerDragEnd)
 
         })
 
