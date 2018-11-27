@@ -40,7 +40,7 @@ let init = (pointer) => {
 
 class MouseDragHelper extends DragHelper {
 
-    constructor(timeline, { target = document.body, direction = 'biggestXorY', overShoot = 1.5, limit = 200 } = {}) {
+    constructor(timeline, { target, direction = 'biggestXorY', overShoot = 1.5, limit = 200 } = {}) {
 
         super({ timeline, target, direction, overShoot, limit })
 
