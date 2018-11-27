@@ -240,11 +240,20 @@ class SvgTimelineHelper {
 
     }
 
+    toggleSvgDisplay(display = undefined) {
+
+        if (display === undefined)
+            display = this.svg.style.display ? null : 'none'
+
+        this.setStyle({ display })
+
+    }
+
     activeSpaceKey() {
 
         windowAddEventListener('keydown', (event) => {
             if (event.code === 'Space') {
-                this.setStyle({ display:this.svg.style.display ? null : 'none' })
+                this.toggleSvgDisplay()
                 event.preventDefault()
             }
         })
