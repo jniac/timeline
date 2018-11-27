@@ -105,6 +105,8 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true, drawGho
     division.on(/main-overlapEnter/, () => makeSvg(lineMain, { 'stroke-width':3 }))
     division.on(/main-overlapExit/, () => makeSvg(lineMain, { 'stroke-width':1 }))
 
+    division.on('destroy', () => g.remove())
+
 }
 
 const drawLink = (helper, division, offsetY, parentOffsetY) => {
@@ -133,6 +135,8 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
     division.on('update', update)
 
     update()
+
+    division.on('destroy', () => path.remove())
 
 }
 
@@ -221,14 +225,10 @@ class SvgTimelineHelper {
         let stage2 = createStage(this, timeline.headContainer.children,
             { offsetHeight:stage.totalHeight, drawArrow:false, drawGhost:true, stageMargin:headStageMargin, divisionShift })
 
-        // for (let division of timeline.headContainer.children) {
-        //
-        //     drawDivision(this, division, stage.totalHeight, { drawArrow:false })
-        //
-        // }
-
         // NOTE: this is for drawing overlap stroke-width
         timeline.forceUpdateHeads()
+
+        this.timeline.on('destroy', () => svg.remove())
 
     }
 
@@ -251,12 +251,18 @@ class SvgTimelineHelper {
 
     activeSpaceKey() {
 
-        windowAddEventListener('keydown', (event) => {
+        const onKeydown = (event) => {
             if (event.code === 'Space') {
                 this.toggleSvgDisplay()
                 event.preventDefault()
             }
-        })
+        }
+
+        windowAddEventListener('keydown', onKeydown)
+
+        this.timeline.on('destroy', () => windowAddEventListener('keydown', onKeydown))
+
+        this.activeSpaceKey = () => {}
 
         return this
 
