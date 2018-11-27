@@ -139,6 +139,9 @@ utils.readonly(Timeline, {
     events,
     utils,
 
+    // DEBUG: should be removed
+    instances,
+
 })
 
 export {
@@ -152,5 +155,8 @@ export {
     helpers,
     events,
     utils,
+    
+    // DEBUG: should be removed
+    instances,
 
 }
