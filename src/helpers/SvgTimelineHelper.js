@@ -87,7 +87,7 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
         let position = division.range.position * scale
         let width = division.range.width * scale
 
-        makeSvg(g, { transform:`translate(${position}, 0)` })
+        makeSvg(g, { transform:`translate(${position.toFixed(1)}, 0)` })
         makeSvg(lineMain, { x2:width })
         makeSvg(lineEnd, { x1:width, x2:width })
 
@@ -129,23 +129,20 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
 
 }
 
-const createStage = (helper, timeline) => {
+const createStage = (helper, divisions, { stageMargin, divisionShift, offsetHeight = 0, drawArrow = true } = {}) => {
 
     let stages = []
     let totalHeight = 0
-    let { stageMargin, divisionShift } = helper
-
-    let heap = [timeline.rootContainer]
 
     let info = new Map()
 
-    while (heap.length) {
+    while (divisions.length) {
 
-        let array = [...heap]
-        heap.length = 0
+        let array = [...divisions]
+        divisions.length = 0
         let stage = []
 
-        let rect = makeSvg('rect', { parent:helper.container, x:-10, y:totalHeight, width:1000, opacity:.95, fill:'#ddd' })
+        let rect = makeSvg('rect', { parent:helper.container, x:-10, y:offsetHeight + totalHeight, width:1000, opacity:.95, fill:'#ddd' })
 
         for (let division of array) {
 
@@ -159,9 +156,9 @@ const createStage = (helper, timeline) => {
 
             stage[stageIndex] ? stage[stageIndex].push(division) : stage[stageIndex] = [division]
 
-            let offsetY = totalHeight + (stageIndex + .5) * divisionShift + stageMargin * .5
+            let offsetY = offsetHeight + totalHeight + (stageIndex + .5) * divisionShift + stageMargin * .5
 
-            drawDivision(helper, division, offsetY)
+            drawDivision(helper, division, offsetY, { drawArrow })
 
             info.set(division, { offsetY })
 
@@ -171,7 +168,7 @@ const createStage = (helper, timeline) => {
 
             }
 
-            heap.push(...division.children)
+            divisions.push(...division.children)
 
         }
 
@@ -191,7 +188,7 @@ const createStage = (helper, timeline) => {
 
 class SvgTimelineHelper {
 
-    constructor(timeline, { scale = 1/16, stageMargin = 28, divisionShift = 6 } = {}) {
+    constructor(timeline, { scale = 1/16, stageMargin = 28, divisionShift = 6, headStageMargin = 10 } = {}) {
 
         let svg = makeSvg('svg')
         svg.classList.add('svg-timeline-helper')
@@ -208,16 +205,19 @@ class SvgTimelineHelper {
 
         })
 
+        this.setStyle({ height:'200px' })
+
         // force update
         timeline.update()
 
-        let stage = createStage(this, timeline)
+        let stage = createStage(this, [timeline.rootContainer], { stageMargin, divisionShift })
+        let stage2 = createStage(this, timeline.headContainer.children, { offsetHeight:stage.totalHeight, drawArrow:false, stageMargin:headStageMargin, divisionShift })
 
-        for (let division of timeline.headContainer.children) {
-
-            drawDivision(this, division, stage.totalHeight, { drawArrow:false })
-
-        }
+        // for (let division of timeline.headContainer.children) {
+        //
+        //     drawDivision(this, division, stage.totalHeight, { drawArrow:false })
+        //
+        // }
 
         // NOTE: this is for drawing overlap stroke-width
         timeline.forceUpdateHeads()
