@@ -1,11 +1,12 @@
 
 import DragHelper from './DragHelper.js'
+import windowAddEventListener from '../utils/windowAddEventListener.js'
 
 let init = (pointer) => {
 
     let currentTouchIdentifier
 
-    window.addEventListener('touchstart', (event) => {
+    windowAddEventListener('touchstart', (event) => {
 
         let [eventTouch] = event.changedTouches
 
@@ -26,7 +27,7 @@ let init = (pointer) => {
 
     })
 
-    window.addEventListener('touchmove', (event) => {
+    windowAddEventListener('touchmove', (event) => {
 
         let [eventTouch] = event.changedTouches
 
@@ -40,7 +41,7 @@ let init = (pointer) => {
 
     })
 
-    window.addEventListener('touchend', (event) => {
+    windowAddEventListener('touchend', (event) => {
 
         let [eventTouch] = event.changedTouches
 

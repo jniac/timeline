@@ -1,4 +1,5 @@
 
+import windowAddEventListener from '../utils/windowAddEventListener.js'
 import { groupEvery, makeSvg } from '../utils/utils.js'
 
 let defaultColors = ['#33f', '#f33', '#f3f']
@@ -241,7 +242,7 @@ class SvgTimelineHelper {
 
     activeSpaceKey() {
 
-        window.addEventListener('keydown', (event) => {
+        windowAddEventListener('keydown', (event) => {
             if (event.code === 'Space') {
                 this.setStyle({ display:this.svg.style.display ? null : 'none' })
                 event.preventDefault()

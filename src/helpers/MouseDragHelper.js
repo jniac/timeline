@@ -1,9 +1,10 @@
 
 import DragHelper from './DragHelper.js'
+import windowAddEventListener from '../utils/windowAddEventListener.js'
 
 let init = (pointer) => {
 
-    window.addEventListener('mousedown', (event) => {
+    windowAddEventListener('mousedown', (event) => {
 
         let { target, clientX:x, clientY:y } = event
 
@@ -11,7 +12,7 @@ let init = (pointer) => {
 
     })
 
-    window.addEventListener('mousemove', (event) => {
+    windowAddEventListener('mousemove', (event) => {
 
         let { clientX:x, clientY:y } = event
 
@@ -27,7 +28,7 @@ let init = (pointer) => {
 
     })
 
-    window.addEventListener('mouseup', (event) => {
+    windowAddEventListener('mouseup', (event) => {
 
         pointer.dragEnd()
 
