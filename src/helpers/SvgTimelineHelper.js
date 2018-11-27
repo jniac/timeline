@@ -22,7 +22,7 @@ const getColor = (division) => {
 
 }
 
-const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) => {
+const drawDivision = (helper, division, offsetY = 0, { drawArrow = true, drawGhost = false } = {}) => {
 
     const makePoints = (...array) => groupEvery(array, 2).map(point => point.map(shortNumber).join(',')).join(' ')
 
@@ -82,6 +82,12 @@ const drawDivision = (helper, division, offsetY = 0, { drawArrow = true } = {}) 
 
     }
 
+    if (drawGhost) {
+
+        let ghostLine = makeSvg('line', { parent:g, y2:offsetY, stroke:color, opacity:.1 })
+
+    }
+
     const update = () => {
 
         let position = division.range.position * scale
@@ -129,7 +135,7 @@ const drawLink = (helper, division, offsetY, parentOffsetY) => {
 
 }
 
-const createStage = (helper, divisions, { stageMargin, divisionShift, offsetHeight = 0, drawArrow = true } = {}) => {
+const createStage = (helper, divisions, { stageMargin, divisionShift, offsetHeight = 0, drawArrow = true, drawGhost = false } = {}) => {
 
     let stages = []
     let totalHeight = 0
@@ -158,7 +164,7 @@ const createStage = (helper, divisions, { stageMargin, divisionShift, offsetHeig
 
             let offsetY = offsetHeight + totalHeight + (stageIndex + .5) * divisionShift + stageMargin * .5
 
-            drawDivision(helper, division, offsetY, { drawArrow })
+            drawDivision(helper, division, offsetY, { drawArrow, drawGhost })
 
             info.set(division, { offsetY })
 
@@ -211,7 +217,8 @@ class SvgTimelineHelper {
         timeline.update()
 
         let stage = createStage(this, [timeline.rootContainer], { stageMargin, divisionShift })
-        let stage2 = createStage(this, timeline.headContainer.children, { offsetHeight:stage.totalHeight, drawArrow:false, stageMargin:headStageMargin, divisionShift })
+        let stage2 = createStage(this, timeline.headContainer.children,
+            { offsetHeight:stage.totalHeight, drawArrow:false, drawGhost:true, stageMargin:headStageMargin, divisionShift })
 
         // for (let division of timeline.headContainer.children) {
         //
