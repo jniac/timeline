@@ -1,7 +1,7 @@
 
 import events from '../events.js'
 
-const now = () => performance.now()
+const now = window && window.performance ? () => window.performance.now() : () => Date.now()
 
 class Pointer {
 
