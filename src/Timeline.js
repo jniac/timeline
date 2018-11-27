@@ -4,6 +4,8 @@ import Head from './core/Head.js'
 import Range from './math/Range.js'
 import Mth from './math/Mth.js'
 import Stack from './utils/Stack.js'
+import Average from './utils/Average.js'
+import now from './utils/now.js'
 import events from './events.js'
 import * as helpers from './helpers/index.js'
 import * as utils from './utils/utils.js'
@@ -83,10 +85,13 @@ class Timeline extends Division {
 
 let onBeforeUpdate = new Stack()
 let onUpdate = new Stack()
+let updateAverage = new Average({ length:30 })
 
 const update = () => {
 
     onBeforeUpdate.execute()
+
+    let t = now()
 
     for (let timeline of instances) {
 
@@ -114,6 +119,8 @@ const update = () => {
         timeline.onUpdate.execute()
 
     }
+    
+    updateAverage.setNewValue(now() - t)
 
     onUpdate.execute()
 
@@ -139,6 +146,10 @@ utils.readonly(Timeline, {
     events,
     utils,
 
+    onUpdate,
+    now,
+    updateAverage,
+
     // DEBUG: should be removed
     instances,
 
@@ -155,7 +166,11 @@ export {
     helpers,
     events,
     utils,
-    
+
+    onUpdate,
+    now,
+    updateAverage,
+
     // DEBUG: should be removed
     instances,
 
