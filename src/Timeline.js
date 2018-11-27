@@ -52,11 +52,30 @@ class Timeline extends Division {
 
     }
 
-    toGraphString() {
+    toGraphString({ bottomUp = false } = {}) {
 
-        return 'timeline:\n' + super.toGraphString(node => `${node.props.name ? node.props.name + ' ' : ''}${node.range.position}:${node.range.width}`)
+        let callback = node => `${node.props.name ? node.props.name + ' ' : ''}${node.range.position}:${node.range.width}`
+
+        return 'timeline:\n' + super.toGraphString({ bottomUp, callback })
 
     }
+
+    // override
+    destroy() {
+
+        this.destroyed = true
+
+    }
+
+}
+
+const destroy = (timeline) => {
+
+    timeline.forSomeDescendants((division) => {
+
+        division.destroy()
+
+    })
 
 }
 

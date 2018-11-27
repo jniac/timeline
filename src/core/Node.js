@@ -314,17 +314,35 @@ class Node {
 
 	}
 
-	forDescendants(callback) {
+	forDescendants(callback, { bottomUp = false } = {}) {
 
-		let child = this.firstChild
+		if (bottomUp === false) {
 
-		while(child) {
+			let child = this.firstChild
 
-			callback(child)
+			while(child) {
 
-			child.forDescendants(callback)
+				callback(child)
 
-			child = child.next
+				child.forDescendants(callback, { bottomUp })
+
+				child = child.next
+
+			}
+
+		} else {
+
+			let child = this.lastChild
+
+			while(child) {
+
+				child.forDescendants(callback, { bottomUp })
+
+				callback(child)
+
+				child = child.previous
+
+			}
 
 		}
 
@@ -376,20 +394,34 @@ class Node {
 
 	// toGraphString:
 
-	toGraphStringLine() {
+	toGraphStringLine({ bottomUp = false } = {}) {
 
 		let intro = []
 
 		for (let parent of this.ancestors)
 			intro.unshift(parent.next ? '│ ' : '  ')
 
-		return intro.join('') + (!this.parent ? (this.next ? '┌' : '─') : (this.next ? '├' : '└')) + '─' + (this.firstChild ? '┬' : '─') + '─ Node#' + this.nodeId
+		return (
+			bottomUp === false
+			? intro.join('') + (!this.parent ? (this.next ? '┌' : '─') : (this.next ? '├' : '└')) + '─' + (this.firstChild ? '┬' : '─') + '─ Node#' + this.nodeId
+			: intro.join('') + (!this.parent ? (this.next ? '└' : '─') : (this.next ? '├' : '┌')) + '─' + (this.firstChild ? '┴' : '─') + '─ Node#' + this.nodeId
+		)
 
 	}
 
-	toGraphString(callback) {
+	toGraphString({ callback = null, bottomUp = false }) {
 
-		return [this, ...this.descendants].map(node => node.toGraphStringLine() + (callback ? ` ${callback(node)}` : '')).join('\n')
+		let array = []
+
+		if (bottomUp === false)
+			array.push(this)
+
+		this.forDescendants(division => array.push(division), { bottomUp })
+
+		if (bottomUp === true)
+			array.push(this)
+
+		return array.map(node => node.toGraphStringLine({ bottomUp }) + (callback ? ` ${callback(node)}` : '')).join('\n')
 
 	}
 
