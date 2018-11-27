@@ -100,7 +100,7 @@ const update = () => {
 
         timeline.onBeforeUpdate.execute()
 
-        if (timeline.isDirty()) {
+        if (timeline.dirty || timeline.dirtyChildren) {
 
             if (timeline.rootContainer.dirty || timeline.rootContainer.someDescendant(node => node.dirty))
                 timeline.rootContainer.update()
@@ -112,14 +112,14 @@ const update = () => {
             // (division or head layout changes require both to compute again head's [localValues])
             timeline.headContainer.forSomeDescendants(head => head instanceof Head, head => head.updateHead())
 
-            timeline.dirty = false
+            timeline.dirty = timeline.dirtyChildren = false
 
         }
 
         timeline.onUpdate.execute()
 
     }
-    
+
     updateAverage.setNewValue(now() - t)
 
     onUpdate.execute()

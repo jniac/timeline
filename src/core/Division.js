@@ -121,7 +121,7 @@ class Division extends Node {
         this.bounds = new Range()
 
         this.dirty = true
-        this.dirtyChildren = true
+        this.dirtyChildren = false
         this.destroyed = false
 
         // this.props = consumeProps(this, props)
