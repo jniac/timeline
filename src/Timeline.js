@@ -7,6 +7,7 @@ import Stack from './utils/Stack.js'
 import events from './events.js'
 import * as helpers from './helpers/index.js'
 import * as utils from './utils/utils.js'
+import requestAnimationFrame from './utils/requestAnimationFrame.js'
 
 let instances = []
 
@@ -84,7 +85,7 @@ const update = () => {
         timeline.onUpdate.execute()
 
     }
-    
+
     requestAnimationFrame(update)
 
 }
