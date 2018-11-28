@@ -54,7 +54,7 @@ class Head extends Division {
 
     }
 
-    startPhysics({ velocity = 0 }) {
+    startPhysics({ velocity = 0 } = {}) {
 
         this.physicsActive = true
         this.mobile.position = this.position
@@ -64,7 +64,8 @@ class Head extends Division {
 
     updatePhysics({ position, velocity, positionDelta }) {
 
-        this.physicsActive = true
+        if (!this.physicsActive)
+            this.startPhysics()
 
         if (position !== undefined)
             this.mobile.position = position
