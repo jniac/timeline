@@ -83,6 +83,24 @@ class Head extends Division {
 
     }
 
+    jumpTo(position) {
+
+        if (typeof position === 'string') {
+
+            let division = this.root.fetchDivision(position)
+
+            if (!division)
+                return console.warn(`Head.prototype.jumpTo: cannot find a position for ${position}`)
+
+            position = division.position
+
+        }
+
+        this.stopPhysics()
+        this.setProps({ position })
+
+    }
+
     getLocalValues(division) {
 
         return this.localValues.get(division) || voidLocalHead
